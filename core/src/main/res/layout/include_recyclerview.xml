@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+    <!--多状态布局-->
+    <com.caitiaobang.core.app.tools.MultipleStatusView
+        android:id="@+id/include_multiple_status_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:emptyView="@layout/custom_empty_view"
+        app:errorView="@layout/custom_error_view"
+        app:loadingView="@layout/custom_loading_view"
+        app:noNetworkView="@layout/custom_no_network_view"
+
+        >
+
+        <!--scrollview布局-->
+        <com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout
+            android:id="@+id/include_refreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!--列表布局-->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/include_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/headview"
+                android:background="#fff"
+                android:focusableInTouchMode="false"
+                android:overScrollMode="never"
+                android:scrollbars="none" />
+
+        </com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout>
+    </com.caitiaobang.core.app.tools.MultipleStatusView>
+</FrameLayout>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/error_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <ImageView
+        android:id="@+id/error_retry_view"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/ic_action_bar_back" />
+
+    <TextView
+        android:id="@+id/MultipleStatusView"
+        style="@style/MultipleStatusView.Content"
+        android:layout_below="@id/error_retry_view"
+        android:layout_marginTop="20dp"
+        android:text="3333" />
+
+    <Button
+        android:visibility="gone"
+        android:id="@+id/error_view_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/MultipleStatusView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/ic_action_bar_back"
+        android:text="重新加载" />
+</RelativeLayout>

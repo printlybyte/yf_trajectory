@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_alignParentBottom="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        app:bl_corners_radius="16dp"
+        app:bl_solid_color="@color/white"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="240dp">
+    <TextView
+        android:foreground="?android:attr/selectableItemBackground"
+
+        android:id="@+id/popup_slide_from_bottom_btn1"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="收藏"
+        android:textColor="@color/p_color_blue"
+        android:textSize="20sp" />
+<View
+   style="@style/line_style"/>
+    <TextView
+        android:foreground="?android:attr/selectableItemBackground"
+
+        android:id="@+id/popup_slide_from_bottom_btn2"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="屏蔽"
+        android:textColor="@color/p_color_blue"
+        android:textSize="20sp" />
+        <View
+            style="@style/line_style"/>
+    <TextView
+        android:foreground="?android:attr/selectableItemBackground"
+
+        android:id="@+id/popup_slide_from_bottom_btn3"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="举报"
+        android:textColor="@color/p_color_blue"
+        android:textSize="20sp" />
+        <View
+            style="@style/line_style"/>
+    <TextView
+        android:foreground="?android:attr/selectableItemBackground"
+
+        android:id="@+id/popup_slide_from_bottom_btn4"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="删除"
+        android:textColor="@color/p_color_blue"
+        android:textSize="20sp" />
+    </LinearLayout>
+    <TextView
+        android:foreground="?android:attr/selectableItemBackground"
+
+        app:bl_corners_radius="16dp"
+        app:bl_solid_color="@color/white"
+        android:id="@+id/popup_slide_from_bottom_cencel"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="取消"
+        android:textColor="@color/p_color_blue"
+        android:textSize="20sp" />
+</LinearLayout>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_action_bar_group"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@color/p_color_blue">
+
+    <LinearLayout
+        android:id="@+id/main_action_bar_back"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        android:background="@drawable/mainback_press_bg"
+        android:clickable="true"
+        android:focusable="false"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:clickable="false"
+            android:focusable="true"
+            android:src="@mipmap/ic_action_bar_back_write" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/main_action_bar_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_marginRight="20dp"
+        android:id="@+id/include_actionbar_back_btn"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:text=""
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:bl_corners_radius="14dp"
+        app:bl_solid_color="#3389FF" />
+
+
+<ImageView
+    android:foreground="?android:attr/selectableItemBackground"
+    android:layout_marginRight="20dp"
+    android:visibility="gone"
+    android:id="@+id/include_actionbar_back_more"
+    android:layout_alignParentRight="true"
+    android:layout_centerVertical="true"
+    android:src="@mipmap/ic_more"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+
+</RelativeLayout>
+
+    <!--添加按钮-->

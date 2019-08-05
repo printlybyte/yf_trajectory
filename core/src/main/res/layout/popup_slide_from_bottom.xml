@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="400dp"
+    >
+        <ListView
+            android:id="@+id/popup_slide_from_bottom_popup_list"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:divider="#f1f1f1"
+            android:dividerHeight="0.5dp"
+            android:scrollbars="none" />
+        <TextView
+            android:layout_below="@+id/popup_slide_from_bottom_popup_list"
+            android:id="@+id/popup_slide_from_bottom_cencel"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="取消"
+            android:textColor="@color/p_color_blue"
+            android:textSize="20sp" />
+</RelativeLayout>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/activity_main_display_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="Hello World!"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <Button
+        android:id="@+id/activity_main_install_apk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="安装apk" />
+
+    <Button
+        android:id="@+id/activity_main_uninstall_apk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="卸载apk" />
+
+    <Button
+        android:id="@+id/activity_main_wifi_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="启用wifi" />
+
+    <Button
+        android:id="@+id/activity_main_wifi_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="禁用wifi" />
+
+    <Button
+        android:id="@+id/activity_main_wifi_is_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="检测wifi功能" />
+
+    <Button
+        android:id="@+id/activity_main_open_uninstall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开启禁止卸载" />
+
+    <Button
+        android:id="@+id/activity_main_close_uninstall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="关闭禁止卸载" />
+
+
+</LinearLayout>
