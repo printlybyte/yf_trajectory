@@ -1,4 +1,4 @@
-package com.yinfeng.yf_trajectory.login;
+package com.yinfeng.yf_trajectory.moudle.login;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -17,7 +17,7 @@ import com.lzy.okgo.model.Response;
 import com.maning.mndialoglibrary.MToast;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.R;
-import com.yinfeng.yf_trajectory.bean.SendSmsBean;
+import com.yinfeng.yf_trajectory.moudle.bean.SendSmsBean;
 
 import java.util.Timer;
 import java.util.TimerTask;

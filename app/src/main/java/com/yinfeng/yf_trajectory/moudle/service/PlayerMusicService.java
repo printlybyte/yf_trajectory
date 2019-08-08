@@ -1,4 +1,4 @@
-package com.yinfeng.yf_trajectory.moudle;
+package com.yinfeng.yf_trajectory.moudle.service;
 
 /**
  * ============================================
@@ -45,6 +45,8 @@ public class PlayerMusicService extends Service {
             Log.d(TAG,TAG+"---->onCreate,启动服务");
         mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.silent);
         mMediaPlayer.setLooping(true);
+
+
     }
 
     @Override

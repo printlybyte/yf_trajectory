@@ -1,4 +1,4 @@
-package com.yinfeng.yf_trajectory.utils;
+package com.yinfeng.yf_trajectory.moudle.utils;
 
 /**
  * ============================================

@@ -42,7 +42,7 @@ public class BaseApplication extends Application {
      */
     private void setupDatabase() {
         //创建数据库shop.db" 创建SQLite数据库的SQLiteOpenHelper的具体实现
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "notes-db.db", null);
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "yf_location.db", null);
         //获取可写数据库
         SQLiteDatabase db = helper.getWritableDatabase();
         //获取数据库对象  GreenDao的顶级对象，作为数据库对象、用于创建表和删除表

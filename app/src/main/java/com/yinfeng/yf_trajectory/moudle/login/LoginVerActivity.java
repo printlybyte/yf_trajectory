@@ -1,4 +1,4 @@
-package com.yinfeng.yf_trajectory.login;
+package com.yinfeng.yf_trajectory.moudle.login;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,9 +18,9 @@ import com.orhanobut.hawk.Hawk;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
-import com.yinfeng.yf_trajectory.MapActivity;
+import com.yinfeng.yf_trajectory.moudle.activity.MapActivity;
 import com.yinfeng.yf_trajectory.R;
-import com.yinfeng.yf_trajectory.bean.ConmonBean;
+import com.yinfeng.yf_trajectory.moudle.bean.ConmonBean;
 import com.zhy.http.okhttp.OkHttpUtils;
 
 import java.util.LinkedHashMap;
@@ -64,6 +64,7 @@ public class LoginVerActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void initView() {
         super.initView();
+        BarUtils.setStatusBarLightMode(this,true);
         BarUtils.setStatusBarColor(LoginVerActivity.this, getResources().getColor(R.color.p_color_blue_tint));
         mActivityPasswordLoginPhone = (EditText) findViewById(R.id.activity_password_login_phone);
         mActivityPasswordLoginPassword = (EditText) findViewById(R.id.activity_password_login_password);

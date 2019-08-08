@@ -1,11 +1,17 @@
-package com.yinfeng.yf_trajectory;
+package com.yinfeng.yf_trajectory.moudle.activity;
 
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,30 +22,49 @@ import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.NetworkUtils;
-import com.blankj.utilcode.util.RegexUtils;
 import com.caitiaobang.core.app.app.BaseActivity;
 import com.caitiaobang.core.app.net.GenericsCallback;
 import com.caitiaobang.core.app.net.JsonGenericsSerializator;
 import com.caitiaobang.core.app.utils.ConmonUtils;
 import com.orhanobut.hawk.Hawk;
-import com.yinfeng.yf_trajectory.bean.UserInfoBean;
-import com.yinfeng.yf_trajectory.moudle.MeInfoActivity;
-import com.yinfeng.yf_trajectory.moudle.PlayerMusicService;
+import com.yinfeng.yf_trajectory.Api;
+import com.yinfeng.yf_trajectory.ConstantApi;
+import com.yinfeng.yf_trajectory.GsonUtils;
+import com.yinfeng.yf_trajectory.R;
+import com.yinfeng.yf_trajectory.mdm.MDMUtils;
+import com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver;
+import com.yinfeng.yf_trajectory.mdm.SampleEula;
+import com.yinfeng.yf_trajectory.moudle.service.LocationService;
+import com.yinfeng.yf_trajectory.moudle.service.PlayerMusicService;
+import com.yinfeng.yf_trajectory.moudle.bean.UserInfoBean;
+import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusBean;
+import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
+
+import org.greenrobot.eventbus.Subscribe;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 
+/**
+ * ============================================
+ * 描  述：两次定位 地图sdk一次  5.0api一次 分别处理定位上报 与地图舒心  锁屏将定位数据插greendao数据库
+ * 包  名：com.yinfeng.yf_trajectory
+ * 类  名：MapActivity
+ * 创建人：liuguodong
+ * 创建时间：2019/8/6 14:47
+ * ============================================
+ **/
 public class MapActivity extends BaseActivity implements View.OnClickListener {
 
     private CircleImageView mActivityMapHeadimg;
-    /**
-     * 员工姓名
-     */
     private TextView mActivityMapName;
+    private ImageView mActivityMapMatterApplication;
+    private ImageView mActivityMapSearch;
 
     @Override
     protected int getContentLayoutId() {
@@ -49,70 +74,74 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void initView() {
         super.initView();
+        new EventBusUtils().register(this);
         mActivityMapHeadimg = (CircleImageView) findViewById(R.id.activity_map_headimg);
         mActivityMapHeadimg.setOnClickListener(this);
         mActivityMapName = (TextView) findViewById(R.id.activity_map_name);
 
+        mActivityMapMatterApplication = (ImageView) findViewById(R.id.activity_map_matter_application);
+        mActivityMapMatterApplication.setOnClickListener(this);
+        mActivityMapSearch = (ImageView) findViewById(R.id.activity_map_search);
+        mActivityMapSearch.setOnClickListener(this);
     }
+
+    private MDMUtils mdmUtils = null;
+    private DevicePolicyManager mDevicePolicyManager = null;
+    private ComponentName mAdminName = null;
+    private SampleEula sampleEula = null;
+
+    /**
+     * 初始化相关组件
+     */
+    private void initHuaWeiHDM() {
+        mdmUtils = new MDMUtils();
+        mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mAdminName = new ComponentName(this, SampleDeviceReceiver.class);
+        sampleEula = new SampleEula(this, mDevicePolicyManager, mAdminName);
+        sampleEula.activeProcessApp();
+    }
+
+    /**
+     * 订阅接受者
+     */
+    @Subscribe
+    public void onEventMainThread(EventBusBean event) {
+        Toast.makeText(this, "" + event.getType(), Toast.LENGTH_SHORT).show();
+        if (event.getType() == 1) {//激活
+            //强制开启数据服务
+            mdmUtils.forceMobiledataOn();
+            //保持某应用始终运行
+            mdmUtils.addPersistentApp();
+            //设置应用为信任应用
+            //setSuperWhiteListForHwSystemManger();
+            //开启禁止卸载
+            mdmUtils.setDisallowedUninstallPackages(true);
+
+        } else if (event.getType() == 2) { //取消
+            if (mAdminName != null && mAdminName != null) {
+                sampleEula.activeProcessApp();
+            } else {
+                Toast.makeText(this, "mAdminName= null", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     @Override
     protected void initData() {
-
         requestDate(0, "");
-
+//        initHuaWeiHDM();
     }
 
     @Override
     protected void initBefore(Bundle savedInstanceState) {
         super.initBefore(savedInstanceState);
         initMap(savedInstanceState);
-        initLocation();
-    }
-
-
-    //定位  单独依赖于定位SDK=======================================================================
-    //声明AMapLocationClient类对象
-    public AMapLocationClient mLocationClient = null;
-    //声明AMapLocationClientOption对象
-    public AMapLocationClientOption mLocationOption = null;
-
-    private void initLocation() {
-        //声明AMapLocationClient类对象
-        //声明定位回调监听器
-        //初始化定位
-        mLocationClient = new AMapLocationClient(getApplicationContext());
-
-        mLocationOption = new AMapLocationClientOption();
-
-        //设置定位模式为AMapLocationMode.Hight_Accuracy，高精度模式。
-        mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-        //设置定位间隔,单位毫秒,默认为2000ms，最低1000ms。
-        mLocationOption.setInterval(3000);
-        //设置是否返回地址信息（默认返回地址信息）
-        mLocationOption.setNeedAddress(true);
-        //单位是毫秒，默认30000毫秒，建议超时时间不要低于8000毫秒。
-        mLocationOption.setHttpTimeOut(20000);
-
-        //给定位客户端对象设置定位参数
-        mLocationClient.setLocationOption(mLocationOption);
-        //启动定位
-        mLocationClient.setLocationListener(mAMapLocationListener);
-        mLocationClient.startLocation();
-        //设置场景模式
-        mLocationOption.setLocationPurpose(AMapLocationClientOption.AMapLocationPurpose.Sport);
-        if (null != mLocationClient) {
-            mLocationClient.setLocationOption(mLocationOption);
-            //设置场景模式后最好调用一次stop，再调用start以保证场景模式生效
-            mLocationClient.stopLocation();
-            mLocationClient.startLocation();
-        }
-
-
         startPlayMusicService();
-        //设置定位回调监听
-
+        startLocationService();
 
     }
+
 
     private void stopPlayMusicService() {
         Intent intent = new Intent(MapActivity.this, PlayerMusicService.class);
@@ -124,29 +153,11 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         startService(intent);
     }
 
-    private int mTempNums = 0;
-    AMapLocationListener mAMapLocationListener = new AMapLocationListener() {
-        @Override
-        public void onLocationChanged(AMapLocation amapLocation) {
-            if (amapLocation != null) {
-                if (amapLocation.getErrorCode() == 0) {
-                    //可在其中解析amapLocation获取相应内容。
-                    Log.i(ConstantApi.LOG_I, "定位SDK更新数据 " + "===" + amapLocation.getLatitude());
-                    mTempNums++;
-                    Toast.makeText(MapActivity.this, "" + mTempNums, Toast.LENGTH_SHORT).show();
-//
-//                    LatLng curLatlng = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
-//                    aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curLatlng, 16f));
+    private void startLocationService() {
+        Intent intent = new Intent(MapActivity.this, LocationService.class);
+        startService(intent);
+    }
 
-                } else {
-                    //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
-                    Log.i(ConstantApi.LOG_I, "location Error, ErrCode:"
-                            + amapLocation.getErrorCode() + ", errInfo:"
-                            + amapLocation.getErrorInfo());
-                }
-            }
-        }
-    };
 
     //地图=======================================================================
     private MapView mMapView = null;
@@ -173,6 +184,12 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
         myLocationStyle.interval(10000); //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
         myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）默认执行此种模式。
+
+        myLocationStyle.myLocationIcon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                .decodeResource(getResources(), R.mipmap.ic_map_deauful_icon)));
+        myLocationStyle.strokeColor(Color.argb(0, 0, 0, 0));// 自定义精度范围的圆形边框颜色
+        myLocationStyle.radiusFillColor(Color.argb(0, 0, 0, 0));//圆圈的颜色,设为透明的时候就可以去掉园区区域了
+
         //控制是否显示定位蓝点
         myLocationStyle.showMyLocation(true);
         //设置定位蓝点的Style
@@ -204,6 +221,8 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
+        new EventBusUtils().unregister(this);
+
     }
 
     @Override
@@ -236,6 +255,12 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
             case R.id.activity_map_headimg:
                 ActivityUtils.startActivity(MeInfoActivity.class);
                 break;
+            case R.id.activity_map_matter_application:
+                ActivityUtils.startActivity(MatterApplicationActivity.class);
+                break;
+            case R.id.activity_map_search:
+                ActivityUtils.startActivity(ViewTrackMapActivity.class);
+                break;
         }
     }
 
@@ -244,7 +269,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
      */
 
     private void requestDate(final int type, String msg) {
-        if (!NetworkUtils.isConnected( )) {
+        if (!NetworkUtils.isConnected()) {
             showToastC("网络无链接,请稍后在试");
             return;
         }
@@ -259,7 +284,6 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         OkHttpUtils
                 .post()
                 .addHeader("track-token", token)
-
                 .url(Api.API_user_info)
                 .build()
                 .execute(new GenericsCallback<UserInfoBean>(new JsonGenericsSerializator()) {
@@ -277,25 +301,21 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                             dismisProgress();
                         }
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
-
                             UserInfoBean.DataBean bean = response.getData();
                             Hawk.put(ConstantApi.HK_USER_BEAN, response.getData());
 
 
                             if (!TextUtils.isEmpty(bean.getIdCard())) {
-                                if (ConmonUtils.isSex(bean.getIdCard()) == 2) {
+                                if (ConmonUtils.isSex(bean.getIdCard()) == 1) {
                                     mActivityMapHeadimg.setImageResource(R.mipmap.ic_home_gire);
-                                } else if (ConmonUtils.isSex(bean.getIdCard()) == 1) {
+                                } else if (ConmonUtils.isSex(bean.getIdCard()) == 2) {
                                     mActivityMapHeadimg.setImageResource(R.mipmap.ic_home_man);
                                 }
                             }
                             mActivityMapName.setText(bean.getName() == "" ? "无数据" : "您好，" + bean.getName());
-
-
                         } else {
                             showToastC(response.getMessage());
                         }
-
                         Log.i(ConstantApi.LOG_I_NET, "请求结果：" + GsonUtils.getInstance().toJson(response));
                         dismisProgress();
                     }

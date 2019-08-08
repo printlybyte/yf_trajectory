@@ -1,4 +1,4 @@
-//package com.yinfeng.yf_trajectory.login;
+//package com.yinfeng.yf_trajectory.moudle.login;
 //
 //import android.os.CountDownTimer;
 //import android.text.TextUtils;
@@ -25,7 +25,7 @@
 //import com.caitiaobang.core.greendao.gen.DaoSession;
 //import com.google.gson.Gson;
 //import com.orhanobut.hawk.Hawk;
-//import com.yinfeng.yf_trajectory.MainActivity;
+//import com.yinfeng.yf_trajectory.moudle.activity.MainActivity;
 //import com.yinfeng.yf_trajectory.R;
 //import com.zhy.http.okhttp.OkHttpUtils;
 //

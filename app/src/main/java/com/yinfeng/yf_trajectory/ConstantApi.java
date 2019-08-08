@@ -18,9 +18,12 @@ public interface ConstantApi {
     int API_REQUEST_SUCCESS = 200;
 
 
-
     // FINAL HK CONSTANS
-    String HK_TOKEN="HK_TOKEN";
-    String HK_USER_BEAN="HK_USER_BEAN";
+    String HK_TOKEN = "HK_TOKEN";
+    String HK_USER_BEAN = "HK_USER_BEAN";
+    String INTENT_FLAG = "INTENT_FLAG";
+    String INTENT_KEY = "INTENT_KEY";
+    String INTENT_KEY_TWO = "INTENT_KEY_TWO";
+    String INTENT_KEY_THREE = "INTENT_KEY_THREE";
 
 }

@@ -1,29 +1,28 @@
-package com.yinfeng.yf_trajectory.bean;
+package com.yinfeng.yf_trajectory.moudle.bean;
 
 /**
  * ============================================
  * 描  述：
- * 包  名：com.yinfeng.yf_trajectory.bean
- * 类  名：ConmonBean
+ * 包  名：com.yinfeng.yf_trajectory.moudle.bean
+ * 类  名：MatterApplicationActivityBean
  * 创建人：liuguodong
- * 创建时间：2019/8/2 11:33
+ * 创建时间：2019/8/6 17:07
  * ============================================
  **/
-public class ConmonBean {
-
+public class MatterApplicationActivityBean {
 
     /**
      * code : 200
-     * message : 登录成功
-     * data : Bearer eyJhbGciOiJIUzUxMiJ9.eyJhY2NvdW50SWQiOiIwMDAxQTExMDAwMDAwMDAwTVUzRSIsInJvbGVzIjpbXSwiZXhwIjoxNTYxMzQ0NTQxfQ.E1WYlVC20pCq6iSk8p8t_q5zge2MqBU74TQB5GyMxiMbY3_AR1UcFqSEYDDDRxlPuSLOcH1XJ9r2Idc2Z5h-8Q
-     * now : 1560739741513
+     * message : 操作成功！
+     * data :
+     * now : 2019-06-17 11:34:42
      * success : true
      */
 
     private int code;
     private String message;
     private String data;
-    private long now;
+    private String now;
     private boolean success;
 
     public int getCode() {
@@ -50,11 +49,11 @@ public class ConmonBean {
         this.data = data;
     }
 
-    public long getNow() {
+    public String getNow() {
         return now;
     }
 
-    public void setNow(long now) {
+    public void setNow(String now) {
         this.now = now;
     }
 

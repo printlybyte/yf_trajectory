@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#f4f4f4"
     android:orientation="vertical"
-    tools:context=".moudle.MeInfoActivity">
+    tools:context=".moudle.activity.MeInfoActivity">
 
     <include layout="@layout/include_actionbar_back" />
 

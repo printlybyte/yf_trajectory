@@ -5,17 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MapActivity">
+    tools:context=".moudle.activity.MapActivity">
 
-    <include layout="@layout/include_actionbar_back"
-        android:visibility="gone"/>
+    <include
+        layout="@layout/include_actionbar_back"
+        android:visibility="gone" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/p_color_blue">
+        android:background="@color/p_color_blue"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
         <de.hdodenhof.circleimageview.CircleImageView
+
+            android:foreground="?android:attr/selectableItemBackground"
             android:id="@+id/activity_map_headimg"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -33,9 +38,30 @@
             android:layout_toRightOf="@+id/activity_map_headimg"
             android:gravity="center"
             android:padding="5dp"
-            android:text="员工姓名"
+            android:text=""
             android:textColor="@color/white"
             android:textStyle="bold" />
+
+
+        <ImageView
+            android:id="@+id/activity_map_matter_application"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:layout_toLeftOf="@+id/activity_map_search"
+            android:src="@mipmap/ic_matter_application" />
+
+        <ImageView
+            android:foreground="?android:attr/selectableItemBackground"
+            android:id="@+id/activity_map_search"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:src="@mipmap/ic_home_search_icon" />
 
         <EditText
             android:layout_width="match_parent"
@@ -46,12 +72,13 @@
             android:layout_toRightOf="@+id/activity_map_name"
             android:background="@null"
             android:drawableRight="@mipmap/ic_home_search_icon"
+            android:gravity="center_vertical"
             android:hint="按时间搜索记录"
             android:paddingLeft="10dp"
-            android:gravity="center_vertical"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="12sp"
+            android:visibility="gone"
             app:bl_corners_radius="12dp"
             app:bl_solid_color="@color/white" />
 
@@ -63,10 +90,10 @@
         android:layout_height="match_parent">
 
 
-    <com.amap.api.maps.MapView
-        android:id="@+id/map"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        <com.amap.api.maps.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <ImageView
 

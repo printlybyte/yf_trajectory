@@ -66,6 +66,20 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
 
+
+    <ImageView
+        android:foreground="?android:attr/selectableItemBackground"
+
+        android:visibility="gone"
+        android:id="@+id/activity_map_search"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="20dp"
+        android:src="@mipmap/ic_home_search_icon" />
+
+
 </RelativeLayout>
 
     <!--添加按钮-->

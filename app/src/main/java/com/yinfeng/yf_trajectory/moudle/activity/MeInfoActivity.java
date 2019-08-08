@@ -1,4 +1,4 @@
-package com.yinfeng.yf_trajectory.moudle;
+package com.yinfeng.yf_trajectory.moudle.activity;
 
 import android.util.Log;
 import android.view.View;
@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import com.orhanobut.hawk.Hawk;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.R;
-import com.yinfeng.yf_trajectory.bean.UserInfoBean;
+import com.yinfeng.yf_trajectory.moudle.bean.UserInfoBean;
 
 public class MeInfoActivity extends BaseActivity implements View.OnClickListener {
 

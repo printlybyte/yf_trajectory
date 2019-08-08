@@ -1,9 +1,9 @@
-package com.yinfeng.yf_trajectory.bean;
+package com.yinfeng.yf_trajectory.moudle.bean;
 
 /**
  * ============================================
  * 描  述：
- * 包  名：com.yinfeng.yf_trajectory.bean
+ * 包  名：com.yinfeng.yf_trajectory.moudle.bean
  * 类  名：SendSmsBean
  * 创建人：liuguodong
  * 创建时间：2019/8/2 11:52

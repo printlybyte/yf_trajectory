@@ -47,6 +47,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BGASwipe
 
     protected TextView mTitle;
     protected ImageView mTitletMore;
+    protected ImageView mTitletSearch;
     protected RelativeLayout mEmail;
     protected LinearLayout mBack, mAdd, mDel;
     protected LinearLayout mTitletGroup;
@@ -225,6 +226,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BGASwipe
         mTitletBtn = findViewById(R.id.include_actionbar_back_btn);
         mActivbarGroup = findViewById(R.id.main_action_bar_group);
         mTitletMore = findViewById(R.id.include_actionbar_back_more);
+        mTitletSearch = findViewById(R.id.activity_map_search);
         //返回
         mBack = findViewById(R.id.main_action_bar_back);
         mBack.setVisibility(View.VISIBLE);

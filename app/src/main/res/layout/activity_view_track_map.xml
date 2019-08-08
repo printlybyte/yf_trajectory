@@ -5,10 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".moudle.activity.ApplicationRecordActivity">
+    tools:context=".moudle.activity.ViewTrackMapActivity">
 
-    <include layout="@layout/include_actionbar_back"/>
+    <include layout="@layout/include_actionbar_back" />
 
-    <include layout="@layout/include_recyclerview" />
+    <include layout="@layout/include_time_selected" />
 
+    <com.amap.api.maps.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>

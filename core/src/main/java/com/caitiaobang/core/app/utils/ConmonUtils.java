@@ -2,6 +2,9 @@ package com.caitiaobang.core.app.utils;
 
 import android.text.TextUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * ============================================
  * 描  述：
@@ -17,8 +20,8 @@ public class ConmonUtils {
     }
 
     /**
-    * 1 man 2 girl
-    */
+     * 1 man 2 girl
+     */
     public static int isSex(String idCard) {
         if (!TextUtils.isEmpty(idCard) && idCard.length() == 18) {
             if (Integer.parseInt(idCard.substring(16, 17)) / 2 == 0) {
@@ -29,4 +32,12 @@ public class ConmonUtils {
         }
         return 0;
     }
+
+
+    public static String getDateToString(long time) {
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date d = new Date(time);
+        return sf.format(d);
+    }
+
 }

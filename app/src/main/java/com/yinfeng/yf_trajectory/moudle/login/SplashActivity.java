@@ -1,4 +1,4 @@
-package com.yinfeng.yf_trajectory.login;
+package com.yinfeng.yf_trajectory.moudle.login;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +8,7 @@ import com.blankj.utilcode.util.ActivityUtils;
 import com.caitiaobang.core.app.app.AppManager;
 import com.orhanobut.hawk.Hawk;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import com.yinfeng.yf_trajectory.MapActivity;
+import com.yinfeng.yf_trajectory.moudle.activity.MapActivity;
 
 public class SplashActivity extends AppCompatActivity {
     protected RxPermissions mRxPermissions;

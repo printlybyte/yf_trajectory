@@ -12,18 +12,13 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 用于申请调用A-GPS模块 -->
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" /> <!-- 用于申请获取蓝牙信息进行室内定位 -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-
-    <!--华为HDM权限-->
-    <!--跟权限-->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- 华为HDM权限 -->
+    <!-- 跟权限 -->
     <uses-permission android:name="com.huawei.permission.sec.MDM" />
-    <uses-permission android:name="com.huawei.permission.sec.MDM.v2" />
-    <!--静默安装  以下为华为MDM所有已申请权限-->
-    <uses-permission android:name="com.huawei.permission.sec.MDM_APP_MANAGEMENT" />
-    <!--<uses-permission android:name="com.huawei.permission.sec.MDM_PHONE_MANAGER" />-->
-    <!--wifi-->
-    <uses-permission android:name="com.huawei.permission.sec.MDM_WIFI" />
-    <!--数据强制开启-->
+    <uses-permission android:name="com.huawei.permission.sec.MDM.v2" /> <!-- 静默安装  以下为华为MDM所有已申请权限 -->
+    <uses-permission android:name="com.huawei.permission.sec.MDM_APP_MANAGEMENT" /> <!-- <uses-permission android:name="com.huawei.permission.sec.MDM_PHONE_MANAGER" /> -->
+    <!-- wifi -->
+    <uses-permission android:name="com.huawei.permission.sec.MDM_WIFI" /> <!-- 数据强制开启 -->
     <uses-permission android:name="com.huawei.permission.sec.MDM_CONNECTIVITY" />
     <uses-permission android:name="com.huawei.permission.sec.MDM_DEVICE_MANAGER" />
     <uses-permission android:name="com.huawei.permission.sec.MDM_SETTINGS_RESTRICTION" />
@@ -37,10 +32,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppThemeBase">
-
-        <meta-data
-            android:name="hwc-theme"
-            android:value="androidhwext:style/Theme.Emui" />
+        <activity android:name=".moudle.activity.ViewTrackMapActivity"></activity>
+        <activity android:name=".moudle.activity.MatterApplicationActivity" /> <!-- <meta-data -->
+        <!-- android:name="hwc-theme" -->
+        <!-- android:value="androidhwext:style/Theme.Emui" /> -->
         <receiver
             android:name=".mdm.SampleDeviceReceiver"
             android:label="银丰轨迹"
@@ -48,56 +43,53 @@
             <meta-data
                 android:name="android.app.device_admin"
                 android:resource="@xml/device_admin" />
+
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
-        <activity android:name=".mdm.LicenseActivity"></activity>
 
-
-        <activity android:name=".moudle.ApplicationRecordActivity"></activity>
-        <activity android:name=".moudle.MeInfoActivity" /> <!-- 适配18:9 -->
+        <activity android:name=".mdm.LicenseActivity" />
+        <activity android:name=".moudle.activity.ApplicationRecordActivity" />
+        <activity android:name=".moudle.activity.MeInfoActivity" /> <!-- 适配18:9 -->
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
 
         <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait" >
-
+            android:name=".moudle.activity.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".moudle.login.LoginVerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".moudle.login.SplashActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
-            android:name=".login.LoginVerActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".login.SplashActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/SplashTheme">
-
-        </activity>
-        <activity
-            android:name=".MapActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
-
+            android:name=".moudle.activity.MapActivity"
+            android:screenOrientation="portrait" /> <!-- 高德 api -->
         <service android:name="com.amap.api.location.APSService" />
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="0653525809b307fc7861d00382cabf83" />
-
+            android:value="0653525809b307fc7861d00382cabf83" /> <!-- 无声音乐增加oom_adj -->
         <service
-            android:name=".moudle.PlayerMusicService"
+            android:name=".moudle.service.PlayerMusicService"
             android:enabled="true"
             android:exported="true"
             android:process=":music_service" />
+        <service
+            android:name=".moudle.service.LocationService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":location_service" />
     </application>
 
 </manifest>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="61dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginRight="10dp"
+    android:elevation="5dp"
+    app:cardCornerRadius="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <!--<View-->
+        <!--android:id="@+id/expand_request_recding_group_line"-->
+        <!--android:background="@color/c_999"-->
+        <!---->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0.5dp"/>-->
+
+        <LinearLayout
+            android:id="@+id/expand_request_recding_group_txtg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@+id/expand_request_recding_group_sub_title_img"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/expand_request_recding_group_title"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="sssss"
+                android:textColor="@color/c_333" />
+
+            <TextView
+                android:id="@+id/expand_request_recding_group_sub_title"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:singleLine="true"
+                android:text="sssss"
+                android:textColor="@color/c_999" />
+
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/expand_request_recding_group_sub_title_img"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:src="@mipmap/arrow_r" />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

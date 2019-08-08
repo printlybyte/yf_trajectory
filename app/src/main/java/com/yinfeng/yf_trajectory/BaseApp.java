@@ -140,7 +140,7 @@ public class BaseApp extends BaseApplication {
     */
     @SuppressLint("MissingPermission")
     private void initFileCrash() {
-        CrashUtils.init(Environment.getExternalStorageDirectory().getAbsolutePath() + "/CTB_crash_file");
+        CrashUtils.init(Environment.getExternalStorageDirectory().getAbsolutePath() + "/yf_crash_file");
     }
 
 
