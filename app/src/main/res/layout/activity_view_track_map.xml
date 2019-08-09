@@ -9,7 +9,13 @@
 
     <include layout="@layout/include_actionbar_back" />
 
+    <FrameLayout
+        android:id="@+id/activity_view_track_map_selected_time_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <include layout="@layout/include_time_selected" />
+
+    </FrameLayout>
 
     <com.amap.api.maps.MapView
         android:id="@+id/map"

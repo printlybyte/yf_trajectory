@@ -75,13 +75,14 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     protected void initView() {
         super.initView();
         new EventBusUtils().register(this);
+
         mActivityMapHeadimg = (CircleImageView) findViewById(R.id.activity_map_headimg);
         mActivityMapHeadimg.setOnClickListener(this);
         mActivityMapName = (TextView) findViewById(R.id.activity_map_name);
 
         mActivityMapMatterApplication = (ImageView) findViewById(R.id.activity_map_matter_application);
         mActivityMapMatterApplication.setOnClickListener(this);
-        mActivityMapSearch = (ImageView) findViewById(R.id.activity_map_search);
+        mActivityMapSearch = (ImageView) findViewById(R.id.activity_map_search_icon);
         mActivityMapSearch.setOnClickListener(this);
     }
 
@@ -130,7 +131,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void initData() {
         requestDate(0, "");
-//        initHuaWeiHDM();
+        initHuaWeiHDM();
     }
 
     @Override
@@ -258,8 +259,10 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
             case R.id.activity_map_matter_application:
                 ActivityUtils.startActivity(MatterApplicationActivity.class);
                 break;
-            case R.id.activity_map_search:
-                ActivityUtils.startActivity(ViewTrackMapActivity.class);
+            case R.id.activity_map_search_icon:
+                Intent intent = new Intent(MapActivity.this, ViewTrackMapActivity.class);
+                intent.putExtra(ConstantApi.INTENT_FLAG, ConstantApi.query_search);
+                startActivity(intent);
                 break;
         }
     }

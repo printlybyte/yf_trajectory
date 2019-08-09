@@ -26,7 +26,10 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.NetworkUtils;
+import com.blankj.utilcode.util.ServiceUtils;
+import com.caitiaobang.core.app.app.AppManager;
 import com.caitiaobang.core.app.app.BaseApplication;
 import com.caitiaobang.core.app.bean.GreendaoLocation;
 import com.caitiaobang.core.app.bean.GreendaoProvinceBean;
@@ -47,8 +50,11 @@ import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.moudle.activity.MapActivity;
 import com.yinfeng.yf_trajectory.moudle.bean.ConmonBean;
 import com.yinfeng.yf_trajectory.moudle.bean.ConmonBean_string;
+import com.yinfeng.yf_trajectory.moudle.bean.MatterApplicationActivityStatusBean;
+import com.yinfeng.yf_trajectory.moudle.bean.UploadInfoBean;
 import com.yinfeng.yf_trajectory.moudle.bean.UploadLocationInfoBean;
 import com.yinfeng.yf_trajectory.moudle.bean.expanded.ApplicationRecordActivityBean;
+import com.yinfeng.yf_trajectory.moudle.login.LoginVerActivity;
 import com.zhy.http.okhttp.OkHttpUtils;
 
 import org.json.JSONArray;
@@ -77,12 +83,13 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        initLocation();
+        initLocation(mGrap);
         initTimePrompt();
         Log.d(TAG, TAG + "---->onCreate,启动服务");
 
 
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -106,7 +113,15 @@ public class LocationService extends Service {
     //声明AMapLocationClientOption对象
     public AMapLocationClientOption mLocationOption = null;
 
-    private void initLocation() {
+
+    /**
+     * 设置上传间隔
+     */
+    private void resetLocationUpLoad() {
+        initLocation(mGrap);
+    }
+
+    private void initLocation(int mInterval) {
         //声明AMapLocationClient类对象
         //声明定位回调监听器
         //初始化定位
@@ -117,7 +132,7 @@ public class LocationService extends Service {
         //设置定位模式为AMapLocationMode.Hight_Accuracy，高精度模式。
         mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
         //设置定位间隔,单位毫秒,默认为2000ms，最低1000ms。
-        mLocationOption.setInterval(5000);
+        mLocationOption.setInterval(mInterval * 1000);
         //设置是否返回地址信息（默认返回地址信息）
         mLocationOption.setNeedAddress(true);
         //单位是毫秒，默认30000毫秒，建议超时时间不要低于8000毫秒。
@@ -221,16 +236,25 @@ public class LocationService extends Service {
             Calendar cal = Calendar.getInstance();
             int hour = cal.get(Calendar.HOUR_OF_DAY);
             int min = cal.get(Calendar.MINUTE);
-            if (parseDate() != null) {
-                Log.i(ConstantApi.LOG_I, "查询数据 jsonArray ：" + parseDate());
-                commitLocationInfo(parseDate());
-            } else {
-                Toast.makeText(context, "上传失败，数据转化异常", Toast.LENGTH_SHORT).show();
-            }
-            Log.i(ConstantApi.LOG_I, min + "");
-            if (min == 0 || min == 30) {  //30分钟触发一次
 
+            //30分钟触发一次获取上传信息
+            if (min == 0 || min == 30) {
+                getUploadInfo();
             }
+
+            int mmUplaodMinute = mUplaod / 60;
+            if (min % mmUplaodMinute == 0) {
+                if (parseDate() != null) {
+                    Log.i(ConstantApi.LOG_I, "查询数据 jsonArray ：" + parseDate());
+                    commitLocationInfo(parseDate());
+                } else {
+                    showToastC("上传失败，数据转化异常");
+                }
+            } else {
+                showToastC("上传时间不能被整除，请联系管理员修改");
+            }
+
+
         }
     };
 
@@ -245,7 +269,7 @@ public class LocationService extends Service {
                 String queryLat = mList.get(i).getLat();
                 String queryLng = mList.get(i).getLng();
                 String queryTime = mList.get(i).getTime();
-                Log.i(ConstantApi.LOG_I, "查询数据 ：" + "lat: " + queryLat + "lng: " + queryLng + "time: " + queryTime);
+                Log.i(ConstantApi.LOG_I, "查询数据 ：" + "lat: " + queryLat + "lng: " + queryLng + "time: " + queryTime + " mList:" + mList.size());
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("lat", queryLat);
@@ -253,10 +277,12 @@ public class LocationService extends Service {
                     jsonObject.put("time", queryTime);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Log.i(ConstantApi.LOG_I, "JSONException ：");
                 }
                 jsonArray.put(jsonObject);
-                return jsonArray;
+
             }
+            return jsonArray;
         }
         return null;
     }
@@ -278,33 +304,87 @@ public class LocationService extends Service {
                     public void onSuccess(Response<String> response) {
                         String data = response.body();//这个就是返回来的结果
                         Timber.i("success:%s", data);
-                        Log.i(ConstantApi.LOG_I, "" + data);
+                        Log.i(ConstantApi.LOG_I, "onSuccess：" + data);
                         try {
                             ConmonBean_string bean = new Gson().fromJson(response.body(), ConmonBean_string.class);
                             if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS) {
-                                Toast.makeText(getBaseContext(), "上传成功", Toast.LENGTH_SHORT).show();
-
+                                showToastC("上传成功");
                                 DaoSession daoSession = BaseApplication.getDaoInstant();
                                 daoSession.deleteAll(GreendaoLocation.class);
+                            } else if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_ERR_901) {
+                                Toast.makeText(getBaseContext(), "账号在其他地方登陆，密码已泄露，建议重置并重新登录！", Toast.LENGTH_SHORT).show();
+//                                AppManager.getInstance().finishAllActivity();
+//                                stopSelf(-1);
+//                                ActivityUtils.startActivity(LoginVerActivity.class);
+                            } else {
+                                showToastC(bean.getMessage());
                             }
                         } catch (Exception e) {
-                            Toast.makeText(getBaseContext(), "转化失败", Toast.LENGTH_SHORT).show();
+                            showToastC("转化失败");
                         }
                     }
 
                     @Override
                     public void onError(Response<String> response) {
                         super.onError(response);
-                        Log.i(ConstantApi.LOG_I, "" + response.body());
+                        Log.i(ConstantApi.LOG_I, "onError：" + response.body());
                         try {
                             ConmonBean_string bean = new Gson().fromJson(response.body(), ConmonBean_string.class);
                             if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS) {
                                 Toast.makeText(getBaseContext(), "" + bean.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         } catch (Exception e) {
-                            Toast.makeText(getBaseContext(), "转化失败", Toast.LENGTH_SHORT).show();
+                            showToastC("转化失败");
                         }
                     }
                 });
+    }
+
+
+    /**
+     * 获取上传信息
+     */
+    private void getUploadInfo() {
+        OkHttpUtils
+                .get()
+                .url(Api.API_point_getFrequency)
+                .build()
+                .execute(new GenericsCallback<UploadInfoBean>(new JsonGenericsSerializator()) {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        showToastC("网络异常，请稍后重试");
+                    }
+
+                    @Override
+                    public void onResponse(UploadInfoBean response, int id) {
+
+                        if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
+                            UploadInfoBean.DataBean bean = response.getData();
+
+                            if (!TextUtils.isEmpty(bean.getGrap())) {
+                                mGrap = Integer.parseInt(bean.getGrap());
+                                resetLocationUpLoad();
+                            } else {
+                                showToastC("没有获取到后台设置的默认抓取频率");
+                            }
+                            if (!TextUtils.isEmpty(bean.getUpload())) {
+                                mUplaod = Integer.parseInt(bean.getUpload());
+                            } else {
+                                showToastC("没有获取到后台设置的默认上传频率");
+                            }
+
+                        } else {
+                            showToastC(response.getMessage());
+                        }
+                        Log.i(ConstantApi.LOG_I_NET, "请求结果：" + GsonUtils.getInstance().toJson(response));
+                    }
+                });
+    }
+
+    private int mGrap = 10;
+    private int mUplaod = 180;
+
+    private void showToastC(String msg) {
+        Toast.makeText(LocationService.this, "" + msg, Toast.LENGTH_SHORT).show();
     }
 }

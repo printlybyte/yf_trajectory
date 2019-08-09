@@ -16,6 +16,7 @@ public interface ConstantApi {
 
 
     int API_REQUEST_SUCCESS = 200;
+    int API_REQUEST_ERR_901 = 901;
 
 
     // FINAL HK CONSTANS
@@ -25,5 +26,15 @@ public interface ConstantApi {
     String INTENT_KEY = "INTENT_KEY";
     String INTENT_KEY_TWO = "INTENT_KEY_TWO";
     String INTENT_KEY_THREE = "INTENT_KEY_THREE";
+
+
+    //搜索跳转
+    String query_search = "query_search";
+    //信息查看
+    String query_info = "query_info";
+
+
+    long time_dialog_min_time = Long.parseLong("1564647419000");
+    long time_dialog_max_time = Long.parseLong("1880266619000");
 
 }

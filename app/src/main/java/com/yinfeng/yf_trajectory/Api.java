@@ -63,6 +63,11 @@ public interface Api {
      *获取坐标点
      */
     String API_point_app_query = APP_DOMAIN + "/point/app/query";
+  /**
+     * post
+     *获取坐标点上传频率
+     */
+    String API_point_getFrequency = APP_DOMAIN + "/point/getFrequency";
 
 
 

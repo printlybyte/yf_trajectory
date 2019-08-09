@@ -272,7 +272,6 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
                             dismisProgress();
                         }
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
-                            showToastC("查询成功");
                             MatterApplicationActivityStatusBean.DataBean bean = response.getData();
                             String status = bean.getStatus();
                             if (!TextUtils.isEmpty(status)) {

@@ -8,13 +8,22 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.Polyline;
+import com.amap.api.maps.model.PolylineOptions;
+import com.amap.api.maps.model.animation.Animation;
+import com.amap.api.maps.model.animation.RotateAnimation;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.caitiaobang.core.app.app.BaseActivity;
 import com.caitiaobang.core.app.net.GenericsCallback;
@@ -33,7 +42,9 @@ import com.yinfeng.yf_trajectory.moudle.bean.ViewTrackMapActivityBean;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -54,6 +65,7 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
      * 搜索
      */
     private TextView mActivityMatterApplicationConfirm;
+    private FrameLayout mActivityViewTrackMapSelectedTimeGroup;
 
     @Override
     protected void initView() {
@@ -65,6 +77,7 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
         mActivityMatterApplicationEndTime.setOnClickListener(this);
         mActivityMatterApplicationConfirm = (TextView) findViewById(R.id.activity_matter_application_confirm);
         mActivityMatterApplicationConfirm.setOnClickListener(this);
+        mActivityViewTrackMapSelectedTimeGroup = (FrameLayout) findViewById(R.id.activity_view_track_map_selected_time_group);
     }
 
     @Override
@@ -74,6 +87,7 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     protected void initData() {
+        setTitle("轨迹查看");
         Intent intent = getIntent();
         if (intent != null) {
             mJumpFlag = intent.getStringExtra(ConstantApi.INTENT_FLAG);
@@ -84,10 +98,13 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
             return;
         }
 
-        if (!TextUtils.isEmpty(mJumpFlag) && mJumpFlag.equals("query_info")) {
+        if (!TextUtils.isEmpty(mJumpFlag) && mJumpFlag.equals(ConstantApi.query_info)) {
+            mActivityViewTrackMapSelectedTimeGroup.setVisibility(View.GONE);
             requestDate(0, "查询中...");
+        } else if (!TextUtils.isEmpty(mJumpFlag) && mJumpFlag.equals(ConstantApi.query_search)) {
+//            showToastC("查询");
+
         }
-        setTitle("轨迹查看");
 
     }
 
@@ -108,7 +125,8 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
                 .setCallBack(this)
                 .setCyclic(false)
                 .setThemeColor(R.color.p_color_blue)
-                .setMinMillseconds(System.currentTimeMillis())
+                .setMinMillseconds(ConstantApi.time_dialog_min_time)
+                .setMaxMillseconds(ConstantApi.time_dialog_max_time)
                 .build();
     }
 
@@ -154,14 +172,16 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
         MyLocationStyle myLocationStyle;
         myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
         myLocationStyle.interval(10000); //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
-        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）默认执行此种模式。
-
+        //连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）默认执行此种模式。
+//        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
+        //定位一次，且将视角移动到地图中心点。
+        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE);
         myLocationStyle.myLocationIcon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
                 .decodeResource(getResources(), R.mipmap.ic_map_deauful_icon)));
         myLocationStyle.strokeColor(Color.argb(0, 0, 0, 0));// 自定义精度范围的圆形边框颜色
         myLocationStyle.radiusFillColor(Color.argb(0, 0, 0, 0));//圆圈的颜色,设为透明的时候就可以去掉园区区域了
 
-        //控制是否显示定位蓝点
+        //控// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
         myLocationStyle.showMyLocation(true);
         //设置定位蓝点的Style
         aMap.setMyLocationStyle(myLocationStyle);
@@ -245,10 +265,9 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
         map.put("startTime", mTimeStart);
         map.put("endTime", mTimeEnd);
         String mNetUrl = Api.API_point_app_query;
-
-
         OkHttpUtils
                 .postString()
+                .addHeader("track-token", token)
                 .content(new Gson().toJson(map))
                 .url(Api.API_point_app_query)
                 .mediaType(MediaType.parse("application/json; charset=utf-8"))
@@ -264,25 +283,101 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
 
                     @Override
                     public void onResponse(ViewTrackMapActivityBean response, int id) {
-                        if (type == 1) {
-                            dismisProgress();
-                        }
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
-
-                            for (int i = 0; i < response.getData().getTrack().size(); i++) {
-                                ViewTrackMapActivityBean.DataBean.TrackBean bean = response.getData().getTrack().get(i);
-                                Log.i(ConstantApi.LOG_I_NET, "lat: " + bean.getX() + " lng: " + bean.getY());
+                            if (response.getData().getTrack().size() > 2) {
+                                DrawTrack(response);
+                            } else {
+                                showToastC("点位不足，请稍后重试");
                             }
-
                         } else {
                             showToastC(response.getMessage());
                         }
                         Log.i(ConstantApi.LOG_I_NET, "请求结果：" + GsonUtils.getInstance().toJson(response));
-                        dismisProgress();
+                        if (type == 1) {
+                            dismisProgress();
+                        }
                     }
                 });
     }
 
+    /**
+     * 绘制
+     */
+    private Polyline polyline;
+
+    private void DrawTrack(ViewTrackMapActivityBean response) {
+        aMap.clear();
+        List<LatLng> latLngs = new ArrayList<LatLng>();
+        int mSize = response.getData().getTrack().size();
+        for (int i = 0; i < mSize; i++) {
+            ViewTrackMapActivityBean.DataBean.TrackBean bean = response.getData().getTrack().get(i);
+            Log.i(ConstantApi.LOG_I_NET, "lat: " + bean.getX() + " lng: " + bean.getY());
+            double latx = bean.getX();
+            double laty = bean.getY();
+            latLngs.add(new LatLng(laty, latx));
+            if (i == 0) {
+                DrawTrackStartMaker(new LatLng(laty, latx));
+            }
+            if (i == mSize - 1) {
+                DrawTrackEndMaker(new LatLng(laty, latx));
+                //起点位置和  地图界面大小控制
+                aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), 18));
+//                可以将地图底图文字设置在添加的覆盖物之上。
+//                aMap.setMapTextZIndex(2);
+                aMap.addPolyline((new PolylineOptions())
+                        //手动数据测试
+                        //.add(new LatLng(26.57, 106.71),new LatLng(26.14,105.55),new LatLng(26.58, 104.82), new LatLng(30.67, 104.06))
+                        //集合数据
+                        .addAll(latLngs)
+                        //线的宽度
+                        .width(10).setDottedLine(false).geodesic(true)
+                        //颜色
+                        .color(Color.argb(255, 255, 20, 147)));
+            }
+        }
+
+    }
+
+    /**
+     * 绘制起点
+     */
+    private void DrawTrackStartMaker(LatLng latLngStart) {
+        MarkerOptions markerOption = new MarkerOptions();
+        markerOption.position(latLngStart);
+//        markerOption.title("西安市").snippet("西安市：34.341568, 108.940174");
+        markerOption.draggable(true);//设置Marker可拖动
+        markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                .decodeResource(getResources(), R.drawable.ic_draw_track_start)));
+        // 将Marker设置为贴地显示，可以双指下拉地图查看效果
+        markerOption.setFlat(true);//设置marker平贴地图效果
+        Marker marker = aMap.addMarker(markerOption);
+        addMarkerAnimation(marker);
+    }
+
+    private void addMarkerAnimation(Marker marker) {
+        Animation animation = new RotateAnimation(marker.getRotateAngle(), marker.getRotateAngle() + 360, 0, 0, 0);
+        long duration = 1000L;
+        animation.setDuration(duration);
+        animation.setInterpolator(new LinearInterpolator());
+        marker.setAnimation(animation);
+        marker.startAnimation();
+    }
+
+    /**
+     * 绘制终点
+     */
+    private void DrawTrackEndMaker(LatLng latLngEnd) {
+        MarkerOptions markerOption = new MarkerOptions();
+        markerOption.position(latLngEnd);
+//        markerOption.title("西安市").snippet("西安市：34.341568, 108.940174");
+        markerOption.draggable(true);//设置Marker可拖动
+        markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                .decodeResource(getResources(), R.drawable.ic_draw_track_stopx)));
+        // 将Marker设置为贴地显示，可以双指下拉地图查看效果
+        markerOption.setFlat(true);//设置marker平贴地图效果
+        Marker marker = aMap.addMarker(markerOption);
+        addMarkerAnimation(marker);
+    }
 
     @Override
     public void onClick(View v) {
@@ -298,9 +393,19 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
                 mDialogYearMonthDay.show(getSupportFragmentManager(), "2");
                 break;
             case R.id.activity_matter_application_confirm:
+                if (TextUtils.isEmpty(mTimeStart)) {
+                    showToastC("请选择开始时间");
+                    return;
+                }
+                if (TextUtils.isEmpty(mTimeEnd)) {
+                    showToastC("请选择结束时间");
+                    return;
+                }
 
                 requestDate(1, "查询中...");
                 break;
         }
     }
+
+
 }

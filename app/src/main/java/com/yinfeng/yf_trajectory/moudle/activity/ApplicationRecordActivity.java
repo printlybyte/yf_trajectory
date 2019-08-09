@@ -295,29 +295,33 @@ public class ApplicationRecordActivity extends BaseActivity {
                     holder.setText(R.id.expand_request_recding_child_start_time, lv1.startTime);
                     holder.setText(R.id.expand_request_recding_child_reson, lv1.reson);
                     if (lv1.status.equals("0")) {
+                        holder.setVisible(R.id.expand_request_recding_child_query, false);
                         String str1 = "结束时间 ：<font color='#FF0000'>进行中</font>";
                         holder.setText(R.id.expand_request_recding_child_end_time, Html.fromHtml(str1));
                     } else if (lv1.status.equals("1")) {
+                        //正常显示轨迹
+                        holder.setVisible(R.id.expand_request_recding_child_query, true);
+
                         holder.setText(R.id.expand_request_recding_child_end_time, lv1.endTime);
                     } else {
+                        holder.setVisible(R.id.expand_request_recding_child_query, false);
+
                         holder.setText(R.id.expand_request_recding_child_end_time, "未知状态");
 
                     }
                     holder.setText(R.id.expand_request_recding_child_address, lv1.address);
 
-
-                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            int pos = holder.getAdapterPosition();
-                            Log.i("testre", "Level 1 item pos: " + pos);
-
-                            Intent intent = new Intent(ApplicationRecordActivity.this, ViewTrackMapActivity.class);
-                            intent.putExtra(ConstantApi.INTENT_FLAG, "query_info");
-                            startActivity(intent);
-
-                        }
-                    });
+                    if (lv1.status.equals("1")) {
+                        holder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                int pos = holder.getAdapterPosition();
+                                Intent intent = new Intent(ApplicationRecordActivity.this, ViewTrackMapActivity.class);
+                                intent.putExtra(ConstantApi.INTENT_FLAG, ConstantApi.query_info);
+                                startActivity(intent);
+                            }
+                        });
+                    }
                     break;
             }
         }
