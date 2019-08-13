@@ -11,7 +11,7 @@ package com.yinfeng.yf_trajectory.moudle.bean;
  **/
 public class UploadInfoBean {
 
-    /**
+       /**
      * code : 200
      * message : 操作成功！
      * data : {"upload":"600","grap":"30"}

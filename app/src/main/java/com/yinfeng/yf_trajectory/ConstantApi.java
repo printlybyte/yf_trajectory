@@ -12,6 +12,7 @@ package com.yinfeng.yf_trajectory;
 public interface ConstantApi {
     String LOG_ERR = "LOG_ERR";
     String LOG_I = "LOG_I";
+    String LOG_I_ = "LOG_I_";
     String LOG_I_NET = "LOG_I_NET";
 
 

@@ -8,15 +8,15 @@ import org.greenrobot.greendao.annotation.Unique;
 
 
 @Entity
-public class GreendaoLocation {
+public class GreendaoLocationBean {
     @Id(autoincrement = true)
     private Long id;
     private String lat;
     private String lng;
     private String address;
     private String time;
-    @Generated(hash = 1766013152)
-    public GreendaoLocation(Long id, String lat, String lng, String address,
+    @Generated(hash = 301938470)
+    public GreendaoLocationBean(Long id, String lat, String lng, String address,
             String time) {
         this.id = id;
         this.lat = lat;
@@ -24,8 +24,8 @@ public class GreendaoLocation {
         this.address = address;
         this.time = time;
     }
-    @Generated(hash = 1296321323)
-    public GreendaoLocation() {
+    @Generated(hash = 1406004995)
+    public GreendaoLocationBean() {
     }
     public Long getId() {
         return this.id;
@@ -33,7 +33,6 @@ public class GreendaoLocation {
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getLat() {
         return this.lat;
     }

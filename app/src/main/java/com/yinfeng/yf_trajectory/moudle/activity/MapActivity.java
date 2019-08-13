@@ -1,13 +1,24 @@
 package com.yinfeng.yf_trajectory.moudle.activity;
 
+import android.annotation.SuppressLint;
 import android.app.admin.DevicePolicyManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -15,10 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
@@ -26,6 +34,7 @@ import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.NetworkUtils;
+import com.caitiaobang.core.app.app.AppManager;
 import com.caitiaobang.core.app.app.BaseActivity;
 import com.caitiaobang.core.app.net.GenericsCallback;
 import com.caitiaobang.core.app.net.JsonGenericsSerializator;
@@ -34,15 +43,16 @@ import com.orhanobut.hawk.Hawk;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
+import com.yinfeng.yf_trajectory.LocationService;
+import com.yinfeng.yf_trajectory.LocationStatusManager;
 import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.mdm.MDMUtils;
 import com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver;
 import com.yinfeng.yf_trajectory.mdm.SampleEula;
-import com.yinfeng.yf_trajectory.moudle.service.LocationService;
-import com.yinfeng.yf_trajectory.moudle.service.PlayerMusicService;
 import com.yinfeng.yf_trajectory.moudle.bean.UserInfoBean;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusBean;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusUtils;
+import com.yinfeng.yf_trajectory.moudle.service.PlayerMusicService;
 import com.zhy.http.okhttp.OkHttpUtils;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -75,15 +85,30 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     protected void initView() {
         super.initView();
         new EventBusUtils().register(this);
+//        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//        @SuppressLint("InvalidWakeLockTag") PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyTAG");
+//        wakeLock.acquire();
+
+//        PowerManager pm = (PowerManager)  getSystemService(Context.POWER_SERVICE);
+//        @SuppressLint("InvalidWakeLockTag") PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyTAG");
+//        wakeLock.acquire();
+
 
         mActivityMapHeadimg = (CircleImageView) findViewById(R.id.activity_map_headimg);
         mActivityMapHeadimg.setOnClickListener(this);
         mActivityMapName = (TextView) findViewById(R.id.activity_map_name);
-
+        mActivityMapName.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                ActivityUtils.startActivity(MainActivity.class);
+                return false;
+            }
+        });
         mActivityMapMatterApplication = (ImageView) findViewById(R.id.activity_map_matter_application);
         mActivityMapMatterApplication.setOnClickListener(this);
         mActivityMapSearch = (ImageView) findViewById(R.id.activity_map_search_icon);
         mActivityMapSearch.setOnClickListener(this);
+        mActivityMapName.setOnClickListener(this);
     }
 
     private MDMUtils mdmUtils = null;
@@ -100,7 +125,11 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         mAdminName = new ComponentName(this, SampleDeviceReceiver.class);
         sampleEula = new SampleEula(this, mDevicePolicyManager, mAdminName);
         sampleEula.activeProcessApp();
+
+//        initNetworkConnect();
+
     }
+
 
     /**
      * 订阅接受者
@@ -108,13 +137,13 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     @Subscribe
     public void onEventMainThread(EventBusBean event) {
         Toast.makeText(this, "" + event.getType(), Toast.LENGTH_SHORT).show();
-        if (event.getType() == 1) {//激活
+        if (event.getType() == 1) { //激活
             //强制开启数据服务
-            mdmUtils.forceMobiledataOn();
+//            mdmUtils.forceMobiledataOn();
             //保持某应用始终运行
             mdmUtils.addPersistentApp();
             //设置应用为信任应用
-            //setSuperWhiteListForHwSystemManger();
+            mdmUtils.setSuperWhiteListForHwSystemManger();
             //开启禁止卸载
             mdmUtils.setDisallowedUninstallPackages(true);
 
@@ -131,7 +160,12 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void initData() {
         requestDate(0, "");
+        UserInfoBean.DataBean bean = Hawk.get(ConstantApi.HK_USER_BEAN);
+        if (bean != null) {
+            setUserDate(bean);
+        }
         initHuaWeiHDM();
+        startLocationService();
     }
 
     @Override
@@ -139,7 +173,6 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         super.initBefore(savedInstanceState);
         initMap(savedInstanceState);
         startPlayMusicService();
-        startLocationService();
 
     }
 
@@ -154,11 +187,12 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         startService(intent);
     }
 
-    private void startLocationService() {
-        Intent intent = new Intent(MapActivity.this, LocationService.class);
-        startService(intent);
-    }
 
+    private void startLocationService(){
+        getApplicationContext().startService(new Intent(this, LocationService.class));
+        LocationStatusManager.getInstance().resetToInit(getApplicationContext());
+
+    }
 
     //地图=======================================================================
     private MapView mMapView = null;
@@ -209,7 +243,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         public void onMyLocationChange(Location location) {
             if (location != null) {
                 aMap.moveCamera(CameraUpdateFactory.zoomTo(16));
-                Log.i(ConstantApi.LOG_I, "地图定位刷新：");
+//                Log.i(ConstantApi.LOG_I, "地图定位刷新：");
             } else {
                 Log.i(ConstantApi.LOG_I, "地图定位刷新 错误");
             }
@@ -223,6 +257,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
         new EventBusUtils().unregister(this);
+
 
     }
 
@@ -264,8 +299,12 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                 intent.putExtra(ConstantApi.INTENT_FLAG, ConstantApi.query_search);
                 startActivity(intent);
                 break;
+            case R.id.activity_map_name:
+
+                break;
         }
     }
+
 
     /**
      * 获取个人信息 track-token
@@ -306,16 +345,8 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
                             UserInfoBean.DataBean bean = response.getData();
                             Hawk.put(ConstantApi.HK_USER_BEAN, response.getData());
+                            setUserDate(bean);
 
-
-                            if (!TextUtils.isEmpty(bean.getIdCard())) {
-                                if (ConmonUtils.isSex(bean.getIdCard()) == 1) {
-                                    mActivityMapHeadimg.setImageResource(R.mipmap.ic_home_gire);
-                                } else if (ConmonUtils.isSex(bean.getIdCard()) == 2) {
-                                    mActivityMapHeadimg.setImageResource(R.mipmap.ic_home_man);
-                                }
-                            }
-                            mActivityMapName.setText(bean.getName() == "" ? "无数据" : "您好，" + bean.getName());
                         } else {
                             showToastC(response.getMessage());
                         }
@@ -326,4 +357,15 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     }
 
 
+    private void setUserDate(UserInfoBean.DataBean bean) {
+        if (!TextUtils.isEmpty(bean.getIdCard())) {
+            if (ConmonUtils.isSex(bean.getIdCard()) == 1) {
+                mActivityMapHeadimg.setImageResource(R.mipmap.ic_home_gire);
+            } else if (ConmonUtils.isSex(bean.getIdCard()) == 2) {
+                mActivityMapHeadimg.setImageResource(R.mipmap.ic_home_man);
+            }
+        }
+        mActivityMapName.setText(bean.getName() == "" ? "无数据" : "您好，" + bean.getName());
+
+    }
 }

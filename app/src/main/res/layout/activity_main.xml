@@ -62,4 +62,23 @@
         android:text="关闭禁止卸载" />
 
 
+    <Button
+        android:id="@+id/activity_main_location_enabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="允许定位服务设置" />
+
+    <Button
+        android:id="@+id/activity_main_location_disabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="禁止定位服务设置" />
+
+    <Button
+        android:id="@+id/activity_main_query_datebase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查看数据库" />
+
+
 </LinearLayout>

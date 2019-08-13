@@ -1,36 +1,12 @@
-package com.yinfeng.yf_trajectory.moudle.service;
+package com.yinfeng.yf_trajectory;
 
-/**
- * ============================================
- * 描  述：
- * 包  名：com.yinfeng.yf_trajectory.moudle
- * 类  名：PlayerMusicService
- * 创建人：liuguodong
- * 创建时间：2019/8/2 21:01
- * ============================================
- **/
-
-import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.PowerManager;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -52,157 +28,236 @@ import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.orhanobut.hawk.Hawk;
-import com.yinfeng.yf_trajectory.Api;
-import com.yinfeng.yf_trajectory.ConstantApi;
-import com.yinfeng.yf_trajectory.GsonUtils;
-import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.moudle.bean.ConmonBean_string;
 import com.yinfeng.yf_trajectory.moudle.bean.UploadInfoBean;
 import com.yinfeng.yf_trajectory.moudle.login.LoginVerActivity;
-import com.yinfeng.yf_trajectory.moudle.utils.LocationErrUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URI;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import okhttp3.Call;
 import timber.log.Timber;
 
+/**
+ * 包名： com.yinfeng.yf_trajectory
+ * <p>
+ * 创建时间：2016/10/27
+ * 项目名称：LocationServiceDemo
+ *
+ * @author guibao.ggb
+ * @email guibao.ggb@alibaba-inc.com
+ * <p>
+ * 类说明：后台服务定位
+ *
+ * <p>
+ * modeified by liangchao , on 2017/01/17
+ * update:
+ * 1. 只有在由息屏造成的网络断开造成的定位失败时才点亮屏幕
+ * 2. 利用notification机制增加进程优先级
+ * </p>
+ */
+public class LocationService extends NotiService {
 
-public class LocationService extends Service {
-    private final static String TAG = "LocationService";
+    private AMapLocationClient mLocationClient;
+    private AMapLocationClientOption mLocationOption;
 
-    @Nullable
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private int locationCount;
+
+    /**
+     * 处理息屏关掉wifi的delegate类
+     */
+    private IWifiAutoCloseDelegate mWifiAutoCloseDelegate = new WifiAutoCloseDelegate();
+
+    /**
+     * 记录是否需要对息屏关掉wifi的情况进行处理
+     */
+    private boolean mIsWifiCloseable = false;
+
+
     @Override
     public void onCreate() {
         super.onCreate();
         getUploadInfo();
         initTimePrompt();
-        Log.d(TAG, TAG + "---->onCreate,启动服务");
         initNetworkConnect();
-
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        applyNotiKeepMech(); //开启利用notification提高进程优先级的机制
+
+        if (mWifiAutoCloseDelegate.isUseful(getApplicationContext())) {
+            mIsWifiCloseable = true;
+            mWifiAutoCloseDelegate.initOnServiceStarted(getApplicationContext());
+        }
+
+        initLocation(mGrap);
+
         return START_STICKY;
     }
 
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        Intent intent = new Intent(getApplicationContext(), LocationService.class);
-        startService(intent);
+        unApplyNotiKeepMech();
+        stopLocation();
+//        Intent intent = new Intent(getApplicationContext(), com.yinfeng.yf_trajectory.moudle.service.LocationService.class);
+//        startService(intent);
         //解除网络广播监听
         unregisterReceiver(networkConnectChangedReceiver);
         unregisterReceiver(mTimeReceiver);
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-
-    //定位  单独依赖于定位SDK=======================================================================
-    //声明AMapLocationClient类对象
-    public AMapLocationClient mLocationClient = null;
-    //声明AMapLocationClientOption对象
-    public AMapLocationClientOption mLocationOption = null;
-
-
-    /**
-     * 设置上传间隔
-     */
-    private void resetLocationUpLoad(boolean onlySensors) {
-        initLocation(mGrap, onlySensors);
+        super.onDestroy();
     }
 
     /**
-     * onlySensors 无网络情况下 仅设备定位 false 高精度定位 true 仅设备定位
+     * 启动定位
      */
-    private void initLocation(int mInterval, boolean onlySensors) {
-        //声明AMapLocationClient类对象
-        //声明定位回调监听器
-        //初始化定位
-        if (mLocationClient == null) {
-            mLocationClient = new AMapLocationClient(getApplicationContext());
+    void initLocation(int mInterval) {
+        stopLocation();
+
+        if (null == mLocationClient) {
+            mLocationClient = new AMapLocationClient(this.getApplicationContext());
         }
-        if (mLocationOption == null) {
-            mLocationOption = new AMapLocationClientOption();
-        }
-        if (onlySensors) {
-            //仅设备定位
-            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);
-        } else {
-            //设置定位模式为AMapLocationMode.Hight_Accuracy，高精度模式。
-            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-        }
-        //设置定位间隔,单位毫秒,默认为2000ms，最低1000ms。
+
+        mLocationOption = new AMapLocationClientOption();
+        // 使用连续
+        mLocationOption.setOnceLocation(false);
+        mLocationOption.setLocationCacheEnable(false);
+        // 每10秒定位一次
         mLocationOption.setInterval(mInterval * 1000);
-        //设置是否返回地址信息（默认返回地址信息）
+        // 地址信息
         mLocationOption.setNeedAddress(true);
-        //单位是毫秒，默认30000毫秒，建议超时时间不要低于8000毫秒。
-        mLocationOption.setHttpTimeOut(20000);
-
-        //给定位客户端对象设置定位参数
         mLocationClient.setLocationOption(mLocationOption);
-        //启动定位
-        mLocationClient.setLocationListener(mAMapLocationListener);
+        mLocationClient.setLocationListener(locationListener);
         mLocationClient.startLocation();
-        //设置场景模式
-        mLocationOption.setLocationPurpose(AMapLocationClientOption.AMapLocationPurpose.Sport);
-        if (null != mLocationClient) {
-            mLocationClient.setLocationOption(mLocationOption);
-            //设置场景模式后最好调用一次stop，再调用start以保证场景模式生效
-            mLocationClient.stopLocation();
-            mLocationClient.startLocation();
-        }
-        //设置定位回调监听
-
     }
 
-    private int mTempNums = 0;
+    /**
+     * 停止定位
+     */
+    void stopLocation() {
+        if (null != mLocationClient) {
+            mLocationClient.stopLocation();
+        }
+    }
 
-    AMapLocationListener mAMapLocationListener = new AMapLocationListener() {
+    AMapLocationListener locationListener = new AMapLocationListener() {
         @Override
-        public void onLocationChanged(AMapLocation amapLocation) {
-            if (amapLocation != null) {
-                if (amapLocation.getErrorCode() == 0) {
-                    //可在其中解析amapLocation获取相应内容。
-                    String lat = amapLocation.getLatitude() + "";
-                    String lng = amapLocation.getLongitude() + "";
-                    String time = System.currentTimeMillis() + "";
-                    String address = amapLocation.getAddress() + "";
-                    Log.i(ConstantApi.LOG_I, "定位SDK更新数据 " + "lat: " + lat + "lng: " + lng + "time: " + time + "address: " + address);
-                    mTempNums++;
-                    showToastC("" + mTempNums);
-//                    LatLng curLatlng = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
-//                    aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curLatlng, 16f));
-                    insertLoactionDate(lat, lng, time, address);
+        public void onLocationChanged(AMapLocation aMapLocation) {
+            //发送结果的通知
+            sendLocationBroadcast(aMapLocation);
 
-                } else {
-                    LocationErrUtils.getInstance().showErr(amapLocation.getErrorCode());
-                    //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
-                    Log.i(ConstantApi.LOG_I, "location Error, ErrCode:"
-                            + amapLocation.getErrorCode() + ", errInfo:"
-                            + amapLocation.getErrorInfo());
-                }
+            if (!mIsWifiCloseable) {
+                return;
             }
+
+            if (aMapLocation.getErrorCode() == AMapLocation.LOCATION_SUCCESS) {
+                mWifiAutoCloseDelegate.onLocateSuccess(getApplicationContext(), PowerManagerUtil.getInstance().isScreenOn(getApplicationContext()), NetUtil.getInstance().isMobileAva(getApplicationContext()));
+            } else {
+                mWifiAutoCloseDelegate.onLocateFail(getApplicationContext(), aMapLocation.getErrorCode(), PowerManagerUtil.getInstance().isScreenOn(getApplicationContext()), NetUtil.getInstance().isWifiCon(getApplicationContext()));
+            }
+
+        }
+
+        private void sendLocationBroadcast(AMapLocation aMapLocation) {
+            String time = System.currentTimeMillis() + "";
+
+            //记录信息并发送广播
+            locationCount++;
+            long callBackTime = System.currentTimeMillis();
+            StringBuffer sb = new StringBuffer();
+            sb.append("定位完成 第" + locationCount + "次\n");
+            sb.append("回调时间: " + Utils.formatUTC(callBackTime, null) + "\n");
+            if (null == aMapLocation) {
+                sb.append("定位失败：location is null!!!!!!!");
+            } else {
+                sb.append(Utils.getLocationStr(aMapLocation));
+                insertLoactionDate(aMapLocation.getLatitude() + "", aMapLocation.getLongitude() + "", time, aMapLocation.getAddress());
+            }
+
+            Log.i(ConstantApi.LOG_I, "定位SDK更新数据 " + sb.toString());
+
+            Intent mIntent = new Intent(MainActivity.RECEIVER_ACTION);
+            mIntent.putExtra("result", sb.toString());
+
+            //发送广播
+            sendBroadcast(mIntent);
         }
     };
+
+
+    private int mGrap = 10;
+    private int mUplaod = 180;
+
+    private void showToastC(String msg) {
+        Toast.makeText(LocationService.this, "" + msg, Toast.LENGTH_SHORT).show();
+    }
+
+
+    NetworkConnectChangedReceiver networkConnectChangedReceiver;
+
+    private void initNetworkConnect() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        networkConnectChangedReceiver = new NetworkConnectChangedReceiver();
+        registerReceiver(networkConnectChangedReceiver, filter);
+    }
+
+    public class NetworkConnectChangedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // 监听网络连接，包括wifi和移动数据的打开和关闭,以及连接上可用的连接都会接到监听
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+                //获取联网状态的NetworkInfo对象
+                NetworkInfo info = intent
+                        .getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+                if (info != null) {
+                    //如果当前的网络连接成功并且网络连接可用
+                    if (NetworkInfo.State.CONNECTED == info.getState() && info.isAvailable()) {
+                        if (info.getType() == ConnectivityManager.TYPE_WIFI
+                                || info.getType() == ConnectivityManager.TYPE_MOBILE) {
+                            Log.i(ConstantApi.LOG_I_NET, "网络可用，精度定位");
+                                initLocation(mGrap);
+                            if (mLocationClient == null) {
+                                initLocation(mGrap);
+                            } else {
+                                mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
+                                mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
+                                mLocationClient = null;
+                                mLocationOption = null;
+                                showToastC("精度定位");
+                                getUploadInfo();
+                            }
+
+                        }
+                    } else {
+                        Log.i(ConstantApi.LOG_I_NET, "网络不可用，GPS定位");
+                        if (mLocationClient == null) {
+                            initLocation(mGrap);
+                        } else {
+                            mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
+                            mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
+                            mLocationClient = null;
+                            mLocationOption = null;
+                            showToastC("GPS定位");
+                            initLocation(mGrap);
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
 
     /**
      * 数据库写入
@@ -409,7 +464,7 @@ public class LocationService extends Service {
 
                             if (!TextUtils.isEmpty(bean.getGrap())) {
                                 mGrap = Integer.parseInt(bean.getGrap());
-                                resetLocationUpLoad(false);
+                                initLocation(mGrap);
                             } else {
                                 showToastC("没有获取到后台设置的默认抓取频率");
                             }
@@ -426,100 +481,4 @@ public class LocationService extends Service {
                     }
                 });
     }
-
-    private int mGrap = 10;
-    private int mUplaod = 180;
-
-    private void showToastC(String msg) {
-        Toast.makeText(LocationService.this, "" + msg, Toast.LENGTH_SHORT).show();
-    }
-
-
-    NetworkConnectChangedReceiver networkConnectChangedReceiver;
-
-    private void initNetworkConnect() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        networkConnectChangedReceiver = new NetworkConnectChangedReceiver();
-        registerReceiver(networkConnectChangedReceiver, filter);
-    }
-
-    public class NetworkConnectChangedReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-//            if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(intent.getAction())) {// 监听wifi的打开与关闭，与wifi的连接无关
-//                int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, 0);
-//                Log.e("TAG", "wifiState:" + wifiState);
-//                switch (wifiState) {
-//                    case WifiManager.WIFI_STATE_DISABLED:
-//                        break;
-//                    case WifiManager.WIFI_STATE_DISABLING:
-//                        break;
-//                }
-//            }
-//            // 监听wifi的连接状态即是否连上了一个有效无线路由
-//            if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent.getAction())) {
-//                Parcelable parcelableExtra = intent
-//                        .getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-//                if (null != parcelableExtra) {
-//                    // 获取联网状态的NetWorkInfo对象
-//                    NetworkInfo networkInfo = (NetworkInfo) parcelableExtra;
-//                    //获取的State对象则代表着连接成功与否等状态
-//                    NetworkInfo.State state = networkInfo.getState();
-//                    //判断网络是否已经连接
-//                    boolean isConnected = state == NetworkInfo.State.CONNECTED;
-//                    Log.e("TAG", "isConnected:" + isConnected);
-//                    if (isConnected) {
-//                        Toast.makeText(context, "连接成功", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        Toast.makeText(context, "连接失败", Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//            }
-            // 监听网络连接，包括wifi和移动数据的打开和关闭,以及连接上可用的连接都会接到监听
-            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                //获取联网状态的NetworkInfo对象
-                NetworkInfo info = intent
-                        .getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-                if (info != null) {
-                    //如果当前的网络连接成功并且网络连接可用
-                    if (NetworkInfo.State.CONNECTED == info.getState() && info.isAvailable()) {
-                        if (info.getType() == ConnectivityManager.TYPE_WIFI
-                                || info.getType() == ConnectivityManager.TYPE_MOBILE) {
-                            Log.i(ConstantApi.LOG_I_NET, "网络可用，精度定位");
-                            if (mLocationClient == null) {
-                                initLocation(mGrap, false);
-                            } else {
-                                mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
-                                mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
-                                mLocationClient = null;
-                                mLocationOption = null;
-                                showToastC("精度定位");
-                                resetLocationUpLoad(false);
-                            }
-
-                        }
-                    } else {
-                        Log.i(ConstantApi.LOG_I_NET, "网络不可用，GPS定位");
-                        if (mLocationClient == null) {
-                            initLocation(mGrap, true);
-                        } else {
-                            mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
-                            mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
-                            mLocationClient = null;
-                            mLocationOption = null;
-                            showToastC("GPS定位");
-                            resetLocationUpLoad(true);
-                        }
-                    }
-                }
-            }
-
-        }
-    }
-
-
 }

@@ -22,4 +22,7 @@
     <string name="title_permissions">权限使用声明</string>
     <string name="read_statement">若您点击同意并开始使用本软件，代表您已阅读并接受<a href="http://www.huawei.mdm.com">《免责声明与软件许可协议》</a>。</string>
 
+    <string name="startLocation">启动定位服务</string>
+    <string name="stopLocation">关闭定位服务</string>
+
 </resources>

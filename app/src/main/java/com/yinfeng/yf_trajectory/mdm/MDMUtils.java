@@ -34,7 +34,7 @@ public class MDMUtils {
     }
 
     public String mComponentName = "com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver";
-    public String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/yinfeng_apk/yfpz.apk";
+    public String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/yf_trajectory/1.apk";
     /**
      * 卸载的包名
      */
@@ -187,7 +187,7 @@ public class MDMUtils {
      * 3. 功能 5,6 从 EMUI9.0 开始支持
      */
 
-    private void setSuperWhiteListForHwSystemManger() {
+    public void setSuperWhiteListForHwSystemManger() {
         try {
             String pageName = mContent.getPackageName();
             DeviceHwSystemManager deviceHwSystemManager = new DeviceHwSystemManager();
@@ -210,4 +210,64 @@ public class MDMUtils {
         }
     }
 
+    /**
+     * 禁用/启用 GPS 功能（EMUI5.0）
+     * 9.0 之前版本：禁用/启用 GPS 功能。禁用后，位置信息中使用 GPS 的定位模式被禁用。
+     * 需要申请 com.huawei.permission.sec.MDM_LOCATION 权限才可以调用此接口。
+     * 9.0 之后版本：不支持此接口，该接口弃用
+     * true:禁用GPS功能
+     * false:启用GPS功能
+     */
+
+
+
+    /**
+     * 打开/关闭 GPS（EMUI5.0）
+     * 9.0 之前版本：打开/关闭使用 GPS 的位置信息定位模式，需要申请
+     * com.huawei.permission.sec.MDM_LOCATION 权限才可以调用此接口
+     * 9.0 之后版本：不支持此接口，该接口弃用
+     * true:打开GPS功能
+     * false:关闭GPS功能
+     */
+    public void turnOnGPS(boolean isTurnOnGPS) {
+        try {
+            String pageName = mContent.getPackageName();//获取应用
+            DeviceControlManager deviceControlManager = new DeviceControlManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            deviceControlManager.turnOnGPS(componentName, isTurnOnGPS);
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.permission.sec.MDM_LOCATION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数admin为null时", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 获取 GPS 状态（EMUI5.0）
+     * true/false 已经开启GPS/未开启GPS 0.1.2
+     */
+    public int isGPSTurnOn() {
+        try {
+            String pageName = mContent.getPackageName();//获取应用
+            DeviceControlManager deviceControlManager = new DeviceControlManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+           boolean isGPSTurnOn= deviceControlManager.isGPSTurnOn(componentName);
+            if (isGPSTurnOn){
+                return 1;
+            }else {
+                return 2;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.permission.sec.MDM_LOCATION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数admin为null时", Toast.LENGTH_SHORT).show();
+        }
+        return 0;
+    }
 }

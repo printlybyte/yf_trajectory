@@ -264,12 +264,17 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
         map.clear();
         map.put("startTime", mTimeStart);
         map.put("endTime", mTimeEnd);
-        String mNetUrl = Api.API_point_app_query;
+          String mNetUrl="";
+        if (!TextUtils.isEmpty(mJumpFlag) && mJumpFlag.equals(ConstantApi.query_info)) {
+            mNetUrl = Api.API_point_apply_query;
+        } else if (!TextUtils.isEmpty(mJumpFlag) && mJumpFlag.equals(ConstantApi.query_search)) {
+            mNetUrl = Api.API_point_app_query;
+        }
         OkHttpUtils
                 .postString()
                 .addHeader("track-token", token)
                 .content(new Gson().toJson(map))
-                .url(Api.API_point_app_query)
+                .url(mNetUrl)
                 .mediaType(MediaType.parse("application/json; charset=utf-8"))
                 .build()
                 .execute(new GenericsCallback<ViewTrackMapActivityBean>(new JsonGenericsSerializator()) {

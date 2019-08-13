@@ -57,18 +57,21 @@ public interface Api {
     String API_point_insert = APP_DOMAIN + "/point/insert";
 
 
-
     /**
      * post
-     *获取坐标点
+     * 获取坐标点
      */
     String API_point_app_query = APP_DOMAIN + "/point/app/query";
-  /**
+    /**
      * post
-     *获取坐标点上传频率
+     * 获取申请记录坐标点
+     */
+    String API_point_apply_query = APP_DOMAIN + "/point/apply/query";
+    /**
+     * post
+     * 获取坐标点上传频率
      */
     String API_point_getFrequency = APP_DOMAIN + "/point/getFrequency";
-
 
 
 }

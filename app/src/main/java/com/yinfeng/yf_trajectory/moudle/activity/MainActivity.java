@@ -5,33 +5,21 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.AppUtils;
-import com.blankj.utilcode.util.ToastUtils;
-import com.huawei.android.app.admin.DeviceApplicationManager;
-import com.huawei.android.app.admin.DeviceControlManager;
-import com.huawei.android.app.admin.DeviceHwSystemManager;
-import com.huawei.android.app.admin.DevicePackageManager;
-import com.huawei.android.app.admin.DeviceRestrictionManager;
 import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.mdm.MDMUtils;
 import com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver;
 import com.yinfeng.yf_trajectory.mdm.SampleEula;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusBean;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusUtils;
-import com.yinfeng.yf_trajectory.moudle.utils.FileUtils;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.EventBusBuilder;
 import org.greenrobot.eventbus.Subscribe;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends Activity implements View.OnClickListener {
     /**
@@ -72,18 +60,39 @@ public class MainActivity extends Activity implements View.OnClickListener {
      */
     private Button mActivityMainCloseUninstall;
     private MDMUtils mdmUtils;
+    /**
+     * 允许定位服务设置
+     */
+    private Button mActivityMainLocationEnabled;
+    /**
+     * 禁止定位服务设置
+     */
+    private Button mActivityMainLocationDisabled;
+    /**
+     * 查看数据库
+     */
+    private Button mActivityMainQueryDatebase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new EventBusUtils().register(this);
+//        new EventBusUtils().register(this);
 
         initView();
     }
 
     private void initView() {
+        mdmUtils = new MDMUtils();
+
+        mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        mAdminName = new ComponentName(this, SampleDeviceReceiver.class);
+
+        sampleEula = new SampleEula(this, mDevicePolicyManager, mAdminName);
+        sampleEula.activeProcessApp();
+
+
         mActivityMainDisplayTxt = (TextView) findViewById(R.id.activity_main_display_txt);
         mActivityMainDisplayTxt.setText("apk path：" + mdmUtils.mPath + '\n' + AppUtils.getAppVersionCode());
         mActivityMainDisplayTxt.setOnClickListener(this);
@@ -110,14 +119,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
 //            e.printStackTrace();
 //        }
 
-        mdmUtils = new MDMUtils();
 
-        mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
-        mAdminName = new ComponentName(this, SampleDeviceReceiver.class);
-
-        sampleEula = new SampleEula(this, mDevicePolicyManager, mAdminName);
-        sampleEula.activeProcessApp();
-
+        mActivityMainLocationEnabled = (Button) findViewById(R.id.activity_main_location_enabled);
+        mActivityMainLocationEnabled.setOnClickListener(this);
+        mActivityMainLocationDisabled = (Button) findViewById(R.id.activity_main_location_disabled);
+        mActivityMainLocationDisabled.setOnClickListener(this);
+        mActivityMainQueryDatebase = (Button) findViewById(R.id.activity_main_query_datebase);
+        mActivityMainQueryDatebase.setOnClickListener(this);
     }
 
 
@@ -150,20 +158,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.activity_main_close_uninstall:
                 mdmUtils.setDisallowedUninstallPackages(false);
                 break;
+            case R.id.activity_main_location_enabled:
+
+                break;
+            case R.id.activity_main_location_disabled:
+                break;
+            case R.id.activity_main_query_datebase:
+                ActivityUtils.startActivity(QueryDateBaseActivity.class);
+                break;
         }
     }
 
     //定义处理接收方法
     @Subscribe
     public void onEventMainThread(EventBusBean event) {
-        Toast.makeText(this, "" + event.getType(), Toast.LENGTH_SHORT).show();
         if (event.getType() == 1) {//激活
             //强制开启数据服务
-            mdmUtils.forceMobiledataOn();
+//            mdmUtils.forceMobiledataOn();
             //保持某应用始终运行
             mdmUtils.addPersistentApp();
             //设置应用为信任应用
-            //setSuperWhiteListForHwSystemManger();
+            mdmUtils.setSuperWhiteListForHwSystemManger();
             //开启禁止卸载
             mdmUtils.setDisallowedUninstallPackages(true);
 

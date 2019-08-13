@@ -23,16 +23,16 @@ public class DaoMaster extends AbstractDaoMaster {
     public static void createAllTables(Database db, boolean ifNotExists) {
         GreendaoAreaBeanDao.createTable(db, ifNotExists);
         GreendaoCityBeanDao.createTable(db, ifNotExists);
+        GreendaoLocationBeanDao.createTable(db, ifNotExists);
         GreendaoProvinceBeanDao.createTable(db, ifNotExists);
-        GreendaoLocationDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
         GreendaoAreaBeanDao.dropTable(db, ifExists);
         GreendaoCityBeanDao.dropTable(db, ifExists);
+        GreendaoLocationBeanDao.dropTable(db, ifExists);
         GreendaoProvinceBeanDao.dropTable(db, ifExists);
-        GreendaoLocationDao.dropTable(db, ifExists);
     }
 
     /**
@@ -53,8 +53,8 @@ public class DaoMaster extends AbstractDaoMaster {
         super(db, SCHEMA_VERSION);
         registerDaoClass(GreendaoAreaBeanDao.class);
         registerDaoClass(GreendaoCityBeanDao.class);
+        registerDaoClass(GreendaoLocationBeanDao.class);
         registerDaoClass(GreendaoProvinceBeanDao.class);
-        registerDaoClass(GreendaoLocationDao.class);
     }
 
     public DaoSession newSession() {
