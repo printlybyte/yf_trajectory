@@ -45,6 +45,7 @@ import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
 import com.yinfeng.yf_trajectory.LocationService;
 import com.yinfeng.yf_trajectory.LocationStatusManager;
+import com.yinfeng.yf_trajectory.PowerManagerUtil;
 import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.mdm.MDMUtils;
 import com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver;
@@ -81,6 +82,25 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         return R.layout.activity_map;
     }
 
+    private PowerManager  powerManager;
+
+
+
+
+
+    private BroadcastReceiver locationChangeBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(ConstantApi.RECEIVER_ACTION)) {
+                String locationResult = intent.getStringExtra("result");
+                if (null != locationResult && !locationResult.trim().equals("")) {
+
+                }
+            }
+        }
+    };
+
     @Override
     protected void initView() {
         super.initView();
@@ -92,7 +112,9 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
 //        PowerManager pm = (PowerManager)  getSystemService(Context.POWER_SERVICE);
 //        @SuppressLint("InvalidWakeLockTag") PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyTAG");
 //        wakeLock.acquire();
-
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConstantApi.RECEIVER_ACTION);
+        registerReceiver(locationChangeBroadcastReceiver, intentFilter);
 
         mActivityMapHeadimg = (CircleImageView) findViewById(R.id.activity_map_headimg);
         mActivityMapHeadimg.setOnClickListener(this);
@@ -146,6 +168,8 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
             mdmUtils.setSuperWhiteListForHwSystemManger();
             //开启禁止卸载
             mdmUtils.setDisallowedUninstallPackages(true);
+            //允许/禁止定位服务设置（EMUI8.0）
+            mdmUtils.setLocationServiceDisabled(false);
 
         } else if (event.getType() == 2) { //取消
             if (mAdminName != null && mAdminName != null) {
@@ -188,7 +212,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     }
 
 
-    private void startLocationService(){
+    private void startLocationService() {
         getApplicationContext().startService(new Intent(this, LocationService.class));
         LocationStatusManager.getInstance().resetToInit(getApplicationContext());
 
@@ -257,6 +281,12 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
         new EventBusUtils().unregister(this);
+
+        if (locationChangeBroadcastReceiver != null)
+            unregisterReceiver(locationChangeBroadcastReceiver);
+
+
+        //releaseWakeLock
 
 
     }

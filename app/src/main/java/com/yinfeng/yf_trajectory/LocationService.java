@@ -1,5 +1,6 @@
 package com.yinfeng.yf_trajectory;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -112,6 +114,7 @@ public class LocationService extends NotiService {
         //解除网络广播监听
         unregisterReceiver(networkConnectChangedReceiver);
         unregisterReceiver(mTimeReceiver);
+
         super.onDestroy();
     }
 
@@ -178,19 +181,43 @@ public class LocationService extends NotiService {
                 sb.append("定位失败：location is null!!!!!!!");
             } else {
                 sb.append(Utils.getLocationStr(aMapLocation));
-                insertLoactionDate(aMapLocation.getLatitude() + "", aMapLocation.getLongitude() + "", time, aMapLocation.getAddress());
+                String lat = aMapLocation.getLatitude() + "";
+                String lng = aMapLocation.getLongitude() + "";
+                String address = aMapLocation.getAddress() + "";
+                String accuracy = aMapLocation.getAccuracy() + "";
+                String provider = aMapLocation.getProvider() + "";
+                String speed = aMapLocation.getSpeed() + "";
+                insertLoactionDate(lat, lng, time + "", address, accuracy, provider, speed);
             }
 
             Log.i(ConstantApi.LOG_I, "定位SDK更新数据 " + sb.toString());
+            requestWakeLock();
 
-            Intent mIntent = new Intent(MainActivity.RECEIVER_ACTION);
+            Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
             mIntent.putExtra("result", sb.toString());
-
             //发送广播
             sendBroadcast(mIntent);
+
+
         }
     };
+    PowerManager powerManager;
 
+    public void requestWakeLock() {
+        if (powerManager == null) {
+            if (PowerManagerUtil.getInstance().isScreenOn(getApplicationContext())) {
+                return;
+            }
+            //针对熄屏后cpu休眠导致的无法联网、定位失败问题,通过定期点亮屏幕实现联网,本操作会导致cpu无法休眠耗电量增加,谨慎使用
+            powerManager = (PowerManager) getApplication().getSystemService(Context.POWER_SERVICE);
+            @SuppressLint("InvalidWakeLockTag")
+            PowerManager.WakeLock wl = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, "bright");
+            wl.acquire();
+            //点亮屏幕
+            wl.release();
+            //释放
+        }
+    }
 
     private int mGrap = 10;
     private int mUplaod = 180;
@@ -226,31 +253,10 @@ public class LocationService extends NotiService {
                         if (info.getType() == ConnectivityManager.TYPE_WIFI
                                 || info.getType() == ConnectivityManager.TYPE_MOBILE) {
                             Log.i(ConstantApi.LOG_I_NET, "网络可用，精度定位");
-                                initLocation(mGrap);
-                            if (mLocationClient == null) {
-                                initLocation(mGrap);
-                            } else {
-                                mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
-                                mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
-                                mLocationClient = null;
-                                mLocationOption = null;
-                                showToastC("精度定位");
-                                getUploadInfo();
-                            }
-
+                            getUploadInfo();
                         }
                     } else {
                         Log.i(ConstantApi.LOG_I_NET, "网络不可用，GPS定位");
-                        if (mLocationClient == null) {
-                            initLocation(mGrap);
-                        } else {
-                            mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
-                            mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
-                            mLocationClient = null;
-                            mLocationOption = null;
-                            showToastC("GPS定位");
-                            initLocation(mGrap);
-                        }
                     }
                 }
             }
@@ -258,11 +264,22 @@ public class LocationService extends NotiService {
         }
     }
 
+    private void resetLocation() {
+        if (mLocationClient == null) {
+            initLocation(mGrap);
+        } else {
+            mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
+            mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
+            mLocationClient = null;
+            mLocationOption = null;
+            initLocation(mGrap);
+        }
+    }
 
     /**
      * 数据库写入
      */
-    private void insertLoactionDate(String lat, String lng, String time, String address) {
+    private void insertLoactionDate(String lat, String lng, String time, String address, String accuracy, String provider, String speed) {
         DaoSession daoSession = BaseApplication.getDaoInstant();
 //        BaseApplication.getDaoInstant().startAsyncSession().runInTx(new Runnable() {
 //            @Override
@@ -273,6 +290,9 @@ public class LocationService extends NotiService {
         bean.setLng(lng);
         bean.setAddress(address);
         bean.setTime(time);
+        bean.setAccuracy(accuracy);
+        bean.setProvider(provider);
+        bean.setSpeed(speed);
         daoSession.insert(bean);//插入或替换
 //            }
 //        });
@@ -318,6 +338,13 @@ public class LocationService extends NotiService {
             int hour = cal.get(Calendar.HOUR_OF_DAY);
             int min = cal.get(Calendar.MINUTE);
 
+            if (hour==1){
+                Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION_DOWNLOAD_APK);
+                mIntent.putExtra("result","downlaod");
+                //发送广播
+                sendBroadcast(mIntent);
+            }
+
             //30分钟触发一次获取上传信息
             if (min == 0 || min == 30) {
                 getUploadInfo();
@@ -359,13 +386,21 @@ public class LocationService extends NotiService {
                 String queryLng = mList.get(i).getLng();
                 String queryTime = mList.get(i).getTime();
                 String queryAddress = mList.get(i).getAddress();
-                Log.i(ConstantApi.LOG_I, "查询数据 ：" + "lat: " + queryLat + "lng: " + queryLng + "time: " + queryTime + " mList:" + "  address :" + queryAddress + mList.size());
+                String queryAccuracy = mList.get(i).getAccuracy();
+                String queryProvider = mList.get(i).getProvider();
+                String querySpeed = mList.get(i).getSpeed();
+
+//                Log.i(ConstantApi.LOG_I, "查询数据 ：" + "lat: " + queryLat + "lng: " + queryLng + "time: " + queryTime + " mList:" + "  address :" + queryAddress + mList.size());
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("lat", queryLat);
                     jsonObject.put("lng", queryLng);
                     jsonObject.put("time", queryTime);
                     jsonObject.put("name", queryAddress);
+
+                    jsonObject.put("accuracy", queryAccuracy);
+                    jsonObject.put("provider", queryProvider);
+                    jsonObject.put("speed", querySpeed);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.i(ConstantApi.LOG_I, "JSONException ：");

@@ -165,7 +165,8 @@ public class QueryDateBaseActivity extends BaseActivity {
         protected void convert(MyHoudle helper, QueryDateBaseActivityBean.DataBean d) {
 
 //            helper.addOnClickListener(R.id.ai_channnel_activity_item_g);
-            helper.setText(R.id.ai_query_datebase_layout_txt, d.getLat() == "" ? "暂无数据" : "lat: " + d.getLat() + "lng: " + d.getLng() + "addr : " + d.getAddress() + "time: " + d.getTime());
+            helper.setText(R.id.ai_query_datebase_layout_txt, d.getLat() == "" ? "暂无数据" : "lat: " + d.getLat() + "lng: " + d.getLng() + "addr : " + d.getAddress() + "time: " + d.getTime()
+                    +'\n'+" Accuracy: "+d.getAccuracy()+" Provider: "+d.getProvider()+" Speed: "+d.getSpeed());
 
             if (!TextUtils.isEmpty(d.getTime())) {
                 String mTimers= TimeUtils.millis2String(Long.parseLong(d.getTime()));

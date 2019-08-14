@@ -1,5 +1,7 @@
 package com.yinfeng.yf_trajectory;
 
+import android.os.Environment;
+
 /**
  * ============================================
  * 描  述：
@@ -37,5 +39,11 @@ public interface ConstantApi {
 
     long time_dialog_min_time = Long.parseLong("1564647419000");
     long time_dialog_max_time = Long.parseLong("1880266619000");
+    String RECEIVER_ACTION = "location_in_background";
+    String RECEIVER_ACTION_DOWNLOAD_APK = "download_apk_in_background";
+
+   String CommonApkPath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/yf_trajectory/";
+   String CommonPath=Environment.getExternalStorageDirectory().getAbsolutePath();
+    String CommonApkName="1.apk";
 
 }

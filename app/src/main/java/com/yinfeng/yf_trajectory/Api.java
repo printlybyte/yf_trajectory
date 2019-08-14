@@ -73,5 +73,12 @@ public interface Api {
      */
     String API_point_getFrequency = APP_DOMAIN + "/point/getFrequency";
 
+    /**
+     * post
+     * 获取升级信息
+     */
+    String API_appVersion_judge = APP_DOMAIN + "/appVersion/judge?id=1";
+
+
 
 }

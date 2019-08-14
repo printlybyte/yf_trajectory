@@ -29,6 +29,9 @@ public class GreendaoLocationBeanDao extends AbstractDao<GreendaoLocationBean, L
         public final static Property Lng = new Property(2, String.class, "lng", false, "LNG");
         public final static Property Address = new Property(3, String.class, "address", false, "ADDRESS");
         public final static Property Time = new Property(4, String.class, "time", false, "TIME");
+        public final static Property Accuracy = new Property(5, String.class, "accuracy", false, "ACCURACY");
+        public final static Property Provider = new Property(6, String.class, "provider", false, "PROVIDER");
+        public final static Property Speed = new Property(7, String.class, "speed", false, "SPEED");
     }
 
 
@@ -48,7 +51,10 @@ public class GreendaoLocationBeanDao extends AbstractDao<GreendaoLocationBean, L
                 "\"LAT\" TEXT," + // 1: lat
                 "\"LNG\" TEXT," + // 2: lng
                 "\"ADDRESS\" TEXT," + // 3: address
-                "\"TIME\" TEXT);"); // 4: time
+                "\"TIME\" TEXT," + // 4: time
+                "\"ACCURACY\" TEXT," + // 5: accuracy
+                "\"PROVIDER\" TEXT," + // 6: provider
+                "\"SPEED\" TEXT);"); // 7: speed
     }
 
     /** Drops the underlying database table. */
@@ -85,6 +91,21 @@ public class GreendaoLocationBeanDao extends AbstractDao<GreendaoLocationBean, L
         if (time != null) {
             stmt.bindString(5, time);
         }
+ 
+        String accuracy = entity.getAccuracy();
+        if (accuracy != null) {
+            stmt.bindString(6, accuracy);
+        }
+ 
+        String provider = entity.getProvider();
+        if (provider != null) {
+            stmt.bindString(7, provider);
+        }
+ 
+        String speed = entity.getSpeed();
+        if (speed != null) {
+            stmt.bindString(8, speed);
+        }
     }
 
     @Override
@@ -115,6 +136,21 @@ public class GreendaoLocationBeanDao extends AbstractDao<GreendaoLocationBean, L
         if (time != null) {
             stmt.bindString(5, time);
         }
+ 
+        String accuracy = entity.getAccuracy();
+        if (accuracy != null) {
+            stmt.bindString(6, accuracy);
+        }
+ 
+        String provider = entity.getProvider();
+        if (provider != null) {
+            stmt.bindString(7, provider);
+        }
+ 
+        String speed = entity.getSpeed();
+        if (speed != null) {
+            stmt.bindString(8, speed);
+        }
     }
 
     @Override
@@ -129,7 +165,10 @@ public class GreendaoLocationBeanDao extends AbstractDao<GreendaoLocationBean, L
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // lat
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // lng
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // address
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // time
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // time
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // accuracy
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // provider
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // speed
         );
         return entity;
     }
@@ -141,6 +180,9 @@ public class GreendaoLocationBeanDao extends AbstractDao<GreendaoLocationBean, L
         entity.setLng(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setAddress(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setTime(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setAccuracy(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setProvider(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setSpeed(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
      }
     
     @Override

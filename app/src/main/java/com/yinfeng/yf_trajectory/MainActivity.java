@@ -19,7 +19,6 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonStartService;
     private TextView tvResult;
 
-    public static final String RECEIVER_ACTION = "location_in_background";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,15 +28,15 @@ public class MainActivity extends AppCompatActivity {
         buttonStartService = (Button) findViewById(R.id.button_start_service);
         tvResult = (TextView) findViewById(R.id.tv_result);
 
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(RECEIVER_ACTION);
-        registerReceiver(locationChangeBroadcastReceiver, intentFilter);
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(ConstantApi.RECEIVER_ACTION);
+//        registerReceiver(locationChangeBroadcastReceiver, intentFilter);
     }
 
     @Override
     protected void onDestroy() {
-        if (locationChangeBroadcastReceiver != null)
-            unregisterReceiver(locationChangeBroadcastReceiver);
+//        if (locationChangeBroadcastReceiver != null)
+//            unregisterReceiver(locationChangeBroadcastReceiver);
 
         super.onDestroy();
     }
@@ -79,18 +78,18 @@ public class MainActivity extends AppCompatActivity {
         sendBroadcast(Utils.getCloseBrodecastIntent());
     }
 
-    private BroadcastReceiver locationChangeBroadcastReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (action.equals(RECEIVER_ACTION)) {
-                String locationResult = intent.getStringExtra("result");
-                if (null != locationResult && !locationResult.trim().equals("")) {
-                    tvResult.setText(locationResult);
-                }
-            }
-        }
-    };
+//    private BroadcastReceiver locationChangeBroadcastReceiver = new BroadcastReceiver() {
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            String action = intent.getAction();
+//            if (action.equals(ConstantApi.RECEIVER_ACTION)) {
+//                String locationResult = intent.getStringExtra("result");
+//                if (null != locationResult && !locationResult.trim().equals("")) {
+//                    tvResult.setText(locationResult);
+//                }
+//            }
+//        }
+//    };
 
 }

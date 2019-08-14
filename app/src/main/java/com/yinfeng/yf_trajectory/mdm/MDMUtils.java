@@ -10,7 +10,9 @@ import com.huawei.android.app.admin.DeviceApplicationManager;
 import com.huawei.android.app.admin.DeviceControlManager;
 import com.huawei.android.app.admin.DeviceHwSystemManager;
 import com.huawei.android.app.admin.DevicePackageManager;
+import com.huawei.android.app.admin.DeviceSettingsManager;
 import com.huawei.android.app.admin.DeviceRestrictionManager;
+import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.moudle.utils.FileUtils;
 
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class MDMUtils {
     }
 
     public String mComponentName = "com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver";
-    public String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/yf_trajectory/1.apk";
+    public String mPath = ConstantApi.CommonApkPath + "1.apk";
     /**
      * 卸载的包名
      */
@@ -211,14 +213,34 @@ public class MDMUtils {
     }
 
     /**
-     * 禁用/启用 GPS 功能（EMUI5.0）
-     * 9.0 之前版本：禁用/启用 GPS 功能。禁用后，位置信息中使用 GPS 的定位模式被禁用。
-     * 需要申请 com.huawei.permission.sec.MDM_LOCATION 权限才可以调用此接口。
-     * 9.0 之后版本：不支持此接口，该接口弃用
-     * true:禁用GPS功能
-     * false:启用GPS功能
+     * 允许/禁止定位服务设置（EMUI8.0）
+     * 设置允许、禁止所有定位服务。
+     * 注意：需要申请 com.huawei.permission.sec.MDM_SETTINGS_RESTRICTION 权限才能调用此接口；
+     * 通过该接口指定禁用还是启用定位服务
+     * 用来指定禁用还是启用定位服务，true表示禁用，false表示启用
+     * 返回值：true：配置成功；
+     * false：配置失败。
      */
-
+    public void setLocationServiceDisabled(boolean isDisabled) {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceSettingsManager.setLocationServiceDisabled(componentName, isDisabled);
+            if (isSuccess) {
+                Toast.makeText(mContent, "定位服务配置成功", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(mContent, "定位服务配置失败", Toast.LENGTH_SHORT).show();
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.systemmanager.permission.MDM_SETTINGS_RESTRICTION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
     /**
@@ -254,10 +276,10 @@ public class MDMUtils {
             String pageName = mContent.getPackageName();//获取应用
             DeviceControlManager deviceControlManager = new DeviceControlManager();
             ComponentName componentName = new ComponentName(pageName, mComponentName);
-           boolean isGPSTurnOn= deviceControlManager.isGPSTurnOn(componentName);
-            if (isGPSTurnOn){
+            boolean isGPSTurnOn = deviceControlManager.isGPSTurnOn(componentName);
+            if (isGPSTurnOn) {
                 return 1;
-            }else {
+            } else {
                 return 2;
             }
         } catch (SecurityException e) {

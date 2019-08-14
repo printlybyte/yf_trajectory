@@ -27,6 +27,33 @@ public class QueryDateBaseActivityBean {
         private String lng;
         private String address;
         private String time;
+        private String accuracy;
+        private String provider;
+        private String speed;
+
+        public String getAccuracy() {
+            return accuracy;
+        }
+
+        public void setAccuracy(String accuracy) {
+            this.accuracy = accuracy;
+        }
+
+        public String getProvider() {
+            return provider;
+        }
+
+        public void setProvider(String provider) {
+            this.provider = provider;
+        }
+
+        public String getSpeed() {
+            return speed;
+        }
+
+        public void setSpeed(String speed) {
+            this.speed = speed;
+        }
 
         public String getLat() {
             return lat;
