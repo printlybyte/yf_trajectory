@@ -24,6 +24,7 @@ import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.lcodecore.tkrefreshlayout.footer.LoadingView;
 import com.lcodecore.tkrefreshlayout.header.GoogleDotView;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.moudle.bean.QueryDateBaseActivityBean;
@@ -197,7 +198,7 @@ public class QueryDateBaseActivity extends BaseActivity {
         try {
             return daoSession.queryBuilder(GreendaoLocationBean.class).list();
         } catch (Exception e) {
-            Log.i(ConstantApi.LOG_I, "green err " + e.toString());
+            Logger.v( "green err " + e.toString());
             showToast("green err " + e.toString());
             e.printStackTrace();
         }

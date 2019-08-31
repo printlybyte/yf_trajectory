@@ -10,25 +10,16 @@ package com.yinfeng.yf_trajectory.moudle.service;
  * ============================================
  **/
 
-import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
@@ -52,34 +43,29 @@ import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
-import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.moudle.bean.ConmonBean_string;
 import com.yinfeng.yf_trajectory.moudle.bean.UploadInfoBean;
-import com.yinfeng.yf_trajectory.moudle.login.LoginVerActivity;
+//import com.yinfeng.yf_trajectory.moudle.login.LoginVerActivity;
 import com.yinfeng.yf_trajectory.moudle.utils.LocationErrUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URI;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import okhttp3.Call;
 import timber.log.Timber;
 
 
-public class LocationService extends Service {
-    private final static String TAG = "LocationService";
+public class LocationServiceTest extends Service {
+    private final static String TAG = "LocationServiceTest";
 
     @Nullable
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -103,7 +89,7 @@ public class LocationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Intent intent = new Intent(getApplicationContext(), LocationService.class);
+        Intent intent = new Intent(getApplicationContext(), LocationServiceTest.class);
         startService(intent);
         //解除网络广播监听
         unregisterReceiver(networkConnectChangedReceiver);
@@ -186,7 +172,7 @@ public class LocationService extends Service {
                     String lng = amapLocation.getLongitude() + "";
                     String time = System.currentTimeMillis() + "";
                     String address = amapLocation.getAddress() + "";
-                    Log.i(ConstantApi.LOG_I, "定位SDK更新数据 " + "lat: " + lat + "lng: " + lng + "time: " + time + "address: " + address);
+                    Logger.v( "定位SDK更新数据 " + "lat: " + lat + "lng: " + lng + "time: " + time + "address: " + address);
                     mTempNums++;
                     showToastC("" + mTempNums);
 //                    LatLng curLatlng = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
@@ -196,7 +182,7 @@ public class LocationService extends Service {
                 } else {
                     LocationErrUtils.getInstance().showErr(amapLocation.getErrorCode());
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
-                    Log.i(ConstantApi.LOG_I, "location Error, ErrCode:"
+                    Logger.v( "location Error, ErrCode:"
                             + amapLocation.getErrorCode() + ", errInfo:"
                             + amapLocation.getErrorInfo());
                 }
@@ -274,7 +260,7 @@ public class LocationService extends Service {
             }
 
             int mmUplaodMinute = mUplaod / 60;
-            Log.i(ConstantApi.LOG_I, " 抓取频率: " + mGrap + " 上传间隔: " + mUplaod + " 计时器任务 整除 ？：" + min % mmUplaodMinute + " 当前时间：" + min);
+            Logger.v( " 抓取频率: " + mGrap + " 上传间隔: " + mUplaod + " 计时器任务 整除 ？：" + min % mmUplaodMinute + " 当前时间：" + min);
 
             if (!NetworkUtils.isConnected()) {
                 showToastC("网络无连接，仅设备模式定位");
@@ -283,7 +269,7 @@ public class LocationService extends Service {
 
             if (min % mmUplaodMinute == 0) {
                 if (parseDate() != null) {
-                    Log.i(ConstantApi.LOG_I, "查询数据 jsonArray ：" + parseDate());
+                    Logger.v( "查询数据 jsonArray ：" + parseDate());
                     commitLocationInfo(parseDate());
                 } else {
                     showToastC("上传失败，数据转化异常");
@@ -304,7 +290,7 @@ public class LocationService extends Service {
                 String queryLng = mList.get(i).getLng();
                 String queryTime = mList.get(i).getTime();
                 String queryAddress = mList.get(i).getAddress();
-                Log.i(ConstantApi.LOG_I, "查询数据 ：" + "lat: " + queryLat + "lng: " + queryLng + "time: " + queryTime + " mList:" + "  address :" + queryAddress + mList.size());
+                Logger.v( "查询数据 ：" + "lat: " + queryLat + "lng: " + queryLng + "time: " + queryTime + " mList:" + "  address :" + queryAddress + mList.size());
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("lat", queryLat);
@@ -313,7 +299,7 @@ public class LocationService extends Service {
                     jsonObject.put("name", queryAddress);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.i(ConstantApi.LOG_I, "JSONException ：");
+                    Logger.v( "JSONException ：");
                 }
                 jsonArray.put(jsonObject);
 
@@ -331,6 +317,7 @@ public class LocationService extends Service {
 //        OkGo.<String>post(Api.API_point_insert)
         // http://192.168.1.137:8111/admin/point/insert
         String token = Hawk.get(ConstantApi.HK_TOKEN);
+        Log.i("testtoken","token: upload "+token);
         OkGo.<String>post(Api.API_point_insert)
                 .tag(this)
                 .headers("track-token", token)
@@ -340,32 +327,32 @@ public class LocationService extends Service {
                     public void onSuccess(Response<String> response) {
                         String data = response.body();//这个就是返回来的结果
                         Timber.i("success:%s", data);
-                        Log.i(ConstantApi.LOG_I, "onSuccess：" + data);
+                        Logger.v( "onSuccess：" + data);
                         try {
                             ConmonBean_string bean = new Gson().fromJson(response.body(), ConmonBean_string.class);
                             if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS) {
-                                Log.i(ConstantApi.LOG_I, "上传成功");
+                                Logger.v( "上传成功");
                                 DaoSession daoSession = BaseApplication.getDaoInstant();
                                 daoSession.deleteAll(GreendaoLocationBean.class);
                             } else if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_ERR_901) {
                                 Toast.makeText(getBaseContext(), "账号在其他地方登陆，密码已泄露，建议重置并重新登录！", Toast.LENGTH_SHORT).show();
-                                Log.i(ConstantApi.LOG_I, "账号在其他地方登陆");
+                                Logger.v( "账号在其他地方登陆");
                                 AppManager.getInstance().finishAllActivity();
                                 stopSelf(-1);
-                                ActivityUtils.startActivity(LoginVerActivity.class);
+//                                ActivityUtils.startActivity(LoginVerActivity.class);
                             } else {
-                                Log.i(ConstantApi.LOG_I, bean.getMessage());
+                                Logger.v( bean.getMessage());
                                 showToastC(bean.getMessage());
                             }
                         } catch (Exception e) {
-                            Log.i(ConstantApi.LOG_I, "转化失败");
+                            Logger.v( "转化失败");
                         }
                     }
 
                     @Override
                     public void onError(Response<String> response) {
                         super.onError(response);
-                        Log.i(ConstantApi.LOG_I, "onError：" + response.body());
+                        Logger.v( "onError：" + response.body());
                         try {
                             ConmonBean_string bean = new Gson().fromJson(response.body(), ConmonBean_string.class);
                             if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS) {
@@ -373,7 +360,7 @@ public class LocationService extends Service {
                             }
                         } catch (Exception e) {
                             showToastC("转化失败");
-                            Log.i(ConstantApi.LOG_I, "Gson转化失败");
+                            Logger.v( "Gson转化失败");
 
                         }
                     }
@@ -422,7 +409,7 @@ public class LocationService extends Service {
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i(ConstantApi.LOG_I_NET, "请求结果：上传信息" + GsonUtils.getInstance().toJson(response));
+                        Logger.v( "请求结果：上传信息" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }
@@ -431,7 +418,7 @@ public class LocationService extends Service {
     private int mUplaod = 180;
 
     private void showToastC(String msg) {
-        Toast.makeText(LocationService.this, "" + msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(LocationServiceTest.this, "" + msg, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -489,7 +476,7 @@ public class LocationService extends Service {
                     if (NetworkInfo.State.CONNECTED == info.getState() && info.isAvailable()) {
                         if (info.getType() == ConnectivityManager.TYPE_WIFI
                                 || info.getType() == ConnectivityManager.TYPE_MOBILE) {
-                            Log.i(ConstantApi.LOG_I_NET, "网络可用，精度定位");
+                            Logger.v( "网络可用，精度定位");
                             if (mLocationClient == null) {
                                 initLocation(mGrap, false);
                             } else {
@@ -503,7 +490,7 @@ public class LocationService extends Service {
 
                         }
                     } else {
-                        Log.i(ConstantApi.LOG_I_NET, "网络不可用，GPS定位");
+                        Logger.v( "网络不可用，GPS定位");
                         if (mLocationClient == null) {
                             initLocation(mGrap, true);
                         } else {

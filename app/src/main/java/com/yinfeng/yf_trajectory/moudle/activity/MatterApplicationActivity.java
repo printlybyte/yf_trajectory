@@ -4,10 +4,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.caitiaobang.core.app.app.BaseActivity;
 import com.caitiaobang.core.app.net.GenericsCallback;
@@ -18,13 +18,13 @@ import com.jzxiang.pickerview.TimePickerDialog;
 import com.jzxiang.pickerview.data.Type;
 import com.jzxiang.pickerview.listener.OnDateSetListener;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
 import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.moudle.bean.MatterApplicationActivityBean;
 import com.yinfeng.yf_trajectory.moudle.bean.MatterApplicationActivityStatusBean;
-import com.yinfeng.yf_trajectory.moudle.bean.UserInfoBean;
 import com.zhy.http.okhttp.OkHttpUtils;
 
 import java.util.LinkedHashMap;
@@ -90,6 +90,7 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
         mActivityMatterApplicationEndTime.setOnClickListener(this);
         mActivityMatterApplicationStokeChick = (TextView) findViewById(R.id.activity_matter_application_stoke_chick);
         mActivityMatterApplicationStokeChick.setOnClickListener(this);
+
     }
 
 
@@ -142,6 +143,7 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
             case R.id.activity_matter_application_stoke_chick:
                 checkInput();
                 break;
+
         }
     }
 
@@ -197,7 +199,7 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
         map.put("reason", reason);
         map.put("title", "标题： " + reason);
         map.put("address", address);
-        Log.i(ConstantApi.LOG_I_NET, "API: " + mUrl + "发送json：" + new Gson().toJson(map));
+        Logger.v( "API: " + mUrl + "发送json：" + new Gson().toJson(map));
         OkHttpUtils
                 .postString()
                 .addHeader("track-token", token)
@@ -229,7 +231,7 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i(ConstantApi.LOG_I_NET, "请求结果：" + GsonUtils.getInstance().toJson(response));
+                        Logger.v( "请求结果：" + GsonUtils.getInstance().toJson(response));
                         dismisProgress();
                     }
                 });
@@ -251,7 +253,7 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
             showToastC("token = null ");
             return;
         }
-        Log.i(ConstantApi.LOG_I_NET, "API: " + Api.API_apply_judge);
+        Logger.v( "API: " + Api.API_apply_judge);
         OkHttpUtils
                 .get()
                 .addHeader("track-token", token)
@@ -287,7 +289,7 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i(ConstantApi.LOG_I_NET, "请求结果：" + GsonUtils.getInstance().toJson(response));
+                        Logger.v( "请求结果：" + GsonUtils.getInstance().toJson(response));
                         dismisProgress();
                     }
                 });
@@ -301,4 +303,11 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
     }
 
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // TODO:OnCreate Method has been created, run FindViewById again to generate code
+        setContentView(R.layout.activity_matter_application);
+        initView();
+    }
 }

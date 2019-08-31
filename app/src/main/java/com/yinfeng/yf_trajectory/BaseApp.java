@@ -8,6 +8,7 @@ import android.support.multidex.MultiDex;
 import android.widget.ImageView;
 
 import com.blankj.utilcode.util.CrashUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.caitiaobang.core.app.app.BaseApplication;
@@ -19,6 +20,10 @@ import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.cookie.CookieJarImpl;
 import com.lzy.okgo.cookie.store.SPCookieStore;
 import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
+import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.DiskLogAdapter;
+import com.orhanobut.logger.Logger;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -39,9 +44,6 @@ public class BaseApp extends BaseApplication {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
-
-
-
 
     }
 
@@ -72,7 +74,8 @@ public class BaseApp extends BaseApplication {
         initFileCrash();
         NineGridView.setImageLoader(new PicassoImageLoader());
 
-
+//        Logger.addLogAdapter(new AndroidLogAdapter());
+        Logger.addLogAdapter(new DiskLogAdapter());
     }
 
     /**

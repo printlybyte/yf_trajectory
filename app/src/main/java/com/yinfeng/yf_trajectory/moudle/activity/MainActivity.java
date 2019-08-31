@@ -1,10 +1,10 @@
 package com.yinfeng.yf_trajectory.moudle.activity;
 
-import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,6 +12,9 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.AppUtils;
+import com.caitiaobang.core.app.app.AppManager;
+import com.caitiaobang.core.app.app.BaseActivity;
+import com.caitiaobang.core.app.storge.LattePreference;
 import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.mdm.MDMUtils;
 import com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver;
@@ -21,7 +24,9 @@ import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusUtils;
 
 import org.greenrobot.eventbus.Subscribe;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+//import com.yinfeng.yf_trajectory.moudle.login.LoginVerActivity;
+
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     /**
      * Hello World!
      */
@@ -72,18 +77,39 @@ public class MainActivity extends Activity implements View.OnClickListener {
      * 查看数据库
      */
     private Button mActivityMainQueryDatebase;
+    /**
+     * 退出登录
+     */
+    private Button mActivityMainExitApp;
+    /**
+     * 关闭系统更新
+     */
+    private Button mActivityMainCloseUpdateSystem;
+    /**
+     * 关闭禁止恢复出厂设置
+     */
+    private Button mActivityMainCloseFactorySettings;
+    /**
+     * 开启应用搜索
+     */
+    private Button mActivityMainStartAppSearch;
+    /**
+     * 开启应用通知
+     */
+    private Button mActivityMainStartNotice;
+    /**
+     * 移除激活
+     */
+    private Button mActivityMainRemovePositionApp;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-//        new EventBusUtils().register(this);
-
-        initView();
+    protected int getContentLayoutId() {
+        return R.layout.activity_main;
     }
 
-    private void initView() {
+    protected void initView() {
+        super.initView();
         mdmUtils = new MDMUtils();
 
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -94,7 +120,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
 
         mActivityMainDisplayTxt = (TextView) findViewById(R.id.activity_main_display_txt);
-        mActivityMainDisplayTxt.setText("apk path：" + mdmUtils.mPath + '\n' + AppUtils.getAppVersionCode());
         mActivityMainDisplayTxt.setOnClickListener(this);
         mActivityMainInstallApk = (Button) findViewById(R.id.activity_main_install_apk);
         mActivityMainInstallApk.setOnClickListener(this);
@@ -126,6 +151,33 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mActivityMainLocationDisabled.setOnClickListener(this);
         mActivityMainQueryDatebase = (Button) findViewById(R.id.activity_main_query_datebase);
         mActivityMainQueryDatebase.setOnClickListener(this);
+        mActivityMainExitApp = (Button) findViewById(R.id.activity_main_exit_app);
+        mActivityMainExitApp.setOnClickListener(this);
+        mActivityMainCloseUpdateSystem = (Button) findViewById(R.id.activity_main_close_update_system);
+        mActivityMainCloseUpdateSystem.setOnClickListener(this);
+        mActivityMainCloseFactorySettings = (Button) findViewById(R.id.activity_main_close_factory_settings);
+        mActivityMainCloseFactorySettings.setOnClickListener(this);
+        mActivityMainStartAppSearch = (Button) findViewById(R.id.activity_main_start_app_search);
+        mActivityMainStartAppSearch.setOnClickListener(this);
+        mActivityMainStartNotice = (Button) findViewById(R.id.activity_main_start_notice);
+        mActivityMainStartNotice.setOnClickListener(this);
+
+
+        //获取手机号码
+        TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        String deviceid = tm.getDeviceId();//获取智能设备唯一编号
+        String te1 = tm.getLine1Number();//获取本机号码
+
+        mActivityMainDisplayTxt.setText("apk path：" + mdmUtils.mPath + '\n' + AppUtils.getAppVersionCode() + '\n' + "手机号： " + te1);
+
+
+        mActivityMainRemovePositionApp = (Button) findViewById(R.id.activity_main_remove_position_app);
+        mActivityMainRemovePositionApp.setOnClickListener(this);
+    }
+
+    @Override
+    protected void initData() {
+
     }
 
 
@@ -137,10 +189,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.activity_main_display_txt:
                 break;
             case R.id.activity_main_uninstall_apk:
-                mdmUtils.installApk(false);
+                showToastC("");
+                mdmUtils.installApk(false, "track");
                 break;
             case R.id.activity_main_install_apk:
-                mdmUtils.installApk(true);
+                mdmUtils.installApk(true, "track");
                 break;
             case R.id.activity_main_wifi_start:
                 mdmUtils.setWifiDisabled(false);
@@ -165,6 +218,31 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.activity_main_query_datebase:
                 ActivityUtils.startActivity(QueryDateBaseActivity.class);
+                break;
+            case R.id.activity_main_exit_app:
+
+                LattePreference.clear();
+                AppManager.getInstance().finishAllActivity();
+                finish();
+//                ActivityUtils.startActivity(LoginVerActivity.class);
+
+                break;
+            case R.id.activity_main_close_update_system:
+                mdmUtils.setSystemUpdateDisabled(false);
+                break;
+            case R.id.activity_main_close_factory_settings:
+                mdmUtils.setRestoreFactoryDisabled(false);
+                break;
+            case R.id.activity_main_start_app_search:
+                mdmUtils.setSearchIndexDisabled(false);
+
+                break;
+            case R.id.activity_main_start_notice:
+                mdmUtils.setNotificationDisabled(false);
+
+                break;
+            case R.id.activity_main_remove_position_app:
+                mdmUtils.removeDisabledDeactivateMdmPackages();
                 break;
         }
     }
@@ -198,4 +276,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         new EventBusUtils().unregister(this);
 
     }
+
+
 }

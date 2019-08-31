@@ -3,6 +3,7 @@ package com.caitiaobang.core.app.storge;
 
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -24,6 +25,30 @@ public final class LattePreference {
     private static final SharedPreferences PREFERENCES =
             PreferenceManager.getDefaultSharedPreferences(Latte.getApplicationContext());
     private static final String APP_PREFERENCES_KEY = "profile";
+
+
+    public static void saveKey(String key, String value) {
+        //步骤1：创建一个SharedPreferences对象
+        SharedPreferences sharedPreferences = Latte.getApplicationContext().getSharedPreferences("data", Context.MODE_MULTI_PROCESS);
+        //步骤2： 实例化SharedPreferences.Editor对象
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        //步骤3：将获取过来的值放入文件
+        editor.putString(key, value);
+        //步骤4：提交
+        editor.commit();
+    }
+
+    public static String getValue(String key) {
+        SharedPreferences sharedPreferences = Latte.getApplicationContext().getSharedPreferences("data", Context.MODE_MULTI_PROCESS);
+        return sharedPreferences.getString(key, "");
+    }
+
+    public static void clear() {
+        SharedPreferences sharedPreferences = Latte.getApplicationContext().getSharedPreferences("data", Context.MODE_MULTI_PROCESS);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+    }
 
     private static SharedPreferences getAppPreference() {
         return PREFERENCES;

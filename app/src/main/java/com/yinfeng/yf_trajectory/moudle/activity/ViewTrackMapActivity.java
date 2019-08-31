@@ -34,6 +34,7 @@ import com.jzxiang.pickerview.TimePickerDialog;
 import com.jzxiang.pickerview.data.Type;
 import com.jzxiang.pickerview.listener.OnDateSetListener;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
@@ -199,9 +200,9 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
         public void onMyLocationChange(Location location) {
             if (location != null) {
                 aMap.moveCamera(CameraUpdateFactory.zoomTo(16));
-                Log.i(ConstantApi.LOG_I, "地图定位刷新：");
+                Logger.v( "地图定位刷新：");
             } else {
-                Log.i(ConstantApi.LOG_I, "地图定位刷新 错误");
+                Logger.v( "地图定位刷新 错误");
             }
 
         }
@@ -297,7 +298,7 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i(ConstantApi.LOG_I_NET, "请求结果：" + GsonUtils.getInstance().toJson(response));
+                        Logger.v( "请求结果：" + GsonUtils.getInstance().toJson(response));
                         if (type == 1) {
                             dismisProgress();
                         }
@@ -316,7 +317,7 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
         int mSize = response.getData().getTrack().size();
         for (int i = 0; i < mSize; i++) {
             ViewTrackMapActivityBean.DataBean.TrackBean bean = response.getData().getTrack().get(i);
-            Log.i(ConstantApi.LOG_I_NET, "lat: " + bean.getX() + " lng: " + bean.getY());
+            Logger.v( "lat: " + bean.getX() + " lng: " + bean.getY());
             double latx = bean.getX();
             double laty = bean.getY();
             latLngs.add(new LatLng(laty, latx));

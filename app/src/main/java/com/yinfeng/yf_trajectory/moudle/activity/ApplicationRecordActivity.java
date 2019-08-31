@@ -26,6 +26,7 @@ import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.lcodecore.tkrefreshlayout.footer.LoadingView;
 import com.lcodecore.tkrefreshlayout.header.GoogleDotView;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
@@ -122,8 +123,8 @@ public class ApplicationRecordActivity extends BaseActivity {
 
             Level1Item lv1 = new Level1Item();
             lv1.setReson("申请原因 ：" + bean.getReason());
-            lv1.setStartTime("开始时间 ：" + bean.getStartTime());
-            lv1.setEndTime("结束时间 ：" + bean.getEndTime());
+            lv1.setStartTime(bean.getStartTime()+"");
+            lv1.setEndTime(  bean.getEndTime()+"");
             lv1.setAddress("前往地点 ：" + bean.getAddress());
             lv1.setStatus(bean.getState());
 
@@ -220,8 +221,8 @@ public class ApplicationRecordActivity extends BaseActivity {
 //        map.put("endTime", mTimeEnd);
         String mNetUrl = Api.API_apply_query + "?pageNum=" + mCurrentPage + "&pageSize=" + pageSize;
 
-        Log.i(ConstantApi.LOG_I_NET, "API: " + Api.API_apply_query + "发送json：" + new Gson().toJson(map) + "mCurrentPage" + mCurrentPage);
-        Log.i(ConstantApi.LOG_I_NET, "token: " + token);
+        Logger.v( "API: " + Api.API_apply_query + "发送json：" + new Gson().toJson(map) + "mCurrentPage" + mCurrentPage);
+        Logger.v( "token: " + token);
         OkHttpUtils
                 .postString()
                 .addHeader("track-token", token)
@@ -243,7 +244,7 @@ public class ApplicationRecordActivity extends BaseActivity {
                             homeAdapter.addData(generateData(response));
                             homeAdapter.notifyDataSetChanged();
 
-
+                            mTestMultipleStatusView.showContent();
                         } else {
                             mTestMultipleStatusView.showEmpty();
                         }
@@ -292,7 +293,7 @@ public class ApplicationRecordActivity extends BaseActivity {
                     break;
                 case TYPE_LEVEL_1:
                     final Level1Item lv1 = (Level1Item) item;
-                    holder.setText(R.id.expand_request_recding_child_start_time, lv1.startTime);
+                    holder.setText(R.id.expand_request_recding_child_start_time,"开始时间 ：" +  lv1.startTime);
                     holder.setText(R.id.expand_request_recding_child_reson, lv1.reson);
                     if (lv1.status.equals("0")) {
                         holder.setVisible(R.id.expand_request_recding_child_query, false);
@@ -302,7 +303,7 @@ public class ApplicationRecordActivity extends BaseActivity {
                         //正常显示轨迹
                         holder.setVisible(R.id.expand_request_recding_child_query, true);
 
-                        holder.setText(R.id.expand_request_recding_child_end_time, lv1.endTime);
+                        holder.setText(R.id.expand_request_recding_child_end_time,"结束时间 ：" +  lv1.endTime);
                     } else {
                         holder.setVisible(R.id.expand_request_recding_child_query, false);
 
@@ -318,6 +319,8 @@ public class ApplicationRecordActivity extends BaseActivity {
                                 int pos = holder.getAdapterPosition();
                                 Intent intent = new Intent(ApplicationRecordActivity.this, ViewTrackMapActivity.class);
                                 intent.putExtra(ConstantApi.INTENT_FLAG, ConstantApi.query_info);
+                                intent.putExtra(ConstantApi.INTENT_KEY, lv1.startTime);
+                                intent.putExtra(ConstantApi.INTENT_KEY_TWO, lv1.endTime);
                                 startActivity(intent);
                             }
                         });
@@ -349,7 +352,8 @@ public class ApplicationRecordActivity extends BaseActivity {
 //        map.put("startTime", mTimeStart);
 //        map.put("endTime", mTimeEnd);
         String mNetUrl = Api.API_apply_query + "?pageNum=" + "1" + "&pageSize=" + pageSize;
-        Log.i(ConstantApi.LOG_I_NET, "API: " + mNetUrl + "发送json：" + new Gson().toJson(map));
+        Logger.v( "API: " + mNetUrl + "发送json：" + new Gson().toJson(map));
+        Logger.v( "Activity token :: " +token);
 
 
         OkHttpUtils
@@ -377,11 +381,13 @@ public class ApplicationRecordActivity extends BaseActivity {
                             setAdapter(response);
                             mCurrentPage = response.getData().getPageNum();
                             mPageSizeTotal = (response.getData().getTotal() / 15.0 + 1.0);
-                            Log.i(ConstantApi.LOG_I_NET, "mPageSizeTotal:" + mPageSizeTotal);
+                            Logger.v( "mPageSizeTotal:" + mPageSizeTotal);
+                            mTestMultipleStatusView.showContent();
                         } else {
                             showToastC(response.getMessage());
+                            mTestMultipleStatusView.showEmpty();
                         }
-                        Log.i(ConstantApi.LOG_I_NET, "请求结果：" + GsonUtils.getInstance().toJson(response));
+                        Logger.v( "请求结果：" + GsonUtils.getInstance().toJson(response));
                         dismisProgress();
                     }
                 });

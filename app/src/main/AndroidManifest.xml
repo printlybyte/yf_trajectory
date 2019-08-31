@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yinfeng.yf_trajectory">
     <!-- 用于进行网络定位 -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--开机广播-->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 用于访问GPS定位 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 获取运营商信息，用于支持提供运营商信息相关的接口 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位 -->
@@ -15,17 +18,13 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- 用于申请调用A-GPS模块 -->
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" /> <!-- 用于申请获取蓝牙信息进行室内定位 -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- 华为HDM权限 -->
-
-    <!-- 不是sdk需要的权限，是示例中NotiService$NotiInnerService需要的权限-->
-    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
-
-
-
-
-    <!-- 跟权限 -->
+    <!-- 不是sdk需要的权限，是示例中NotiService$NotiInnerService需要的权限 -->
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" /> <!-- 跟权限 -->
     <uses-permission android:name="com.huawei.permission.sec.MDM" />
     <uses-permission android:name="com.huawei.permission.sec.MDM.v2" /> <!-- 静默安装  以下为华为MDM所有已申请权限 -->
     <uses-permission android:name="com.huawei.permission.sec.MDM_APP_MANAGEMENT" /> <!-- <uses-permission android:name="com.huawei.permission.sec.MDM_PHONE_MANAGER" /> -->
@@ -35,6 +34,7 @@
     <uses-permission android:name="com.huawei.permission.sec.MDM_DEVICE_MANAGER" />
     <uses-permission android:name="com.huawei.permission.sec.MDM_SETTINGS_RESTRICTION" />
     <uses-permission android:name="com.huawei.permission.sec.MDM_MMS" />
+
     <application
         android:name=".BaseApp"
         android:allowBackup="true"
@@ -43,9 +43,16 @@
         android:roundIcon="@mipmap/ic_app_start_icon"
         android:supportsRtl="true"
         android:theme="@style/AppThemeBase">
-        <activity android:name=".moudle.activity.QueryDateBaseActivity"></activity>
-        <activity android:name=".moudle.activity.ViewTrackMapActivity" />
-        <activity android:name=".moudle.activity.MatterApplicationActivity" /> <!-- <meta-data -->
+        <activity android:name=".moudle.login.SMSActivity"></activity>
+        <activity
+            android:name=".moudle.activity.QueryDateBaseActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".moudle.activity.ViewTrackMapActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".moudle.activity.MatterApplicationActivity"
+            android:screenOrientation="portrait" /> <!-- <meta-data -->
         <!-- android:name="hwc-theme" -->
         <!-- android:value="androidhwext:style/Theme.Emui" /> -->
         <receiver
@@ -61,9 +68,15 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".mdm.LicenseActivity" />
-        <activity android:name=".moudle.activity.ApplicationRecordActivity" />
-        <activity android:name=".moudle.activity.MeInfoActivity" /> <!-- 适配18:9 -->
+        <activity
+            android:name=".mdm.LicenseActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".moudle.activity.ApplicationRecordActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".moudle.activity.MeInfoActivity"
+            android:screenOrientation="portrait" /> <!-- 适配18:9 -->
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
@@ -71,9 +84,9 @@
         <activity
             android:name=".moudle.activity.MainActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".moudle.login.LoginVerActivity"
-            android:screenOrientation="portrait" />
+        <!--<activity-->
+            <!--android:name=".moudle.login.LoginVerActivity"-->
+            <!--android:screenOrientation="portrait" />-->
         <activity
             android:name=".moudle.login.SplashActivity"
             android:screenOrientation="portrait"
@@ -86,7 +99,19 @@
         </activity>
         <activity
             android:name=".moudle.activity.MapActivity"
-            android:screenOrientation="portrait" /> <!-- 高德 api -->
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <data
+                    android:host="com.yinfeng.yf_trajectory"
+                    android:path="/cyn"
+                    android:scheme="csd" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity> <!-- 高德 api -->
         <service android:name="com.amap.api.location.APSService" />
 
         <meta-data
@@ -97,29 +122,43 @@
             android:enabled="true"
             android:exported="true"
             android:process=":music_service" />
-        <service android:name=".moudle.service.LocationService" />
-
-
+        <service android:name=".moudle.service.LocationServiceTest" />
         <service
             android:name=".LocationService"
             android:process=":remote1">
             <intent-filter>
-                <action android:name="com.yinfeng.yf_trajectory.LocationService"></action>
+                <action android:name="com.yinfeng.yf_trajectory.LocationService" />
             </intent-filter>
         </service>
         <service
             android:name=".LocationHelperService"
             android:process=":remote2">
             <intent-filter>
-                <action android:name="com.yinfeng.yf_trajectory.LocationHelperService"></action>
+                <action android:name="com.yinfeng.yf_trajectory.LocationHelperService" />
             </intent-filter>
         </service>
+
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            >
+            android:screenOrientation="portrait" />
 
-        </activity>
+
+        <receiver android:name=".SimStateReceiver">
+            <intent-filter android:priority="900">
+                <action android:name="android.intent.action.SIM_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+
+
+        <receiver android:name=".BootBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_SHUTDOWN"></action>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

@@ -3,12 +3,14 @@ package com.yinfeng.yf_trajectory;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.PowerManager;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,21 +20,34 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.BarUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.NetworkUtils;
+import com.blankj.utilcode.util.SPStaticUtils;
 import com.caitiaobang.core.app.app.AppManager;
 import com.caitiaobang.core.app.app.BaseApplication;
+import com.caitiaobang.core.app.app.Latte;
 import com.caitiaobang.core.app.bean.GreendaoLocationBean;
 import com.caitiaobang.core.app.net.GenericsCallback;
 import com.caitiaobang.core.app.net.JsonGenericsSerializator;
+import com.caitiaobang.core.app.storge.LattePreference;
 import com.caitiaobang.core.greendao.gen.DaoSession;
 import com.google.gson.Gson;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.Logger;
+import com.yinfeng.yf_trajectory.mdm.SharedPreferenceUtil;
 import com.yinfeng.yf_trajectory.moudle.bean.ConmonBean_string;
+import com.yinfeng.yf_trajectory.moudle.bean.UpdateAndAliveTimeBean;
 import com.yinfeng.yf_trajectory.moudle.bean.UploadInfoBean;
-import com.yinfeng.yf_trajectory.moudle.login.LoginVerActivity;
+//import com.yinfeng.yf_trajectory.moudle.login.LoginVerActivity;
+import com.yinfeng.yf_trajectory.moudle.login.SMSActivity;
+import com.yinfeng.yf_trajectory.moudle.utils.ACache;
+import com.yinfeng.yf_trajectory.moudle.utils.ConmonUtils;
+import com.yinfeng.yf_trajectory.moudle.utils.SMSCore;
 import com.zhy.http.okhttp.OkHttpUtils;
 
 import org.json.JSONArray;
@@ -84,7 +99,11 @@ public class LocationService extends NotiService {
     @Override
     public void onCreate() {
         super.onCreate();
+
+
+
         getUploadInfo();
+        getUpdateAndAliveTime();
         initTimePrompt();
         initNetworkConnect();
     }
@@ -109,12 +128,11 @@ public class LocationService extends NotiService {
     public void onDestroy() {
         unApplyNotiKeepMech();
         stopLocation();
-//        Intent intent = new Intent(getApplicationContext(), com.yinfeng.yf_trajectory.moudle.service.LocationService.class);
+//        Intent intent = new Intent(getApplicationContext(), com.yinfeng.yf_trajectory.moudle.service.LocationServiceTest.class);
 //        startService(intent);
         //解除网络广播监听
         unregisterReceiver(networkConnectChangedReceiver);
         unregisterReceiver(mTimeReceiver);
-
         super.onDestroy();
     }
 
@@ -187,16 +205,23 @@ public class LocationService extends NotiService {
                 String accuracy = aMapLocation.getAccuracy() + "";
                 String provider = aMapLocation.getProvider() + "";
                 String speed = aMapLocation.getSpeed() + "";
-                insertLoactionDate(lat, lng, time + "", address, accuracy, provider, speed);
+                if (!TextUtils.isEmpty(provider) && provider.equals("gps")) {
+
+                    String isLogin = LattePreference.getValue(ConstantApi.HK_CHECK_LOGIN);
+                    if (TextUtils.isEmpty(isLogin) || isLogin == null) {
+                         Logger.v( "已经退出登录，请及时登录，否则将无定位信息");
+                        return;
+                    }
+                    insertLoactionDate(lat, lng, time + "", address, accuracy, provider, speed);
+                } else {
+                     Logger.v( "非GPS数据或者GPS为null  不写入数据库 " + sb.toString());
+                }
             }
 
-            Log.i(ConstantApi.LOG_I, "定位SDK更新数据 " + sb.toString());
-            requestWakeLock();
 
-            Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
-            mIntent.putExtra("result", sb.toString());
-            //发送广播
-            sendBroadcast(mIntent);
+
+            Logger.v("定位SDK更新数据 " + aMapLocation.getLatitude() + "  " + aMapLocation.getLongitude() + " Accuracy: " + aMapLocation.getAccuracy() + "  provider :" + aMapLocation.getProvider()+"version :"+ AppUtils.getAppVersionCode());
+            requestWakeLock();
 
 
         }
@@ -219,8 +244,28 @@ public class LocationService extends NotiService {
         }
     }
 
+    /**
+     * mGrap 抓取频率   mUplaod 上传时间
+     */
     private int mGrap = 10;
     private int mUplaod = 180;
+
+    /**
+     * 下载轨迹apk的时间与辅助拉活时间
+     */
+
+    private int DownloadApkHour = 5;
+    private int DownloadApkMinute = 5;
+
+
+    /**
+     * 下载轨迹助手apk的时间与轨迹拉活时间
+     */
+    private int DownloadHelpApkHour = 6;
+    private int DownloadHelpApkMinute = 5;
+
+    private int DownloadHelpAliveApkHour = 6;
+    private int DownloadHelpAliveApkMinute = 7;
 
     private void showToastC(String msg) {
         Toast.makeText(LocationService.this, "" + msg, Toast.LENGTH_SHORT).show();
@@ -252,11 +297,12 @@ public class LocationService extends NotiService {
                     if (NetworkInfo.State.CONNECTED == info.getState() && info.isAvailable()) {
                         if (info.getType() == ConnectivityManager.TYPE_WIFI
                                 || info.getType() == ConnectivityManager.TYPE_MOBILE) {
-                            Log.i(ConstantApi.LOG_I_NET, "网络可用，精度定位");
+                             Logger.v( "网络可用，精度定位");
                             getUploadInfo();
+
                         }
                     } else {
-                        Log.i(ConstantApi.LOG_I_NET, "网络不可用，GPS定位");
+                         Logger.v( "网络不可用，GPS定位");
                     }
                 }
             }
@@ -328,6 +374,33 @@ public class LocationService extends NotiService {
         System.out.println("================" + min % upload);
     }
 
+    private void checkPhone() {
+        String localPhone = LattePreference.getValue(ConstantApi.HK_PHONE);
+        String line1Nums = ConmonUtils.getLineNumber();
+        String line1Numsxxxxxx = "";
+        if (!TextUtils.isEmpty(localPhone) && !TextUtils.isEmpty(line1Nums)) {
+            if (line1Nums.length() == 14) {
+                line1Numsxxxxxx = line1Nums.substring(3, 14).toString();
+            } else if (line1Nums.length() == 11) {
+                line1Numsxxxxxx = line1Nums;
+            } else {
+                Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
+                mIntent.putExtra("result", ConstantApi.RECEVIER_NO_SIM_READY);
+                //发送广播
+                sendBroadcast(mIntent);
+                return;
+            }
+            if (!localPhone.equals(line1Numsxxxxxx)) {
+                showToastC("手机号已被更换");
+                Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
+                mIntent.putExtra("result", ConstantApi.RECEVIER_NO_SIM_READY);
+                //发送广播
+                sendBroadcast(mIntent);
+                return;
+            }
+        }
+    }
+
     /**
      * 分钟计时器
      */
@@ -338,16 +411,46 @@ public class LocationService extends NotiService {
             int hour = cal.get(Calendar.HOUR_OF_DAY);
             int min = cal.get(Calendar.MINUTE);
 
-            if (hour==1){
+
+            String localPhone = LattePreference.getValue(ConstantApi.HK_PHONE);
+            checkPhone();
+
+             Logger.v( "localPhone : " + localPhone + "LineNumber: " + ConmonUtils.getLineNumber());
+            if (!NetworkUtils.isConnected()) {
+                showToastC("网络无连接");
+                return;
+            }
+
+
+            //下载轨迹apk
+            if (hour == DownloadApkHour && min == DownloadApkMinute) {   //检测apk
                 Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION_DOWNLOAD_APK);
-                mIntent.putExtra("result","downlaod");
+                mIntent.putExtra("result", "downlaod");
                 //发送广播
                 sendBroadcast(mIntent);
             }
 
-            //30分钟触发一次获取上传信息
+            //下载轨迹助手apk
+            if (hour == DownloadHelpApkHour && min == DownloadHelpApkMinute) {   //检测apk
+                Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION_DOWNLOAD_HELP_APK);
+                mIntent.putExtra("result", "downlaod");
+                //发送广播
+                sendBroadcast(mIntent);
+            }
+
+
+            //拉活轨迹助手apk
+            if (hour == DownloadHelpAliveApkHour && min == DownloadHelpAliveApkMinute) {   //检测apk
+                Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
+                mIntent.putExtra("result", ConstantApi.RECEIVER_ACTION_DOWNLOAD_ALIVE_HELP_APK);
+                //发送广播
+                sendBroadcast(mIntent);
+            }
+
+            //30分钟触发一次获取上传信息  wu tocken默认值
             if (min == 0 || min == 30) {
                 getUploadInfo();
+                getUpdateAndAliveTime();
             }
 
             if (mUplaod % 60 != 0) {
@@ -356,19 +459,37 @@ public class LocationService extends NotiService {
             }
 
             int mmUplaodMinute = mUplaod / 60;
-            Log.i(ConstantApi.LOG_I, " 抓取频率: " + mGrap + " 上传间隔: " + mUplaod + " 计时器任务 整除 ？：" + min % mmUplaodMinute + " 当前时间：" + min);
-
-            if (!NetworkUtils.isConnected()) {
-                showToastC("网络无连接，仅设备模式定位");
-                return;
-            }
+             Logger.v( " 抓取频率: " + mGrap + " 上传间隔: " + mUplaod + " 计时器任务 整除 ？：" + min % mmUplaodMinute + " 当前时间：分钟" + min + " 当前时间：小时" + hour);
 
             if (min % mmUplaodMinute == 0) {
                 if (parseDate() != null) {
-                    Log.i(ConstantApi.LOG_I, "查询数据 jsonArray ：" + parseDate());
-                    commitLocationInfo(parseDate());
+                     Logger.v( "查询数据 jsonArray ：" + parseDate());
+//                    String token = LattePreference.getValue(ConstantApi.HK_ROMOTE_TOKEN);
+//                    if (!TextUtils.isEmpty(token)) {
+//                        commitLocationInfoToken(parseDate());
+//                    } else if (!TextUtils.isEmpty(ConmonUtils.getLineNumber())) {
+//                        commitLocationInfoPhone(parseDate(), ConmonUtils.getLineNumber());
+//                    } else {
+//                        showToastC("无token 无手机号 ");
+//                    }
+                    if (ConmonUtils.hasSimCard()) {
+//                        commitLocationInfoPhone(parseDate(), localPhone);
+
+                        commitLocationInfoToken(parseDate());
+                    } else {
+
+                        if (!TextUtils.isEmpty(localPhone)) {
+                            Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
+                            mIntent.putExtra("result", ConstantApi.RECEVIER_NO_SIM_READY);
+                            //发送广播
+                            sendBroadcast(mIntent);
+                        } else {
+                            showToastC("无卡无手机号");
+                        }
+                    }
                 } else {
-                    showToastC("上传失败，数据转化异常");
+//                    showToastC("本地无数据");
+
                 }
             }
         }
@@ -389,24 +510,20 @@ public class LocationService extends NotiService {
                 String queryAccuracy = mList.get(i).getAccuracy();
                 String queryProvider = mList.get(i).getProvider();
                 String querySpeed = mList.get(i).getSpeed();
-
-//                Log.i(ConstantApi.LOG_I, "查询数据 ：" + "lat: " + queryLat + "lng: " + queryLng + "time: " + queryTime + " mList:" + "  address :" + queryAddress + mList.size());
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("lat", queryLat);
                     jsonObject.put("lng", queryLng);
                     jsonObject.put("time", queryTime);
-                    jsonObject.put("name", queryAddress);
-
+                    jsonObject.put("address", queryAddress);
                     jsonObject.put("accuracy", queryAccuracy);
                     jsonObject.put("provider", queryProvider);
                     jsonObject.put("speed", querySpeed);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.i(ConstantApi.LOG_I, "JSONException ：");
+                     Logger.v( "JSONException ：");
                 }
                 jsonArray.put(jsonObject);
-
             }
             return jsonArray;
         }
@@ -414,48 +531,118 @@ public class LocationService extends NotiService {
     }
 
 
+
     /**
-     * 提交点数据
+     * 提交token数据
      */
-    private void commitLocationInfo(JSONArray jsonArray) {
+//    private void commitLocationInfoPhone(JSONArray jsonArray, String phone) {
+//        JSONObject jsonObject = new JSONObject();
+//        try {
+//            jsonObject.put("pointList", jsonArray);
+//            jsonObject.put("phone", phone);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 //        OkGo.<String>post(Api.API_point_insert)
-        // http://192.168.1.137:8111/admin/point/insert
-        String token = Hawk.get(ConstantApi.HK_TOKEN);
+//                .tag(this)
+//                .upJson(jsonObject)
+//                .execute(new StringCallback() {
+//                    @Override
+//                    public void onSuccess(Response<String> response) {
+//                        String data = response.body();//这个就是返回来的结果
+//                        Timber.i("success:%s", data);
+//                         Logger.v( "onSuccess：" + data);
+//                        try {
+//                            ConmonBean_string bean = new Gson().fromJson(response.body(), ConmonBean_string.class);
+//                            if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS) {
+//                                 Logger.v( "上传成功");
+//                                DaoSession daoSession = BaseApplication.getDaoInstant();
+//                                daoSession.deleteAll(GreendaoLocationBean.class);
+//                            } else if ( bean.getCode() == ConstantApi.API_REQUEST_ERR_901) {
+////                                Toast.makeText(getBaseContext(), "账号在其他地方登陆，密码已泄露，建议重置并重新登录！", Toast.LENGTH_SHORT).show();
+//                                 Logger.v( "账号在其他地方登陆");
+//                                Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
+//                                mIntent.putExtra("result", ConstantApi.RECEVIER_901);
+//                                //发送广播
+//                                sendBroadcast(mIntent);
+//                            } else {
+//                                 Logger.v( bean.getMessage());
+//                                showToastC(bean.getMessage());
+//                            }
+//                        } catch (Exception e) {
+//                             Logger.v( "转化失败");
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(Response<String> response) {
+//                        super.onError(response);
+//                         Logger.v( "onError：" + response.body());
+//                        try {
+//                            ConmonBean_string bean = new Gson().fromJson(response.body(), ConmonBean_string.class);
+//                            if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS) {
+//                                Toast.makeText(getBaseContext(), "" + bean.getMessage(), Toast.LENGTH_SHORT).show();
+//                            }
+//                        } catch (Exception e) {
+//                            showToastC("转化失败");
+//                             Logger.v( "Gson转化失败");
+//
+//                        }
+//                    }
+//                });
+//    }
+
+
+    private void commitLocationInfoToken(JSONArray jsonArray) {
+        String token = LattePreference.getValue(ConstantApi.HK_ROMOTE_TOKEN);
+        if (TextUtils.isEmpty(token)) {
+//            showToastC("token = null ");
+            Logger.v( "token = null 上传数据");
+            return;
+        }
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("pointList", jsonArray);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         OkGo.<String>post(Api.API_point_insert)
                 .tag(this)
                 .headers("track-token", token)
-                .upJson(jsonArray)//
+                .upJson(jsonObject)//
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(Response<String> response) {
                         String data = response.body();//这个就是返回来的结果
                         Timber.i("success:%s", data);
-                        Log.i(ConstantApi.LOG_I, "onSuccess：" + data);
+                        Logger.v( "onSuccess：" + data);
                         try {
                             ConmonBean_string bean = new Gson().fromJson(response.body(), ConmonBean_string.class);
                             if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS) {
-                                Log.i(ConstantApi.LOG_I, "上传成功");
+                                Logger.v( "上传成功");
                                 DaoSession daoSession = BaseApplication.getDaoInstant();
                                 daoSession.deleteAll(GreendaoLocationBean.class);
-                            } else if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_ERR_901) {
-                                Toast.makeText(getBaseContext(), "账号在其他地方登陆，密码已泄露，建议重置并重新登录！", Toast.LENGTH_SHORT).show();
-                                Log.i(ConstantApi.LOG_I, "账号在其他地方登陆");
-                                AppManager.getInstance().finishAllActivity();
-                                stopSelf(-1);
-                                ActivityUtils.startActivity(LoginVerActivity.class);
+                            } else if (  bean.getCode() == ConstantApi.API_REQUEST_ERR_901) {
+//                                Toast.makeText(getBaseContext(), "账号在其他地方登陆，密码已泄露，建议重置并重新登录！", Toast.LENGTH_SHORT).show();
+                                Logger.v( "账号在其他地方登陆");
+                                Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
+                                mIntent.putExtra("result", ConstantApi.RECEVIER_901);
+                                //发送广播
+                                sendBroadcast(mIntent);
+
                             } else {
-                                Log.i(ConstantApi.LOG_I, bean.getMessage());
+                                Logger.v( bean.getMessage());
                                 showToastC(bean.getMessage());
                             }
                         } catch (Exception e) {
-                            Log.i(ConstantApi.LOG_I, "转化失败");
+                            Logger.v( "转化失败");
                         }
                     }
 
                     @Override
                     public void onError(Response<String> response) {
                         super.onError(response);
-                        Log.i(ConstantApi.LOG_I, "onError：" + response.body());
+                        Logger.v( "onError：" + response.body());
                         try {
                             ConmonBean_string bean = new Gson().fromJson(response.body(), ConmonBean_string.class);
                             if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS) {
@@ -463,7 +650,7 @@ public class LocationService extends NotiService {
                             }
                         } catch (Exception e) {
                             showToastC("转化失败");
-                            Log.i(ConstantApi.LOG_I, "Gson转化失败");
+                            Logger.v( "Gson转化失败");
 
                         }
                     }
@@ -475,14 +662,8 @@ public class LocationService extends NotiService {
      * 获取上传信息
      */
     private void getUploadInfo() {
-        String token = Hawk.get(ConstantApi.HK_TOKEN);
-        if (TextUtils.isEmpty(token)) {
-            showToastC("token = null ");
-            return;
-        }
         OkHttpUtils
                 .get()
-                .addHeader("track-token", token)
                 .url(Api.API_point_getFrequency)
                 .build()
                 .execute(new GenericsCallback<UploadInfoBean>(new JsonGenericsSerializator()) {
@@ -496,7 +677,6 @@ public class LocationService extends NotiService {
 
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
                             UploadInfoBean.DataBean bean = response.getData();
-
                             if (!TextUtils.isEmpty(bean.getGrap())) {
                                 mGrap = Integer.parseInt(bean.getGrap());
                                 initLocation(mGrap);
@@ -512,7 +692,57 @@ public class LocationService extends NotiService {
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i(ConstantApi.LOG_I_NET, "请求结果：上传信息" + GsonUtils.getInstance().toJson(response));
+                         Logger.v( "请求结果：上传信息" + GsonUtils.getInstance().toJson(response));
+                    }
+                });
+    }
+
+
+    /**
+     * 获取更新信息
+     */
+
+
+    private void getUpdateAndAliveTime() {
+        OkHttpUtils
+                .get()
+                .url(Api.API_appVersion_getUpdateAndAliveTime)
+                .build()
+                .execute(new GenericsCallback<UpdateAndAliveTimeBean>(new JsonGenericsSerializator()) {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        showToastC("网络异常，请稍后重试");
+                    }
+
+                    @Override
+                    public void onResponse(UpdateAndAliveTimeBean response, int id) {
+
+                        if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
+                            UpdateAndAliveTimeBean.DataBean bean = response.getData();
+
+                            if (!TextUtils.isEmpty(bean.getUpdateHour())) {
+                                DownloadApkHour = Integer.parseInt(bean.getUpdateHour());
+                            }
+                            if (!TextUtils.isEmpty(bean.getUpdateMinter())) {
+                                DownloadApkMinute = Integer.parseInt(bean.getUpdateMinter());
+                            }
+
+                            if (!TextUtils.isEmpty(bean.getHelpUpdateHour())) {
+                                DownloadHelpApkHour = Integer.parseInt(bean.getHelpUpdateHour());
+                            }
+                            if (!TextUtils.isEmpty(bean.getHelpUpdateMinter())) {
+                                DownloadHelpApkMinute = Integer.parseInt(bean.getHelpUpdateMinter());
+                            }
+                            if (!TextUtils.isEmpty(bean.getHelpKeepAliveHour())) {
+                                DownloadHelpAliveApkHour = Integer.parseInt(bean.getHelpKeepAliveHour());
+                            }
+                            if (!TextUtils.isEmpty(bean.getHelpKeepAliveMinter())) {
+                                DownloadHelpAliveApkMinute = Integer.parseInt(bean.getHelpKeepAliveMinter());
+                            }
+                        } else {
+                            showToastC(response.getMessage());
+                        }
+                         Logger.v( "请求结果：getUpdateAndAliveTime" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }

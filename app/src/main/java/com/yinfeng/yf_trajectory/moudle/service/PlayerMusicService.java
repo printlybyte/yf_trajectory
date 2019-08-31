@@ -23,14 +23,17 @@ import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.caitiaobang.core.app.net.GenericsCallback;
 import com.caitiaobang.core.app.net.JsonGenericsSerializator;
+import com.caitiaobang.core.app.storge.LattePreference;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.FileCallback;
 import com.lzy.okgo.model.Progress;
 import com.lzy.okgo.model.Response;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
@@ -63,7 +66,7 @@ import okhttp3.Call;
 
 public class PlayerMusicService extends Service {
     private final static String TAG = "PlayerMusicService";
-    private MediaPlayer mMediaPlayer;
+//    private MediaPlayer mMediaPlayer;
     public static final boolean DEBUG = true;
 
     public static final String PACKAGE_NAME = "com.jiangdg.keepappalive";
@@ -79,15 +82,15 @@ public class PlayerMusicService extends Service {
         super.onCreate();
         if (DEBUG)
             Log.d(TAG, TAG + "---->onCreate,启动服务");
-        mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.silent);
-        mMediaPlayer.setLooping(true);
+//        mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.silent);
+//        mMediaPlayer.setLooping(true);
 
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConstantApi.RECEIVER_ACTION_DOWNLOAD_APK);
+        intentFilter.addAction(ConstantApi.RECEIVER_ACTION_DOWNLOAD_HELP_APK);
         registerReceiver(locationChangeBroadcastReceiver, intentFilter);
     }
-
 
 
     @Override
@@ -95,32 +98,32 @@ public class PlayerMusicService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                startPlayMusic();
+//                startPlayMusic();
             }
         }).start();
         return START_STICKY;
     }
 
-    private void startPlayMusic() {
-        if (mMediaPlayer != null) {
-            if (DEBUG)
-                Log.d(TAG, "启动后台播放音乐");
-            mMediaPlayer.start();
-        }
-    }
+//    private void startPlayMusic() {
+//        if (mMediaPlayer != null) {
+//            if (DEBUG)
+//                Log.d(TAG, "启动后台播放音乐");
+//            mMediaPlayer.start();
+//        }
+//    }
 
-    private void stopPlayMusic() {
-        if (mMediaPlayer != null) {
-            if (DEBUG)
-                Log.d(TAG, "关闭后台播放音乐");
-            mMediaPlayer.stop();
-        }
-    }
+//    private void stopPlayMusic() {
+//        if (mMediaPlayer != null) {
+//            if (DEBUG)
+//                Log.d(TAG, "关闭后台播放音乐");
+//            mMediaPlayer.stop();
+//        }
+//    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopPlayMusic();
+//        stopPlayMusic();
         if (DEBUG)
             Log.d(TAG, TAG + "---->onCreate,停止服务");
         // 重启自己
@@ -145,27 +148,33 @@ public class PlayerMusicService extends Service {
             if (action.equals(ConstantApi.RECEIVER_ACTION_DOWNLOAD_APK)) {
                 String locationResult = intent.getStringExtra("result");
                 if (null != locationResult && !locationResult.trim().equals("")) {
-                    requestDate();
+                    requestDate("track");
+                }
+            } else if (action.equals(ConstantApi.RECEIVER_ACTION_DOWNLOAD_HELP_APK)) {
+                String locationResult = intent.getStringExtra("result");
+                if (null != locationResult && !locationResult.trim().equals("")) {
+                    requestDate("help");
                 }
             }
         }
     };
 
-    private void requestDate() {
+
+    /**
+     * downloadType 1= 轨迹 track   2 助手 help
+     */
+    private void requestDate(String downloadType) {
         if (!NetworkUtils.isConnected()) {
             showToastC("网络无链接,请稍后在试");
             return;
         }
-        String token = Hawk.get(ConstantApi.HK_TOKEN);
-        if (TextUtils.isEmpty(token)) {
-            showToastC("token = null ");
-            return;
-        }
-        Log.i(ConstantApi.LOG_I_NET, "API: " + Api.API_apply_judge);
+
+        Logger.v( "API: " + Api.API_apply_judge);
         OkHttpUtils
-                .get()
-                .addHeader("track-token", token)
+                .post()
                 .url(Api.API_appVersion_judge)
+                .addParams("v", AppUtils.getAppVersionCode() + "")
+                .addParams("type", downloadType)
                 .build()
                 .execute(new GenericsCallback<ApkDownloadBean>(new JsonGenericsSerializator()) {
                     @Override
@@ -176,35 +185,43 @@ public class PlayerMusicService extends Service {
                     @Override
                     public void onResponse(ApkDownloadBean response, int id) {
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
-                            if (!response.getData().isNewest()) { //有新版本
+
+                            if (!response.getData().isNewest()) {  //有新版本
                                 String DownLoadUrl = response.getData().getAppVersion().getDownLoadUrl();
                                 if (!TextUtils.isEmpty(DownLoadUrl)) {
-                                    downloadFile(response.getData().getAppVersion().getDownLoadUrl());
+                                    downloadFile(DownLoadUrl, downloadType);
                                 } else {
-                                    Log.i(ConstantApi.LOG_I_NET, "DownLoadUrl=null");
+                                    Logger.v( "DownLoadUrl=null");
                                 }
                             } else {
-                                Log.i(ConstantApi.LOG_I_NET, "无新版本");
+                                Logger.v( "无新版本");
                             }
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i(ConstantApi.LOG_I_NET, "请求结果：" + GsonUtils.getInstance().toJson(response));
+                        Logger.v( "请求结果：" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }
 
 
-    private void downloadFile(String mUrl) {
+    private void downloadFile(String mUrl, String downloadType) {
         String mPath;
         if (FileUtils.createOrExistsDir(ConstantApi.CommonApkPath)) {
-//                    showToastC("");创建成功
             mPath = ConstantApi.CommonApkPath;
         } else {
             mPath = ConstantApi.CommonPath;
         }
+        String downLoadApkName = "";
+        if (!TextUtils.isEmpty(downloadType)) {
+            if (downloadType.equals("track")) {//轨迹apk名字
+                downLoadApkName = ConstantApi.CommonApkName;
+            } else if (downloadType.equals("help")) {//轨迹助手apk名字
+                downLoadApkName = ConstantApi.CommonHelpApkName;
+            }
+        }
         OkGo.<File>get(mUrl) //
-                .execute(new FileCallback(mPath, ConstantApi.CommonApkName) {
+                .execute(new FileCallback(mPath, downLoadApkName) {
                     @Override
                     public void onSuccess(Response<File> response) {
 //                                e.onComplete();
@@ -217,7 +234,20 @@ public class PlayerMusicService extends Service {
 
                     @Override
                     public void downloadProgress(Progress progress) {
-//                                e.onNext(progress);
+                        float prgressx = progress.fraction * 100;
+                        Logger.v( "下载进度 ：" + prgressx);
+                        if (prgressx == 100) {
+                            if (downloadType.equals("track")) {
+                            Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
+                                mIntent.putExtra("result", ConstantApi.RECEVIER_DOWNLOAD_APK);
+                            sendBroadcast(mIntent);
+                            } else if (downloadType.equals("help")) {
+                                Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
+                                mIntent.putExtra("result", ConstantApi.RECEVIER_DOWNLOAD_HELP_APK);
+                                sendBroadcast(mIntent);
+
+                            }
+                        }
                     }
                 });
     }

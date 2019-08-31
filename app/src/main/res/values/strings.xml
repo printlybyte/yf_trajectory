@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">"test_huawei"</string>
+    <string name="app_name">"银丰轨迹"</string>
     <string name="current_state_wifi">"当前状态："</string>
     <string name="current_state_google_account">"当前状态："</string>
     <string name="current_state_screen_capture">"当前状态："</string>

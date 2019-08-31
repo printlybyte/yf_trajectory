@@ -1,155 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
+
+
     android:orientation="vertical"
     tools:context=".moudle.activity.MatterApplicationActivity">
 
-    <include layout="@layout/include_actionbar_back" />
-<View
-    android:background="#f4f4f4"
-    android:layout_width="match_parent"
-    android:layout_height="5dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginRight="20dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="30dp"
-        android:paddingRight="50dp"
-        android:text="前往地点"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        app:bl_corners_bottomRightRadius="12dp"
-        app:bl_corners_topRightRadius="12dp"
-        app:bl_solid_color="@color/p_color_blue" />
-
-    <EditText
-        android:id="@+id/activity_matter_application_input_address"
-        style="@style/_matter_application_input_style"
-        android:layout_height="40dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginRight="30dp"
-        android:gravity="center_vertical"
-        android:hint="点击填写前往地点"
-        android:inputType="textAutoComplete"
-        android:singleLine="true"
-        app:bl_corners_radius="12dp"
-        app:bl_solid_color="#f2f2f2" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginRight="20dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="30dp"
-        android:paddingRight="50dp"
-        android:text="申请理由"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        app:bl_corners_bottomRightRadius="12dp"
-        app:bl_corners_topRightRadius="12dp"
-        app:bl_solid_color="@color/p_color_blue" />
-
-    <EditText
-        android:id="@+id/activity_matter_application_input_reson"
-        style="@style/_matter_application_input_style"
-        android:layout_height="100dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginRight="30dp"
-        android:gravity="start"
-        android:hint="点击填写申请理由"
-        android:inputType="textAutoComplete"
-        android:paddingTop="10dp"
-        app:bl_corners_radius="12dp"
-        app:bl_solid_color="#f2f2f2" />
-
-    <TextView
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginRight="20dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="30dp"
-        android:paddingRight="50dp"
-        android:text="申请时间"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        app:bl_corners_bottomRightRadius="12dp"
-        app:bl_corners_topRightRadius="12dp"
-        app:bl_solid_color="@color/p_color_blue" />
-
 
     <LinearLayout
-        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginRight="30dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
+
+        <include layout="@layout/include_actionbar_back" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="#f4f4f4" />
 
         <TextView
-            android:id="@+id/activity_matter_application_start_time"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="25dp"
-            android:layout_weight="1"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:gravity="center"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="20dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="30dp"
+            android:paddingRight="50dp"
+            android:text="前往地点"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:bl_corners_bottomRightRadius="12dp"
+            app:bl_corners_topRightRadius="12dp"
+            app:bl_solid_color="@color/p_color_blue" />
 
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="点击选择开始时间"
-            android:textColor="@color/c_999"
-            android:textSize="10sp"
+        <EditText
+            android:id="@+id/activity_matter_application_input_address"
+            style="@style/_matter_application_input_style"
+            android:layout_height="40dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="30dp"
+            android:gravity="center_vertical"
+            android:hint="点击填写前往地点"
+            android:inputType="textAutoComplete"
+            android:singleLine="true"
             app:bl_corners_radius="12dp"
             app:bl_solid_color="#f2f2f2" />
 
         <TextView
-            android:id="@+id/activity_matter_application_end_time"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="25dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="20dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="30dp"
+            android:paddingRight="50dp"
+            android:text="申请理由"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:bl_corners_bottomRightRadius="12dp"
+            app:bl_corners_topRightRadius="12dp"
+            app:bl_solid_color="@color/p_color_blue" />
 
-            android:layout_marginLeft="20dp"
-            android:layout_weight="1"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:gravity="center"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="点击选择结束时间"
-            android:textColor="@color/c_999"
-            android:textSize="10sp"
-
+        <EditText
+            android:id="@+id/activity_matter_application_input_reson"
+            style="@style/_matter_application_input_style"
+            android:layout_height="100dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="30dp"
+            android:gravity="start"
+            android:hint="点击填写申请理由"
+            android:inputType="textAutoComplete"
+            android:paddingTop="10dp"
             app:bl_corners_radius="12dp"
             app:bl_solid_color="#f2f2f2" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="20dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="30dp"
+            android:paddingRight="50dp"
+            android:text="申请时间"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:visibility="gone"
+            app:bl_corners_bottomRightRadius="12dp"
+            app:bl_corners_topRightRadius="12dp"
+            app:bl_solid_color="@color/p_color_blue" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="30dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/activity_matter_application_start_time"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_weight="1"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="点击选择开始时间"
+                android:textColor="@color/c_999"
+                android:textSize="10sp"
+                app:bl_corners_radius="12dp"
+                app:bl_solid_color="#f2f2f2" />
+
+            <TextView
+                android:id="@+id/activity_matter_application_end_time"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+
+                android:layout_marginLeft="20dp"
+                android:layout_weight="1"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="点击选择结束时间"
+                android:textColor="@color/c_999"
+                android:textSize="10sp"
+
+                app:bl_corners_radius="12dp"
+                app:bl_solid_color="#f2f2f2" />
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/activity_matter_application_stoke_chick"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginRight="30dp"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="行程开始"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:bl_corners_radius="5dp"
+            app:bl_solid_color="@color/p_color_blue" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/activity_matter_application_stoke_chick"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="50dp"
-        android:gravity="center"
-        android:layout_marginRight="30dp"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:text="行程开始"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        app:bl_corners_radius="5dp"
-        app:bl_solid_color="@color/p_color_blue" />
 
-</LinearLayout>
+
+</RelativeLayout>

@@ -6,7 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 
-public class SharedPreferenceUtil  {
+public class SharedPreferenceUtil {
     private static String EULA_PREFIX = "eula_useraccepted_";
     private int mVersionCode;
     private String mEulaKey = null;
@@ -17,9 +17,12 @@ public class SharedPreferenceUtil  {
         mContext = context;
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         // the eulaKey changes every time you increment the version number in AndroidManifest.xml
-        mVersionCode = getVersionCodeInner();;
+        mVersionCode = getVersionCodeInner();
+        ;
         mEulaKey = EULA_PREFIX + mVersionCode;
     }
+
+
 
     public boolean hasUserAccepted() {
         return mSharedPreferences.getBoolean(mEulaKey, false);
@@ -31,14 +34,14 @@ public class SharedPreferenceUtil  {
         editor.commit();
     }
 
-    public int getVersionCode(){
+    public int getVersionCode() {
         return mVersionCode;
     }
 
     private int getVersionCodeInner() {
         PackageInfo pi = null;
         try {
-             pi = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES);
+            pi = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

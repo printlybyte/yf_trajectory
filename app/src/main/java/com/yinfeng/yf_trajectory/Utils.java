@@ -179,6 +179,7 @@ public class Utils {
 
 	public static Notification buildNotification(Context context) {
 		Notification.Builder builder = new Notification.Builder(context);
+
 		builder.setContentText("service");
 		return builder.getNotification();
 	}

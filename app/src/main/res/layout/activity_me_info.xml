@@ -43,6 +43,14 @@
                 app:bl_corners_bottomRightRadius="12dp"
                 app:bl_corners_topRightRadius="12dp"
                 app:bl_solid_color="@color/p_color_blue" />
+
+            <TextView
+                android:layout_centerHorizontal="true"
+                android:id="@+id/activity_me_info_hint_double"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginRight="@dimen/dp_10"
+                android:background="#00000000" />
         </RelativeLayout>
 
 
@@ -53,6 +61,7 @@
             android:layout_marginRight="20dp">
 
             <TextView
+                android:id="@+id/activity_me_info_name_chick"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -243,6 +252,9 @@
                 app:bl_corners_bottomRightRadius="12dp"
                 app:bl_corners_topRightRadius="12dp"
                 app:bl_solid_color="@color/p_color_blue" />
+
+
+
         </RelativeLayout>
 
 

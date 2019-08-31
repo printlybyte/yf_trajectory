@@ -1,11 +1,13 @@
 package com.yinfeng.yf_trajectory.moudle.activity;
 
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.ClickUtils;
 import com.caitiaobang.core.app.app.BaseActivity;
 import com.google.gson.Gson;
 import com.orhanobut.hawk.Hawk;
@@ -37,6 +39,7 @@ public class MeInfoActivity extends BaseActivity implements View.OnClickListener
      *
      */
     private TextView mActivityMeInfoJob;
+    private TextView mActivityMeInfoHintDouble;
 
     @Override
     protected int getContentLayoutId() {
@@ -61,6 +64,14 @@ public class MeInfoActivity extends BaseActivity implements View.OnClickListener
         mActivityMeInfoCompany = (TextView) findViewById(R.id.activity_me_info_company);
         mActivityMeInfoDepartment = (TextView) findViewById(R.id.activity_me_info_department);
         mActivityMeInfoJob = (TextView) findViewById(R.id.activity_me_info_job);
+        mActivityMeInfoHintDouble = (TextView) findViewById(R.id.activity_me_info_hint_double);
+        mActivityMeInfoHintDouble.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                ActivityUtils.startActivity(MainActivity.class);
+                return false;
+            }
+        });
     }
 
     @Override
@@ -85,8 +96,10 @@ public class MeInfoActivity extends BaseActivity implements View.OnClickListener
             default:
                 break;
             case R.id.activity_me_info_request:
+
                 ActivityUtils.startActivity(ApplicationRecordActivity.class);
                 break;
+
         }
     }
 

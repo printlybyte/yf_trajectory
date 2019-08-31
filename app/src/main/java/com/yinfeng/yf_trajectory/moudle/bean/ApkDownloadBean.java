@@ -14,8 +14,8 @@ public class ApkDownloadBean {
     /**
      * code : 200
      * message : 操作成功！
-     * data : {"appVersion":{"id":"2","createTime":"","updateTime":"2018-12-13 18:01:51","createBy":"","updateBy":"","state":"1","sort":999,"delFlag":"0","ids":"","orderBy":"","downLoadUrl":"https://madou.oss-cn-beijing.aliyuncs.com/%E9%99%AA%E8%AF%8A%E5%91%98.apk","updateLog":"支持在线提现,bug修复123","versionCode":"1","versionName":"1.0"},"newest":false}
-     * now : 2019-08-14 17:45:07
+     * data : {"appVersion":{"id":"7","createTime":"","updateTime":"","createBy":"","updateBy":"","state":"1","sort":999,"delFlag":"0","ids":"","orderBy":"","downLoadUrl":"new","updateLog":"助手1.1","versionCode":"2","versionName":"1.0.1","appType":"help"},"newest":false}
+     * now : 2019-08-25 19:09:46
      * success : true
      */
 
@@ -67,7 +67,7 @@ public class ApkDownloadBean {
 
     public static class DataBean {
         /**
-         * appVersion : {"id":"2","createTime":"","updateTime":"2018-12-13 18:01:51","createBy":"","updateBy":"","state":"1","sort":999,"delFlag":"0","ids":"","orderBy":"","downLoadUrl":"https://madou.oss-cn-beijing.aliyuncs.com/%E9%99%AA%E8%AF%8A%E5%91%98.apk","updateLog":"支持在线提现,bug修复123","versionCode":"1","versionName":"1.0"}
+         * appVersion : {"id":"7","createTime":"","updateTime":"","createBy":"","updateBy":"","state":"1","sort":999,"delFlag":"0","ids":"","orderBy":"","downLoadUrl":"new","updateLog":"助手1.1","versionCode":"2","versionName":"1.0.1","appType":"help"}
          * newest : false
          */
 
@@ -92,9 +92,9 @@ public class ApkDownloadBean {
 
         public static class AppVersionBean {
             /**
-             * id : 2
+             * id : 7
              * createTime :
-             * updateTime : 2018-12-13 18:01:51
+             * updateTime :
              * createBy :
              * updateBy :
              * state : 1
@@ -102,10 +102,11 @@ public class ApkDownloadBean {
              * delFlag : 0
              * ids :
              * orderBy :
-             * downLoadUrl : https://madou.oss-cn-beijing.aliyuncs.com/%E9%99%AA%E8%AF%8A%E5%91%98.apk
-             * updateLog : 支持在线提现,bug修复123
-             * versionCode : 1
-             * versionName : 1.0
+             * downLoadUrl : new
+             * updateLog : 助手1.1
+             * versionCode : 2
+             * versionName : 1.0.1
+             * appType : help
              */
 
             private String id;
@@ -122,6 +123,7 @@ public class ApkDownloadBean {
             private String updateLog;
             private String versionCode;
             private String versionName;
+            private String appType;
 
             public String getId() {
                 return id;
@@ -233,6 +235,14 @@ public class ApkDownloadBean {
 
             public void setVersionName(String versionName) {
                 this.versionName = versionName;
+            }
+
+            public String getAppType() {
+                return appType;
+            }
+
+            public void setAppType(String appType) {
+                this.appType = appType;
             }
         }
     }

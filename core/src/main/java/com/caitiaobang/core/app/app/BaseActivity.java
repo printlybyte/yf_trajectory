@@ -1,13 +1,17 @@
 package com.caitiaobang.core.app.app;
 
+import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -76,12 +80,12 @@ public abstract class BaseActivity extends AppCompatActivity implements BGASwipe
             // 得到界面Id并设置到Activity界面中
             int layId = getContentLayoutId();
             setContentView(layId);
-
             initSystemBar();
             initBefore();
             initBefore(savedInstanceState);
             initView();
             initData();
+
             if (BuildConfig.DEBUG) {
                 Timber.plant(new Timber.DebugTree());
             } else {
@@ -186,7 +190,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BGASwipe
      */
     protected void initBefore() {
     }
-    protected void initBefore(  Bundle savedInstanceState) {
+
+    protected void initBefore(Bundle savedInstanceState) {
 
     }
     /**
@@ -468,6 +473,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BGASwipe
         }
         return super.dispatchTouchEvent(ev);
     }
+
 
 
 }

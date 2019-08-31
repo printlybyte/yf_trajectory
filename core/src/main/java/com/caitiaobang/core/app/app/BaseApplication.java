@@ -24,7 +24,6 @@ public class BaseApplication extends Application {
         Latte.init(this);
         BGASwipeBackHelper.init(this, null);
         Hawk.init(this).build();
-
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
 //                .addInterceptor(new LoggerInterceptor("TAG"))
                 .connectTimeout(10000L, TimeUnit.MILLISECONDS)

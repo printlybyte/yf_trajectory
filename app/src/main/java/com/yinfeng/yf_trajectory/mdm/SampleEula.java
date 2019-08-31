@@ -146,7 +146,6 @@ public class SampleEula {
             mActivity.startActivityForResult(intent, REQUEST_ENABLE);
             Log.d("SAMPLE", "activeProcess");
 
-
         }
     }
 

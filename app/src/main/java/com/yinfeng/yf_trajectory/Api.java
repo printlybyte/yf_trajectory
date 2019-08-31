@@ -11,7 +11,9 @@ package com.yinfeng.yf_trajectory;
  **/
 public interface Api {
     //    String APP_DOMAIN = "http://postman.wanghuifeng.me/mock/19";
-    String APP_DOMAIN = "http://47.105.197.148:8111/admin";
+//    String APP_DOMAIN = "http://47.105.197.148:8111/admin";
+    String APP_DOMAIN = "http://47.104.98.97/admin";
+//    String APP_DOMAIN = "http://192.168.1.137:8111/admin";
 
     /**
      * post
@@ -77,8 +79,10 @@ public interface Api {
      * post
      * 获取升级信息
      */
-    String API_appVersion_judge = APP_DOMAIN + "/appVersion/judge?id=1";
+    String API_appVersion_judge = APP_DOMAIN + "/appVersion/last";
 
+
+    String API_appVersion_getUpdateAndAliveTime = APP_DOMAIN + "/appVersion/getUpdateAndAliveTime";
 
 
 }

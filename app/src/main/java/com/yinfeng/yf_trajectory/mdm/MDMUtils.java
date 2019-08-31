@@ -2,9 +2,12 @@ package com.yinfeng.yf_trajectory.mdm;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.caitiaobang.core.app.app.BaseActivity;
 import com.caitiaobang.core.app.app.Latte;
 import com.huawei.android.app.admin.DeviceApplicationManager;
 import com.huawei.android.app.admin.DeviceControlManager;
@@ -12,11 +15,16 @@ import com.huawei.android.app.admin.DeviceHwSystemManager;
 import com.huawei.android.app.admin.DevicePackageManager;
 import com.huawei.android.app.admin.DeviceSettingsManager;
 import com.huawei.android.app.admin.DeviceRestrictionManager;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.moudle.utils.FileUtils;
 
+import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+import static android.content.pm.PackageManager.DONT_KILL_APP;
 
 /**
  * ============================================
@@ -37,25 +45,36 @@ public class MDMUtils {
 
     public String mComponentName = "com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver";
     public String mPath = ConstantApi.CommonApkPath + "1.apk";
+    public String mPathHelp = ConstantApi.CommonApkPath + "2.apk";
     /**
      * 卸载的包名
      */
-    String mInstallPackageName = "com.yinfeng.wypzh";
+    String mInstallPackageName = "com.yinfeng.yf_trajectory_help";
 
     /**
-     * @ isInstall true 安装   false 卸载
+     * @ isInstall true 安装   false 卸载   installType  track 轨迹    help  轨迹助手
      */
-    public void installApk(boolean isInstall) {
+    public void installApk(boolean isInstall, String installType) {
         try {
             String pageName = mContent.getPackageName();//获取应用
             DevicePackageManager devicePackageManager = new DevicePackageManager();
             ComponentName componentName = new ComponentName(pageName, mComponentName);
             if (isInstall) {
-                if (!FileUtils.isFileExists(mPath)) {
-                    Toast.makeText(mContent, "apk文件不存在", Toast.LENGTH_SHORT).show();
-                    return;
+                if (installType.equals("track")) {
+                    if (!FileUtils.isFileExists(mPath)) {
+                        Toast.makeText(mContent, "apk文件不存在", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    devicePackageManager.installPackage(componentName, mPath);
+                } else if (installType.equals("help")) {
+                    if (!FileUtils.isFileExists(mPathHelp)) {
+                        Toast.makeText(mContent, "apk文件不存在", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    devicePackageManager.installPackage(componentName, mPathHelp);
+                } else {
+                    Toast.makeText(mContent, "==================", Toast.LENGTH_SHORT).show();
                 }
-                devicePackageManager.installPackage(componentName, mPath);
             } else {
                 devicePackageManager.uninstallPackage(componentName, mInstallPackageName, true);
             }
@@ -137,6 +156,7 @@ public class MDMUtils {
                     "\uF06C 此 apk 没有\n" +
                     "com.huawei.permission.sec.MDM_CONNECTIVI\n" +
                     "TY权限。", Toast.LENGTH_SHORT).show();
+            Logger.v( "SecurityException forceMobiledataOn======" + i.toString());
         }
 
     }
@@ -244,6 +264,36 @@ public class MDMUtils {
 
 
     /**
+     * 2.15.34允许/禁止定位模式设置（EMUI8.0）
+     * 注意：需要申请 com.huawei.permission.sec.MDM_SETTINGS_RESTRICTION 权限
+     * 才能调用此接口；通过该接口指定禁用还是启用定位模式
+     */
+    public boolean setLocationModeDisabled(boolean isDisabled) {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceSettingsManager.setLocationModeDisabled(componentName, isDisabled);
+            if (isSuccess) {
+                Toast.makeText(mContent, "定位模式设置成功", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                Toast.makeText(mContent, "定位模式设置失败", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.systemmanager.permission.MDM_SETTINGS_RESTRICTION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+            return false;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    /**
      * 打开/关闭 GPS（EMUI5.0）
      * 9.0 之前版本：打开/关闭使用 GPS 的位置信息定位模式，需要申请
      * com.huawei.permission.sec.MDM_LOCATION 权限才可以调用此接口
@@ -292,4 +342,271 @@ public class MDMUtils {
         }
         return 0;
     }
+
+
+    /**
+     * setCustomSettingsMenu
+     * 设置订制菜单
+     */
+    public void setCustomSettingsMenu() {
+        try {
+            String pageName = mContent.getPackageName();//获取应用
+            DeviceControlManager deviceControlManager = new DeviceControlManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            ArrayList<String> mMenuList = new ArrayList<>();
+            mMenuList.add("com.android.settings.Settings$AppAndNotificationDashboardActivity");
+            deviceControlManager.setCustomSettingsMenu(componentName, mMenuList);
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.permission.sec..MDM_DEVICE_MAN\n" +
+                    "AGER\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数admin为null时", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    /**
+     * 禁止/允许应用通知消息（EMUI8.1）
+     * setNotificationDisabled
+     * true：禁用应用通知消息 isDisabled
+     * false：启用应用通知消息 isDisabled
+     * <p>
+     * true：应用通知消息功能被禁用；false：应用通知消息功能未禁用
+     */
+
+    public boolean setNotificationDisabled(boolean isDisabled) {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceSettingsManager.setNotificationDisabled(componentName, isDisabled);
+            if (isSuccess) {
+//                Toast.makeText(mContent, "应用通知消息功能被禁用", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                Toast.makeText(mContent, "应用通知消息功能未禁用", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.systemmanager.permission.MDM_SETTINGS_RESTRICTION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+            return false;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+
+    /**
+     * 禁禁用/启用恢复出厂设置(EMUI5.1)
+     * setRestoreFactoryDisabled
+     * true：禁用恢复出厂设置false：恢复正常状态。
+     * <p>
+     * true：配置成功；false：配置失败。
+     */
+
+    public boolean setRestoreFactoryDisabled(boolean isDisabled) {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceSettingsManager.setRestoreFactoryDisabled(componentName, isDisabled);
+            if (isSuccess) {
+                Toast.makeText(mContent, "出厂设置配置成功", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                Toast.makeText(mContent, "出厂设置配置失败", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.systemmanager.permission.MDM_SETTINGS_RESTRICTION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+            return false;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+
+    /**
+     * 系统升级 setSystemUpdateDisabled
+     * 禁用/启用系统升级功能(EMUI5.1)
+     * true：禁用系统升级功能。false：启用系统升级功能。 isDisabled
+     * <p>
+     * true：配置成功；false：配置失败。
+     */
+    public boolean setSystemUpdateDisabled(boolean isDisabled) {
+        try {
+            String pageName = mContent.getPackageName();//获取应用
+            DeviceRestrictionManager deviceRestrictionManager = new DeviceRestrictionManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceRestrictionManager.setSystemUpdateDisabled(componentName, isDisabled);
+            if (isSuccess) {
+                Toast.makeText(mContent, "禁用系统升级成功", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                Toast.makeText(mContent, "禁用系统升级失败", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.systemmanager.permission.MDM_UPDATESTATE_MANAGER\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+    }
+
+
+    /**
+     * 2.15.44禁止/允许设置搜索（EMUI8.2）
+     * setSearchIndexDisabled
+     * 版权所有©华为技术有限公司 第 279 页, 共 298 页禁用后设置搜索工具条（
+     * 包含语音搜索按钮）不可见，启用后恢复正常，在桌面搜索中，无法搜索出设置条目
+     * <p>
+     * true：已禁用设置搜索；false：未禁用设置搜索；
+     * return：true：设置搜索已禁用
+     * false：设置搜索未禁用
+     */
+
+
+    public boolean setSearchIndexDisabled(boolean isDisabled) {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceSettingsManager.setSearchIndexDisabled(componentName, isDisabled);
+            if (isSuccess) {
+                Toast.makeText(mContent, "设置搜索已禁用", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                Toast.makeText(mContent, "设置搜索未禁用", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.systemmanager.permission.MDM_SETTINGS_RESTRICTION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+            return false;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+
+    /**
+     * 1 添加禁止反激活名单（EMUI4.1）
+     */
+
+    public void addDisabledDeactivateMdmPackages() {
+        try {
+            String pageName = mContent.getPackageName();  //获取应用
+            DevicePackageManager devicePackageManager = new DevicePackageManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            List<String> mPackageList = new ArrayList<>();
+            mPackageList.add(pageName);
+            devicePackageManager.addDisabledDeactivateMdmPackages(componentName, mPackageList);
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "此apk未经设备管理激活\n" +
+                    "或此apk没有\n" +
+                    "此 apk 没有\n" +
+                    "com.huawei.permission.sec.MDM_APP_MANAGEMENT \n" +
+                    "权限。\n" +
+                    "或此apk不属于当前用户\n", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    /**
+     * 1 移除禁止反激活名单（EMUI4.1）
+     */
+
+    public void removeDisabledDeactivateMdmPackages() {
+        try {
+            String pageName = mContent.getPackageName();  //获取应用
+            DevicePackageManager devicePackageManager = new DevicePackageManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            List<String> mPackageList = new ArrayList<>();
+            mPackageList.add(pageName);
+            devicePackageManager.removeDisabledDeactivateMdmPackages(componentName, mPackageList);
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "此apk未经设备管理激活\n" +
+                    "或此apk没有\n" +
+                    "此 apk 没有\n" +
+                    "com.huawei.permission.sec.MDM_APP_MANAGEMENT \n" +
+                    "权限。\n" +
+                    "或此apk不属于当前用户\n", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    /**
+     * 禁用/启用添加多用户(EMUI5.1)
+     * 设置多用户添加禁用状态。禁用时，“添加用户”、“添加访客”、“添加隐私空间”功能
+     * 无法使用，“允许设备锁定下添加用户”开关关闭且无法被开启。
+     * 注意：需要申请 com.huawei.permission.sec.MDM_SETTINGS_RESTRICTION 权限
+     * 才能调用此接口。
+     * <p>
+     * true：禁用添加多用户；
+     * false：恢复正常状态。
+     * <p>
+     * true：配置成功；
+     * false：配置失败。
+     */
+
+
+    public boolean setAddUserDisabled(boolean isDisabled) {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceSettingsManager.setAddUserDisabled(componentName, isDisabled);
+            if (isSuccess) {
+//                Toast.makeText(mContent, "配置成功AddUser", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                Toast.makeText(mContent, "配置失败AddUser", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "此 apk 没有\n" +
+                    "com.huawei.permission.sec.MDM_SETTINGS_RESTRICTION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+            return false;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+
+    public void setPackageManager() {
+        String ComponentNamePermissionsName =
+                "com.android.packageinstaller.permission.ui.ManagePermissionsActivity";
+        try {
+            String pageName = "com.android.packageinstaller";
+            PackageManager packageManager = Latte.getApplicationContext().getPackageManager();
+            ComponentName componentName = new ComponentName(pageName, ComponentNamePermissionsName);
+            packageManager.setComponentEnabledSetting(componentName, COMPONENT_ENABLED_STATE_DISABLED, DONT_KILL_APP);
+        } catch (SecurityException e) {
+
+            Toast.makeText(mContent, " setPackageManager err"+e.getMessage(), Toast.LENGTH_SHORT).show();
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "setPackageManager err Exception"+e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 }
