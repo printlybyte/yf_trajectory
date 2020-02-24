@@ -221,8 +221,8 @@ public class ApplicationRecordActivity extends BaseActivity {
 //        map.put("endTime", mTimeEnd);
         String mNetUrl = Api.API_apply_query + "?pageNum=" + mCurrentPage + "&pageSize=" + pageSize;
 
-        Logger.v( "API: " + Api.API_apply_query + "发送json：" + new Gson().toJson(map) + "mCurrentPage" + mCurrentPage);
-        Logger.v( "token: " + token);
+       Log.i("testre","API: " + Api.API_apply_query + "发送json：" + new Gson().toJson(map) + "mCurrentPage" + mCurrentPage);
+       Log.i("testre","token: " + token);
         OkHttpUtils
                 .postString()
                 .addHeader("track-token", token)
@@ -348,14 +348,10 @@ public class ApplicationRecordActivity extends BaseActivity {
             return;
         }
         Map<String, Object> map = new LinkedHashMap<>();
-        map.clear();
 //        map.put("startTime", mTimeStart);
 //        map.put("endTime", mTimeEnd);
         String mNetUrl = Api.API_apply_query + "?pageNum=" + "1" + "&pageSize=" + pageSize;
-        Logger.v( "API: " + mNetUrl + "发送json：" + new Gson().toJson(map));
-        Logger.v( "Activity token :: " +token);
-
-
+       Log.i("testre","API: " + mNetUrl + "发送json：" + new Gson().toJson(map));
         OkHttpUtils
                 .postString()
                 .addHeader("track-token", token)
@@ -377,17 +373,17 @@ public class ApplicationRecordActivity extends BaseActivity {
                         if (type == 1) {
                             dismisProgress();
                         }
-                        if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
+                        if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.getData().getList().size()>0) {
                             setAdapter(response);
                             mCurrentPage = response.getData().getPageNum();
                             mPageSizeTotal = (response.getData().getTotal() / 15.0 + 1.0);
-                            Logger.v( "mPageSizeTotal:" + mPageSizeTotal);
+                           Log.i("testre","mPageSizeTotal:" + mPageSizeTotal);
                             mTestMultipleStatusView.showContent();
                         } else {
-                            showToastC(response.getMessage());
+//                            showToastC(response.getMessage());
                             mTestMultipleStatusView.showEmpty();
                         }
-                        Logger.v( "请求结果：" + GsonUtils.getInstance().toJson(response));
+                       Log.i("testre","请求结果：" + GsonUtils.getInstance().toJson(response));
                         dismisProgress();
                     }
                 });

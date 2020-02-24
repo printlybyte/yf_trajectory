@@ -110,7 +110,7 @@
 //////                            setButtonStatusOn();
 ////                        } else {
 ////                            MToast.makeTextLong(mContext, bean.getMessage());
-////                            Log.i("TESTD",""+ bean.getMessage());
+////                          Log.i("testre",""+ bean.getMessage());
 //////                            setButtonStatusOn();
 ////                            showToastC(bean.getMessage());
 ////                        }
@@ -177,7 +177,7 @@
 //                        @Override
 //                        public void onComplete(Platform platform, int i, final HashMap<String, Object> hashMap) {
 //                            /*platform.getDb().exportData()获取用户数据*/
-//                            Log.i("ShareSDK", "onComplete ---->  登录成功" + platform.getDb().exportData());
+//                          Log.i("testre","ShareSDK", "onComplete ---->  登录成功" + platform.getDb().exportData());
 //                            platform.getDb().getUserId();
 //                            String mUserId = platform.getDb().getUserId();
 //                            String mUserName = platform.getDb().getUserName();
@@ -188,14 +188,14 @@
 //
 //                        @Override
 //                        public void onError(Platform platform, int i, Throwable throwable) {
-//                            Log.i("ShareSDK", "onError ---->  登录失败" + throwable.toString());
-//                            Log.i("ShareSDK", "onError ---->  登录失败" + throwable.getStackTrace().toString());
-//                            Log.i("ShareSDK", "onError ---->  登录失败" + throwable.getMessage());
+//                          Log.i("testre","ShareSDK", "onError ---->  登录失败" + throwable.toString());
+//                          Log.i("testre","ShareSDK", "onError ---->  登录失败" + throwable.getStackTrace().toString());
+//                          Log.i("testre","ShareSDK", "onError ---->  登录失败" + throwable.getMessage());
 //                        }
 //
 //                        @Override
 //                        public void onCancel(Platform platform, int i) {
-//                            Log.i("ShareSDK", "onCancel ---->  登录取消");
+//                          Log.i("testre","ShareSDK", "onCancel ---->  登录取消");
 //                        }
 //                    });
 //                    wechat.SSOSetting(false);
@@ -220,7 +220,7 @@
 //                        @Override
 //                        public void onComplete(Platform platform, int i, final HashMap<String, Object> hashMap) {
 //                            /*platform.getDb().exportData()获取用户数据*/
-//                            Log.i("ShareSDK", "onComplete ---->  登录成功" + platform.getDb().exportData());
+//                          Log.i("testre","ShareSDK", "onComplete ---->  登录成功" + platform.getDb().exportData());
 //                            String mUserId = platform.getDb().getUserId();
 //                            String mUserName = platform.getDb().getUserName();
 //                            String mUserIcon = platform.getDb().getUserIcon();
@@ -230,14 +230,14 @@
 //
 //                        @Override
 //                        public void onError(Platform platform, int i, Throwable throwable) {
-//                            Log.i("ShareSDK", "onError ---->  登录失败" + throwable.toString());
-//                            Log.i("ShareSDK", "onError ---->  登录失败" + throwable.getStackTrace().toString());
-//                            Log.i("ShareSDK", "onError ---->  登录失败" + throwable.getMessage());
+//                          Log.i("testre","ShareSDK", "onError ---->  登录失败" + throwable.toString());
+//                          Log.i("testre","ShareSDK", "onError ---->  登录失败" + throwable.getStackTrace().toString());
+//                          Log.i("testre","ShareSDK", "onError ---->  登录失败" + throwable.getMessage());
 //                        }
 //
 //                        @Override
 //                        public void onCancel(Platform platform, int i) {
-//                            Log.i("ShareSDK", "onCancel ---->  登录取消");
+//                          Log.i("testre","ShareSDK", "onCancel ---->  登录取消");
 //                        }
 //                    });
 //                    wechat.SSOSetting(false);
@@ -261,7 +261,7 @@
 //                        @Override
 //                        public void onComplete(Platform platform, int i, final HashMap<String, Object> hashMap) {
 //                            /*platform.getDb().exportData()获取用户数据*/
-//                            Log.i("ShareSDK", "onComplete ---->  登录成功" + platform.getDb().exportData());
+//                          Log.i("testre","ShareSDK", "onComplete ---->  登录成功" + platform.getDb().exportData());
 //                            String mUserId = platform.getDb().getUserId();
 //                            String mUserName = platform.getDb().getUserName();
 //                            String mUserIcon = platform.getDb().getUserIcon();
@@ -271,15 +271,15 @@
 //
 //                        @Override
 //                        public void onError(Platform platform, int i, Throwable throwable) {
-//                            Log.i("ShareSDK", "onError ---->  登录失败" + throwable.toString());
-//                            Log.i("ShareSDK", "onError ---->  登录失败" + throwable.getStackTrace().toString());
-//                            Log.i("ShareSDK", "onError ---->  登录失败" + throwable.getMessage());
+//                          Log.i("testre","ShareSDK", "onError ---->  登录失败" + throwable.toString());
+//                          Log.i("testre","ShareSDK", "onError ---->  登录失败" + throwable.getStackTrace().toString());
+//                          Log.i("testre","ShareSDK", "onError ---->  登录失败" + throwable.getMessage());
 //
 //                        }
 //
 //                        @Override
 //                        public void onCancel(Platform platform, int i) {
-//                            Log.i("ShareSDK", "onCancel ---->  登录取消");
+//                          Log.i("testre","ShareSDK", "onCancel ---->  登录取消");
 //                        }
 //                    });
 //                    sinaweibo.SSOSetting(false);
@@ -305,7 +305,7 @@
 //        }
 //        String md5 = ("account" + mAccount + "headimgUrl" + headimgUrl + "type" + mType + "username" + username + FinalUtils.MDK_KEY).trim();
 //        String md5encrypt = EncryptUtils.encryptMD5ToString(md5).toLowerCase();
-//        Log.i("testd", "md5：" + md5 + "  md5encrypt: " + md5encrypt);
+//       Log.i("testre","md5：" + md5 + "  md5encrypt: " + md5encrypt);
 //        if (type == 1) {
 //            showProgress("登陆中...");
 //        }
@@ -334,7 +334,7 @@
 //                        }
 //                        if (response != null && response.isSuccess()) {
 //                            //showToastC(response.getMessage());
-//                            Log.i("testr", "网络结果：" + new Gson().toJson(response));
+//                          Log.i("testre","testr", "网络结果：" + new Gson().toJson(response));
 //
 //                            showToastC("登录成功");
 //                            Hawk.put("already_login_ctb", "1");

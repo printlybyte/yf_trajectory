@@ -11,6 +11,7 @@
     <include layout="@layout/include_actionbar_back" />
 
     <LinearLayout
+        android:paddingBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -225,8 +226,36 @@
 
         </RelativeLayout>
 
-
         <RelativeLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="0dp"
+                android:paddingLeft="30dp"
+                android:text="版本号："
+                android:textColor="@color/c_333"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/activity_me_info_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:paddingLeft="10dp"
+                android:text=""
+                android:textColor="@color/c_999"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="25dp"
             android:layout_marginTop="22dp">
@@ -259,6 +288,7 @@
 
 
         <LinearLayout
+            android:visibility="gone"
             android:id="@+id/activity_me_info_request"
             android:layout_marginBottom="30dp"
             android:layout_marginTop="30dp"
@@ -285,7 +315,32 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/activity_me_info_leave"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_width="50dp"
+            android:foreground="?android:attr/selectableItemBackground"
 
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:orientation="vertical">
+
+            <ImageView
+
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@mipmap/ic_leaveing_list_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="请假记录"
+                android:textColor="@color/c_333"
+                android:textSize="12sp" />
+        </LinearLayout>
     </LinearLayout>
 
 

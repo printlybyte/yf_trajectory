@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.caitiaobang.core.app.storge.LattePreference;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.Logger;
 
 /**
  * ============================================
@@ -30,7 +31,7 @@ public class SimStateReceiver extends BroadcastReceiver {
             TelephonyManager tm = (TelephonyManager) context.getSystemService(Service.TELEPHONY_SERVICE);
             int state = tm.getSimState();
             if (state == 1) {
-                Log.i("testre", "sim 卡槽弹开 ：" + state);
+              Log.i("testre","sim 卡槽弹开 ：" + state);
                 LattePreference.clear();
                 Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
                 mIntent.putExtra("result", ConstantApi.RECEVIER_NO_SIM_READY);

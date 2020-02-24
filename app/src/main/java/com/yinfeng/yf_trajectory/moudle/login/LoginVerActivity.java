@@ -146,7 +146,7 @@
 //        Map<String, String> mMapValue = new LinkedHashMap<>();
 //        mMapValue.put("username", username);
 //        mMapValue.put("msgCode", msgCode);
-//        Logger.v( "API: " + Api.API_login + " par:" + GsonUtils.getInstance().toJson(mMapValue));
+//       Log.i("testre","API: " + Api.API_login + " par:" + GsonUtils.getInstance().toJson(mMapValue));
 //        OkHttpUtils
 //                .postString()
 //                .content(new Gson().toJson(mMapValue))
@@ -168,14 +168,14 @@
 //                            dismisProgress();
 //                        }
 //                        if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
-//                            Log.i("testr", "网络结果：" + new Gson().toJson(response));
+//                          Log.i("testre","testr", "网络结果：" + new Gson().toJson(response));
 //                            if (TextUtils.isEmpty(response.getData())) {
 //                                showToastC("登录失败");
 //                                return;
 //                            }
 //                            mActivityPasswordLoginPhone.setEnabled(false);
 //
-//                            Logger.v( "登录 token : " + response.getData());
+//                           Log.i("testre","登录 token : " + response.getData());
 //                            LattePreference.saveKey(ConstantApi.HK_ROMOTE_TOKEN, response.getData() + "");
 //                            Hawk.put(ConstantApi.HK_TOKEN, response.getData() + "");
 //                            showToastC(response.getMessage());
@@ -186,7 +186,7 @@
 //                            showToastC(response.getMessage());
 //
 //                        }
-//                        Logger.v( "请求结果：" + GsonUtils.getInstance().toJson(response));
+//                       Log.i("testre","请求结果：" + GsonUtils.getInstance().toJson(response));
 //                        dismisProgress();
 //                    }
 //                });

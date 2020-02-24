@@ -22,12 +22,10 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
+        startOneActivity(context);
+//        if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
+//        }
 
-        Logger.v(" 开机启动 "  );
-
-        if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
-            startOneActivity(context);
-        }
     }
 
     private void startOneActivity(Context context) {

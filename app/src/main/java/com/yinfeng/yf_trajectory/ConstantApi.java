@@ -16,6 +16,8 @@ public interface ConstantApi {
     String LOG_I = "LOG_I";
     String LOG_I_ = "LOG_I_";
     String LOG_I_NET = "LOG_I_NET";
+    String HAWK_LAT = "HAWK_LAT";
+    String HAWK_LNG = "HAWK_LNG";
 
 
     int API_REQUEST_SUCCESS = 200;
@@ -25,8 +27,7 @@ public interface ConstantApi {
     // FINAL HK CONSTANS
     String HK_TOKEN = "HK_TOKEN";
     String HK_ROMOTE_TOKEN = "HK_ROMOTE_TOKEN";
-    String HK_CHECK_LOGIN = "HK_CHECK_LOGIN";
-    String HK_PHONE = "HK_PHONE";
+    String HK_ICCID = "HK_ICCID";
     String HK_USER_BEAN = "HK_USER_BEAN";
     String INTENT_FLAG = "INTENT_FLAG";
     String INTENT_KEY = "INTENT_KEY";
@@ -71,5 +72,37 @@ public interface ConstantApi {
 
 
     String isActivation = "isActivation";
+
+//String EVENT_TAG_ACTION="EVENT_TAG_ACTION";
+    /**
+     * 标记外出报备的状态  0=无外出报备  1  有状态
+     */
+    String isMatterStatus = "isMatterStatus";
+
+
+    String isWorkingDay = "isWorkingDay";
+
+
+    String work_time_start = "work_time_start";
+    String work_time_end = "work_time_end";
+
+
+    String leave_time_start = "leave_time_start";
+    String leave_time_end = "leave_time_end";
+    String leave_time_status = "leave_time_status";
+
+
+    String work_time_status = "work_time_status";
+
+
+    /**
+    * isWorkStatus==0 异常  ==1 状态开始   ==2 状态停止
+    */
+    String work_day_isLocation_status = "work_day_isLocation_status";
+//    String overtime_status = "overtime_status";
+
+
+    String service_action="service_action_event";
+    String activity_action="activity_action_event";
 
 }

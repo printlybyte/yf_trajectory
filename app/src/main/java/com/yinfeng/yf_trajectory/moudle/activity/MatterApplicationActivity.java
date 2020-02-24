@@ -12,6 +12,7 @@ import com.blankj.utilcode.util.NetworkUtils;
 import com.caitiaobang.core.app.app.BaseActivity;
 import com.caitiaobang.core.app.net.GenericsCallback;
 import com.caitiaobang.core.app.net.JsonGenericsSerializator;
+import com.caitiaobang.core.app.storge.LattePreference;
 import com.caitiaobang.core.app.utils.ConmonUtils;
 import com.google.gson.Gson;
 import com.jzxiang.pickerview.TimePickerDialog;
@@ -114,7 +115,7 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
     public void onDateSet(TimePickerDialog timePickerView, long millseconds) {
         String text = ConmonUtils.getDateToString(millseconds);
 //        mTime = millseconds / 1000 + "";
-        Log.i("", "");
+        Log.i("testre","");
         if (mTimeType == 1) {
             mTimeStart = text;
             mActivityMatterApplicationStartTime.setText(text);
@@ -199,7 +200,7 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
         map.put("reason", reason);
         map.put("title", "标题： " + reason);
         map.put("address", address);
-        Logger.v( "API: " + mUrl + "发送json：" + new Gson().toJson(map));
+        Log.i("testre","API: " + mUrl + "发送json：" + new Gson().toJson(map));
         OkHttpUtils
                 .postString()
                 .addHeader("track-token", token)
@@ -224,14 +225,16 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
                             if (mStatus.equals("0")) {
                                 showToastC("记录成功");
+                                LattePreference.saveKey(ConstantApi.isMatterStatus, "1");
                             } else {
                                 showToastC("结束记录成功");
+                                LattePreference.saveKey(ConstantApi.isMatterStatus, "0");
                             }
                             finish();
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Logger.v( "请求结果：" + GsonUtils.getInstance().toJson(response));
+                        Log.i("testre","请求结果：" + GsonUtils.getInstance().toJson(response));
                         dismisProgress();
                     }
                 });
@@ -253,7 +256,7 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
             showToastC("token = null ");
             return;
         }
-        Logger.v( "API: " + Api.API_apply_judge);
+        Log.i("testre","API: " + Api.API_apply_judge);
         OkHttpUtils
                 .get()
                 .addHeader("track-token", token)
@@ -289,7 +292,7 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Logger.v( "请求结果：" + GsonUtils.getInstance().toJson(response));
+                        Log.i("testre","请求结果：" + GsonUtils.getInstance().toJson(response));
                         dismisProgress();
                     }
                 });
@@ -303,11 +306,4 @@ public class MatterApplicationActivity extends BaseActivity implements OnDateSet
     }
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO:OnCreate Method has been created, run FindViewById again to generate code
-        setContentView(R.layout.activity_matter_application);
-        initView();
-    }
 }

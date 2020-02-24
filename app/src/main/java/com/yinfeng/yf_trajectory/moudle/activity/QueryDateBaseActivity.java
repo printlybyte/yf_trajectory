@@ -198,7 +198,7 @@ public class QueryDateBaseActivity extends BaseActivity {
         try {
             return daoSession.queryBuilder(GreendaoLocationBean.class).list();
         } catch (Exception e) {
-            Logger.v( "green err " + e.toString());
+           Log.i("testre","green err " + e.toString());
             showToast("green err " + e.toString());
             e.printStackTrace();
         }

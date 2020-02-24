@@ -16,14 +16,18 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.amap.api.location.AMapLocation;
+import com.caitiaobang.core.app.app.Latte;
+import com.orhanobut.logger.Logger;
+import com.yinfeng.yf_trajectory.moudle.utils.PermissionUtilsx;
+import com.yinfeng.yf_trajectory.moudle.utils.PlayVoice;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -38,6 +42,21 @@ import java.util.Locale;
  * @类型名称: Utils
  */
 public class Utils {
+	public static void checkPer() {
+		if (!PermissionUtilsx.checkP()) {
+			Logger.i("权限已关闭");
+			PlayVoice.playVoice(Latte.getApplicationContext(), R.raw.per_tts);
+		}
+	}
+	public static Long getTimeLong(String timeStr) {
+		try {
+			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(timeStr).getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	/**
 	 * 开始定位
 	 */
@@ -72,13 +91,11 @@ public class Utils {
 			sb.append("经    度    : " + location.getLongitude() + "\n");
 			sb.append("纬    度    : " + location.getLatitude() + "\n");
 			sb.append("精    度    : " + location.getAccuracy() + "米" + "\n");
-//			sb.append("提供者    : " + location.getProvider() + "\n");
+			sb.append("提供者    : " + location.getProvider() + "\n");
 
-			Log.i("testre",""+"经    度    : " + location.getLongitude() + "\n"+
-					"纬    度    : " + location.getLatitude() + "\n");
-//			sb.append("海    拔    : " + location.getAltitude() + "米" + "\n");
-//			sb.append("速    度    : " + location.getSpeed() + "米/秒" + "\n");
-//			sb.append("角    度    : " + location.getBearing() + "\n");
+			sb.append("海    拔    : " + location.getAltitude() + "米" + "\n");
+			sb.append("速    度    : " + location.getSpeed() + "米/秒" + "\n");
+			sb.append("角    度    : " + location.getBearing() + "\n");
 			if (location.getProvider().equalsIgnoreCase(
 					android.location.LocationManager.GPS_PROVIDER)) {
 				// 以下信息只有提供者是GPS时才会有
@@ -88,14 +105,14 @@ public class Utils {
 			}
 
 			//逆地理信息
-//			sb.append("国    家    : " + location.getCountry() + "\n");
-//			sb.append("省            : " + location.getProvince() + "\n");
-//			sb.append("市            : " + location.getCity() + "\n");
-//			sb.append("城市编码 : " + location.getCityCode() + "\n");
-//			sb.append("区            : " + location.getDistrict() + "\n");
-//			sb.append("区域 码   : " + location.getAdCode() + "\n");
+			sb.append("国    家    : " + location.getCountry() + "\n");
+			sb.append("省            : " + location.getProvince() + "\n");
+			sb.append("市            : " + location.getCity() + "\n");
+			sb.append("城市编码 : " + location.getCityCode() + "\n");
+			sb.append("区            : " + location.getDistrict() + "\n");
+			sb.append("区域 码   : " + location.getAdCode() + "\n");
 			sb.append("地    址    : " + location.getAddress() + "\n");
-//			sb.append("兴趣点    : " + location.getPoiName() + "\n");
+			sb.append("兴趣点    : " + location.getPoiName() + "\n");
 			//定位完成的时间
 			sb.append("定位时间: " + formatUTC(location.getTime(), "yyyy-MM-dd HH:mm:ss") + "\n");
 
@@ -179,7 +196,6 @@ public class Utils {
 
 	public static Notification buildNotification(Context context) {
 		Notification.Builder builder = new Notification.Builder(context);
-
 		builder.setContentText("service");
 		return builder.getNotification();
 	}

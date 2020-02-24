@@ -1,5 +1,7 @@
 package com.yinfeng.yf_trajectory.moudle.bean;
 
+import java.util.List;
+
 /**
  * ============================================
  * 描  述：
@@ -11,11 +13,12 @@ package com.yinfeng.yf_trajectory.moudle.bean;
  **/
 public class ApkDownloadBean {
 
+
     /**
      * code : 200
      * message : 操作成功！
-     * data : {"appVersion":{"id":"7","createTime":"","updateTime":"","createBy":"","updateBy":"","state":"1","sort":999,"delFlag":"0","ids":"","orderBy":"","downLoadUrl":"new","updateLog":"助手1.1","versionCode":"2","versionName":"1.0.1","appType":"help"},"newest":false}
-     * now : 2019-08-25 19:09:46
+     * data : {"downLoadUrl":"http://qiniu.jyncmall.com/2.0.3.apk","orderBy":null,"updateTime":"2018-12-13 18:01:51","updateLog":"支持在线提现,bug修复123","sort":999,"versionName":"2.02","delFlag":"0","versionCode":"203","updateTime_date_str":"2018-12-13","createBy":"","createTime":null,"updateBy":"","appType":"track","updateTime_str":"2018-12-13 18:01:51","ids":null,"sysAttachments":[],"id":"2","state":"1"}
+     * now : 2019-09-17 15:09:03
      * success : true
      */
 
@@ -67,183 +70,187 @@ public class ApkDownloadBean {
 
     public static class DataBean {
         /**
-         * appVersion : {"id":"7","createTime":"","updateTime":"","createBy":"","updateBy":"","state":"1","sort":999,"delFlag":"0","ids":"","orderBy":"","downLoadUrl":"new","updateLog":"助手1.1","versionCode":"2","versionName":"1.0.1","appType":"help"}
-         * newest : false
+         * downLoadUrl : http://qiniu.jyncmall.com/2.0.3.apk
+         * orderBy : null
+         * updateTime : 2018-12-13 18:01:51
+         * updateLog : 支持在线提现,bug修复123
+         * sort : 999
+         * versionName : 2.02
+         * delFlag : 0
+         * versionCode : 203
+         * updateTime_date_str : 2018-12-13
+         * createBy :
+         * createTime : null
+         * updateBy :
+         * appType : track
+         * updateTime_str : 2018-12-13 18:01:51
+         * ids : null
+         * sysAttachments : []
+         * id : 2
+         * state : 1
          */
 
-        private AppVersionBean appVersion;
-        private boolean newest;
+        private String downLoadUrl;
+        private Object orderBy;
+        private String updateTime;
+        private String updateLog;
+        private int sort;
+        private String versionName;
+        private String delFlag;
+        private String versionCode;
+        private String updateTime_date_str;
+        private String createBy;
+        private Object createTime;
+        private String updateBy;
+        private String appType;
+        private String updateTime_str;
+        private Object ids;
+        private String id;
+        private String state;
+        private List<?> sysAttachments;
 
-        public AppVersionBean getAppVersion() {
-            return appVersion;
+        public String getDownLoadUrl() {
+            return downLoadUrl;
         }
 
-        public void setAppVersion(AppVersionBean appVersion) {
-            this.appVersion = appVersion;
+        public void setDownLoadUrl(String downLoadUrl) {
+            this.downLoadUrl = downLoadUrl;
         }
 
-        public boolean isNewest() {
-            return newest;
+        public Object getOrderBy() {
+            return orderBy;
         }
 
-        public void setNewest(boolean newest) {
-            this.newest = newest;
+        public void setOrderBy(Object orderBy) {
+            this.orderBy = orderBy;
         }
 
-        public static class AppVersionBean {
-            /**
-             * id : 7
-             * createTime :
-             * updateTime :
-             * createBy :
-             * updateBy :
-             * state : 1
-             * sort : 999
-             * delFlag : 0
-             * ids :
-             * orderBy :
-             * downLoadUrl : new
-             * updateLog : 助手1.1
-             * versionCode : 2
-             * versionName : 1.0.1
-             * appType : help
-             */
+        public String getUpdateTime() {
+            return updateTime;
+        }
 
-            private String id;
-            private String createTime;
-            private String updateTime;
-            private String createBy;
-            private String updateBy;
-            private String state;
-            private int sort;
-            private String delFlag;
-            private String ids;
-            private String orderBy;
-            private String downLoadUrl;
-            private String updateLog;
-            private String versionCode;
-            private String versionName;
-            private String appType;
+        public void setUpdateTime(String updateTime) {
+            this.updateTime = updateTime;
+        }
 
-            public String getId() {
-                return id;
-            }
+        public String getUpdateLog() {
+            return updateLog;
+        }
 
-            public void setId(String id) {
-                this.id = id;
-            }
+        public void setUpdateLog(String updateLog) {
+            this.updateLog = updateLog;
+        }
 
-            public String getCreateTime() {
-                return createTime;
-            }
+        public int getSort() {
+            return sort;
+        }
 
-            public void setCreateTime(String createTime) {
-                this.createTime = createTime;
-            }
+        public void setSort(int sort) {
+            this.sort = sort;
+        }
 
-            public String getUpdateTime() {
-                return updateTime;
-            }
+        public String getVersionName() {
+            return versionName;
+        }
 
-            public void setUpdateTime(String updateTime) {
-                this.updateTime = updateTime;
-            }
+        public void setVersionName(String versionName) {
+            this.versionName = versionName;
+        }
 
-            public String getCreateBy() {
-                return createBy;
-            }
+        public String getDelFlag() {
+            return delFlag;
+        }
 
-            public void setCreateBy(String createBy) {
-                this.createBy = createBy;
-            }
+        public void setDelFlag(String delFlag) {
+            this.delFlag = delFlag;
+        }
 
-            public String getUpdateBy() {
-                return updateBy;
-            }
+        public String getVersionCode() {
+            return versionCode;
+        }
 
-            public void setUpdateBy(String updateBy) {
-                this.updateBy = updateBy;
-            }
+        public void setVersionCode(String versionCode) {
+            this.versionCode = versionCode;
+        }
 
-            public String getState() {
-                return state;
-            }
+        public String getUpdateTime_date_str() {
+            return updateTime_date_str;
+        }
 
-            public void setState(String state) {
-                this.state = state;
-            }
+        public void setUpdateTime_date_str(String updateTime_date_str) {
+            this.updateTime_date_str = updateTime_date_str;
+        }
 
-            public int getSort() {
-                return sort;
-            }
+        public String getCreateBy() {
+            return createBy;
+        }
 
-            public void setSort(int sort) {
-                this.sort = sort;
-            }
+        public void setCreateBy(String createBy) {
+            this.createBy = createBy;
+        }
 
-            public String getDelFlag() {
-                return delFlag;
-            }
+        public Object getCreateTime() {
+            return createTime;
+        }
 
-            public void setDelFlag(String delFlag) {
-                this.delFlag = delFlag;
-            }
+        public void setCreateTime(Object createTime) {
+            this.createTime = createTime;
+        }
 
-            public String getIds() {
-                return ids;
-            }
+        public String getUpdateBy() {
+            return updateBy;
+        }
 
-            public void setIds(String ids) {
-                this.ids = ids;
-            }
+        public void setUpdateBy(String updateBy) {
+            this.updateBy = updateBy;
+        }
 
-            public String getOrderBy() {
-                return orderBy;
-            }
+        public String getAppType() {
+            return appType;
+        }
 
-            public void setOrderBy(String orderBy) {
-                this.orderBy = orderBy;
-            }
+        public void setAppType(String appType) {
+            this.appType = appType;
+        }
 
-            public String getDownLoadUrl() {
-                return downLoadUrl;
-            }
+        public String getUpdateTime_str() {
+            return updateTime_str;
+        }
 
-            public void setDownLoadUrl(String downLoadUrl) {
-                this.downLoadUrl = downLoadUrl;
-            }
+        public void setUpdateTime_str(String updateTime_str) {
+            this.updateTime_str = updateTime_str;
+        }
 
-            public String getUpdateLog() {
-                return updateLog;
-            }
+        public Object getIds() {
+            return ids;
+        }
 
-            public void setUpdateLog(String updateLog) {
-                this.updateLog = updateLog;
-            }
+        public void setIds(Object ids) {
+            this.ids = ids;
+        }
 
-            public String getVersionCode() {
-                return versionCode;
-            }
+        public String getId() {
+            return id;
+        }
 
-            public void setVersionCode(String versionCode) {
-                this.versionCode = versionCode;
-            }
+        public void setId(String id) {
+            this.id = id;
+        }
 
-            public String getVersionName() {
-                return versionName;
-            }
+        public String getState() {
+            return state;
+        }
 
-            public void setVersionName(String versionName) {
-                this.versionName = versionName;
-            }
+        public void setState(String state) {
+            this.state = state;
+        }
 
-            public String getAppType() {
-                return appType;
-            }
+        public List<?> getSysAttachments() {
+            return sysAttachments;
+        }
 
-            public void setAppType(String appType) {
-                this.appType = appType;
-            }
+        public void setSysAttachments(List<?> sysAttachments) {
+            this.sysAttachments = sysAttachments;
         }
     }
 }

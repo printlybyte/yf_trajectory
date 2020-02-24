@@ -1,37 +1,25 @@
 package com.yinfeng.yf_trajectory.moudle.login;
 
-import android.app.Dialog;
 import android.app.admin.DevicePolicyManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.preference.DialogPreference;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.SmsMessage;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
-import com.caitiaobang.core.app.app.AppManager;
+import com.caitiaobang.core.app.app.Latte;
 import com.caitiaobang.core.app.storge.LattePreference;
-import com.maning.mndialoglibrary.MProgressDialog;
-import com.maning.mndialoglibrary.MToast;
 import com.orhanobut.hawk.Hawk;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.mdm.MDMUtils;
 import com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver;
 import com.yinfeng.yf_trajectory.mdm.SampleEula;
-import com.yinfeng.yf_trajectory.moudle.activity.MainActivity;
-import com.yinfeng.yf_trajectory.moudle.activity.MapActivity;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusBean;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusUtils;
-import com.yinfeng.yf_trajectory.moudle.utils.SMSCore;
 
 import org.greenrobot.eventbus.Subscribe;
 
@@ -95,10 +83,7 @@ public class SplashActivity extends AppCompatActivity {
             mdmUtils.setRestoreFactoryDisabled(true);
             //禁用搜索
             mdmUtils.setSearchIndexDisabled(true);
-
-
-
-            ActivityUtils.startActivity(SMSActivity.class);
+            ActivityUtils.startActivity(ICCIDActivity.class);
             Hawk.put(ConstantApi.isActivation, "1");
             finish();
         } else if (event.getType() == 2) { //取消
@@ -122,15 +107,19 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new EventBusUtils().register(this);
+        LattePreference.saveKey(ConstantApi.work_time_status,"3");
+
+//        LattePreference.saveKey(ConstantApi.overtime_status,"3");
 
         String isLoginStatus = Hawk.get(ConstantApi.isActivation, "");
         if (TextUtils.isEmpty(isLoginStatus)) {
-            initHuaWeiHDM();
+//            initHuaWeiHDM();
+            ActivityUtils.startActivity(ICCIDActivity.class);
+            finish();
         } else {
-            ActivityUtils.startActivity(SMSActivity.class);
+            ActivityUtils.startActivity(ICCIDActivity.class);
             finish();
         }
-
     }
 
 
@@ -140,8 +129,6 @@ public class SplashActivity extends AppCompatActivity {
         if (resultCode == 0) {
             finish();
         }
-//        Toast.makeText(this, resultCode + "", Toast.LENGTH_SHORT).show();
-
     }
 
 

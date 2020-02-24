@@ -189,7 +189,7 @@
 ////        }
 ////        String md5 = ("version" + "20180101" + FinalUtils.MDK_KEY).trim();
 ////        String md5encrypt = EncryptUtils.encryptMD5ToString(md5).toLowerCase();
-////        Log.i("testd", "md5：" + md5 + "  md5encrypt: " + md5encrypt);
+////       Log.i("testre","md5：" + md5 + "  md5encrypt: " + md5encrypt);
 ////        if (type == 1) {
 ////            showProgress("下载数据中...");
 ////        }
@@ -197,7 +197,7 @@
 ////        map.clear();
 ////        map.put("version", "20180101");
 ////        map.put("sign", md5encrypt);
-////        Log.i("tests", "发送json：" + new Gson().toJson(map));
+////      Log.i("testre","tests", "发送json：" + new Gson().toJson(map));
 ////        OkHttpUtils
 ////                .postString()
 ////                .content(new Gson().toJson(map))
@@ -217,7 +217,7 @@
 ////                    public void onResponse(AllAddressBean response, int id) {
 ////                        if (response != null && response.isSuccess()) {
 ////                            //showToastC(response.getMessage());
-////                            Log.i("testr", "网络结果：" + new Gson().toJson(response));
+////                          Log.i("testre","testr", "网络结果：" + new Gson().toJson(response));
 ////                            insertAreaData6(response);
 ////                        } else {
 ////                            //showToastC(response.getMessage());
@@ -261,7 +261,7 @@
 ////                cityBeanx.setNo(Integer.parseInt(allAddressBean.getResult().getAreas().get(i).getCityBean().get(i1).getCityid()));
 ////                daoSession2.insertOrReplace(cityBeanx);//插入或替换
 ////
-//////                Log.i("TESTD", "" + cityBean.getCity());
+//////               Log.i("testre","" + cityBean.getCity());
 ////                int mChildrenSize = cityBean.getChildren().size();
 ////                for (int i2 = 0; i2 < mChildrenSize; i2++) {
 ////                    AllAddressBean.ResultBean.AreasBean.CityBean.ChildrenBean childrenBean = allAddressBean.getResult().getAreas().get(i).getCityBean().get(i1).getChildren().get(i2);
@@ -274,7 +274,7 @@
 ////                    areaBean.setAreaNameId(childrenBean.getAreaid() + "");
 ////                    areaBean.setNo(Integer.parseInt(childrenBean.getAreaid()));
 ////                    daoSession3.insertOrReplace(areaBean);//插入或替换
-//////                    Log.i("TESTD", "" + childrenBean.getArea() + "");
+//////                   Log.i("testre","" + childrenBean.getArea() + "");
 ////                }
 ////            }
 ////        }

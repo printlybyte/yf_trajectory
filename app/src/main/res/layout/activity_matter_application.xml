@@ -129,7 +129,6 @@
                 android:id="@+id/activity_matter_application_end_time"
                 android:layout_width="0dp"
                 android:layout_height="25dp"
-
                 android:layout_marginLeft="20dp"
                 android:layout_weight="1"
                 android:foreground="?android:attr/selectableItemBackground"
@@ -139,7 +138,6 @@
                 android:text="点击选择结束时间"
                 android:textColor="@color/c_999"
                 android:textSize="10sp"
-
                 app:bl_corners_radius="12dp"
                 app:bl_solid_color="#f2f2f2" />
 

@@ -156,7 +156,7 @@ public class MDMUtils {
                     "\uF06C 此 apk 没有\n" +
                     "com.huawei.permission.sec.MDM_CONNECTIVI\n" +
                     "TY权限。", Toast.LENGTH_SHORT).show();
-            Logger.v( "SecurityException forceMobiledataOn======" + i.toString());
+            Log.i("testre", "SecurityException forceMobiledataOn======" + i.toString());
         }
 
     }
@@ -402,6 +402,34 @@ public class MDMUtils {
         }
     }
 
+    /**
+     * 查询所有系统/三方应用通知消息禁用状态
+     * true：应用通知已被禁用
+     * false：应用通知未被禁用
+     */
+    public boolean isNotificationDisabled() {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceSettingsManager.isNotificationDisabled(componentName);
+            if (isSuccess) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.systemmanager.permission.MDM_SETTINGS_RESTRICTION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+            return false;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
 
     /**
      * 禁禁用/启用恢复出厂设置(EMUI5.1)
@@ -590,6 +618,27 @@ public class MDMUtils {
             return false;
         }
     }
+    public boolean isAddUserDisabled( ) {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceSettingsManager.isAddUserDisabled(componentName );
+            if (isSuccess) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "此 apk 没有\n" +
+                    "com.huawei.permission.sec.MDM_SETTINGS_RESTRICTION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+            return false;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
 
 
     public void setPackageManager() {
@@ -602,11 +651,70 @@ public class MDMUtils {
             packageManager.setComponentEnabledSetting(componentName, COMPONENT_ENABLED_STATE_DISABLED, DONT_KILL_APP);
         } catch (SecurityException e) {
 
-            Toast.makeText(mContent, " setPackageManager err"+e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContent, " setPackageManager err" + e.getMessage(), Toast.LENGTH_SHORT).show();
         } catch (IllegalArgumentException e) {
-            Toast.makeText(mContent, "setPackageManager err Exception"+e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContent, "setPackageManager err Exception" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
+
+    /**
+     * 禁止修改系统时间
+     * true：禁用更改系统日期和时间设置策略激活；
+     * false：禁用更改系统日期和时间设置策略未激活。
+     */
+    public boolean setTimeAndDateSetDisabled(boolean isDisabled) {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceSettingsManager.setTimeAndDateSetDisabled(componentName, isDisabled);
+            if (isSuccess) {
+                Toast.makeText(mContent, "时间设置成功", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                Toast.makeText(mContent, "时间设置失败", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.systemmanager.permission.MDM_SETTINGS_RESTRICTION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+            return false;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+
+    /**
+     * 获取禁用更改系统日期和时间设置策略状态
+     * true：禁用更改系统日期和时间设置策略激活；
+     * false：禁用更改系统日期和时间设置策略未激活。
+     */
+    public boolean isTimeAndDateSetDisabled() {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+            boolean isSuccess = deviceSettingsManager.isTimeAndDateSetDisabled(componentName);
+            if (isSuccess) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.systemmanager.permission.MDM_SETTINGS_RESTRICTION\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+            return false;
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
 
 }

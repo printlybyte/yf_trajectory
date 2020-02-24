@@ -101,6 +101,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * 移除激活
      */
     private Button mActivityMainRemovePositionApp;
+    /**
+     * 开启时间设置
+     */
+    private Button mActivityMainStartTimeSetting;
 
 
     @Override
@@ -173,6 +177,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         mActivityMainRemovePositionApp = (Button) findViewById(R.id.activity_main_remove_position_app);
         mActivityMainRemovePositionApp.setOnClickListener(this);
+        mActivityMainStartTimeSetting = (Button) findViewById(R.id.activity_main_start_time_setting);
+        mActivityMainStartTimeSetting.setOnClickListener(this);
     }
 
     @Override
@@ -244,6 +250,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.activity_main_remove_position_app:
                 mdmUtils.removeDisabledDeactivateMdmPackages();
                 break;
+            case R.id.activity_main_start_time_setting:
+                mdmUtils.setTimeAndDateSetDisabled(false);
+                break;
         }
     }
 
@@ -278,4 +287,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // TODO:OnCreate Method has been created, run FindViewById again to generate code
+        setContentView(R.layout.activity_main);
+        initView();
+    }
 }

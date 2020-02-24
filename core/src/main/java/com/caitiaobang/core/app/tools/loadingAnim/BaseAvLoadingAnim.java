@@ -11,6 +11,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.caitiaobang.core.R;
+import com.orhanobut.logger.Logger;
 import com.wang.avi.AVLoadingIndicatorView;
 
 
@@ -35,7 +36,6 @@ public class BaseAvLoadingAnim extends DialogFragment {
         getDialog().getWindow().getAttributes().windowAnimations = R.style.dialogAnim;
         View rootView = inflater.inflate(R.layout.av_loading_layout, null);
         mAvLoadingLayoutAvi = (AVLoadingIndicatorView) rootView.findViewById(R.id.av_loading_layout_avi);
-        Log.i("TESTRE","onCreateViewonCreateViewonCreateView");
         // 设置宽度为屏宽、靠近屏幕底部。
         return rootView;
     }

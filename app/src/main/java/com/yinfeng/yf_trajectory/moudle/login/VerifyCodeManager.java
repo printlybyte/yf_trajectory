@@ -15,6 +15,7 @@ import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.maning.mndialoglibrary.MToast;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.moudle.bean.SendSmsBean;
@@ -131,7 +132,7 @@ public class VerifyCodeManager {
                     public void onSuccess(Response<String> response) {
                         String data = response.body();//这个就是返回来的结果
                         Timber.i("success:%s", data);
-                        Log.i("testd", "" + data);
+                       Log.i("testre","" + data);
                         SendSmsBean bean = new Gson().fromJson(data, SendSmsBean.class);
                         if (bean != null) {
                             if (bean.isSuccess()) {
@@ -146,7 +147,7 @@ public class VerifyCodeManager {
                     @Override
                     public void onError(Response<String> response) {
                         super.onError(response);
-                        Log.i("testd", "" + response);
+                       Log.i("testre","" + response);
                         SendSmsBean bean = new Gson().fromJson(response.body(), SendSmsBean.class);
                         if (bean != null) {
                             MToast.makeTextLong(mContext, bean.getMessage());

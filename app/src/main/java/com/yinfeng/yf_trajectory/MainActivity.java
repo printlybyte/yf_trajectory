@@ -1,9 +1,5 @@
 package com.yinfeng.yf_trajectory;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.telecom.Connection;
@@ -47,13 +43,13 @@ public class MainActivity extends AppCompatActivity {
      */
     public void startService(View v) {
         if (buttonStartService.getText().toString().equals(getResources().getString(R.string.startLocation))) {
-            startLocationService();
+//            startLocationService();
 
             buttonStartService.setText(R.string.stopLocation);
             tvResult.setText("正在定位...");
         } else {
-            stopLocationService();
-
+//            stopLocationService();
+//
             buttonStartService.setText(R.string.startLocation);
             tvResult.setText("");
         }
@@ -66,17 +62,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 开始定位服务
      */
-    private void startLocationService(){
-        getApplicationContext().startService(new Intent(this, LocationService.class));
-    }
 
-    /**
-     * 关闭服务
-     * 先关闭守护进程，再关闭定位服务
-     */
-    private void stopLocationService(){
-        sendBroadcast(Utils.getCloseBrodecastIntent());
-    }
+
+
 
 //    private BroadcastReceiver locationChangeBroadcastReceiver = new BroadcastReceiver() {
 //

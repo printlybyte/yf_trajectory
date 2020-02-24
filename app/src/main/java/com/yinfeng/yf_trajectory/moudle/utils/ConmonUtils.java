@@ -1,11 +1,17 @@
 package com.yinfeng.yf_trajectory.moudle.utils;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.caitiaobang.core.app.app.Latte;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * ============================================
@@ -19,6 +25,27 @@ import com.caitiaobang.core.app.app.Latte;
 public final class ConmonUtils {
 
 
+    public static int getHelpVersionCode() {
+        PackageManager pckMan = Latte.getApplicationContext().getPackageManager();
+        ArrayList<HashMap<String, Object>> items = new ArrayList<HashMap<String, Object>>();
+        List<PackageInfo> packageInfo = pckMan.getInstalledPackages(0);
+        for (PackageInfo pInfo : packageInfo) {
+            HashMap<String, Object> item = new HashMap<String, Object>();
+            item.put("appimage", pInfo.applicationInfo.loadIcon(pckMan));
+            item.put("packageName", pInfo.packageName);
+            item.put("versionCode", pInfo.versionCode);
+            item.put("versionName", pInfo.versionName);
+            if (pInfo.packageName.equals("com.yinfeng.yf_trajectory_help")) {
+                Log.i("TESTRE", "packageName: " + pInfo.packageName + pInfo.versionCode);
+                return pInfo.versionCode;
+            }
+            item.put("appName", pInfo.applicationInfo.loadLabel(pckMan).toString());
+            items.add(item);
+        }
+        return 0;
+    }
+
+
 
     /**
      * 判断是否包含SIM卡
@@ -29,18 +56,15 @@ public final class ConmonUtils {
     public static boolean hasSimCard() {
         TelephonyManager telMgr = (TelephonyManager)
                 Latte.getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-        int simState = telMgr.getSimState();
-        boolean result = true;
-        switch (simState) {
-            case TelephonyManager.SIM_STATE_ABSENT:
-                result = false; // 没有SIM卡
-                break;
-            case TelephonyManager.SIM_STATE_UNKNOWN:
-                result = false;
-                break;
+        try {
+            String simSer = telMgr.getSimSerialNumber();
+            if (simSer == null || simSer.equals("")) {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
         }
-        Log.d("try", result ? "有SIM卡" : "无SIM卡");
-        return result;
+        return true;
     }
 
     private ConmonUtils() {

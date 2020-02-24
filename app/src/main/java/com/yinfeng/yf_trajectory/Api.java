@@ -10,10 +10,8 @@ package com.yinfeng.yf_trajectory;
  * ============================================
  **/
 public interface Api {
-    //    String APP_DOMAIN = "http://postman.wanghuifeng.me/mock/19";
-//    String APP_DOMAIN = "http://47.105.197.148:8111/admin";
     String APP_DOMAIN = "http://47.104.98.97/admin";
-//    String APP_DOMAIN = "http://192.168.1.137:8111/admin";
+//    String APP_DOMAIN = "http://47.105.197.148:8111/admin";
 
     /**
      * post
@@ -83,6 +81,47 @@ public interface Api {
 
 
     String API_appVersion_getUpdateAndAliveTime = APP_DOMAIN + "/appVersion/getUpdateAndAliveTime";
+
+
+    /**
+     * 根据手机卡串号获取手机号
+     */
+    String commonGetPhoneByCode = APP_DOMAIN + "/common/getPhoneByCode";
+
+    /**
+     * 绑定手机串号和手机号
+     */
+    String commonAddPhone = APP_DOMAIN + "/common/addPhone";
+    String appVersionGetNewVersion = APP_DOMAIN + "/appVersion/getNewVersion";
+
+
+    /**
+     * 记录当前动作
+     */
+    String commonrecordOperate = APP_DOMAIN + "/common/recordOperate";
+    String commongetMatter = APP_DOMAIN + "/common/getMatter";
+    String commongetWorkTime = APP_DOMAIN + "/common/getWorkTime";
+    String commonjudgeLeave = APP_DOMAIN + "/common/judgeLeave";
+
+    String commonJudgeIsWork = APP_DOMAIN + "/common/judgeIsWork";
+
+
+    /**
+     * 取消请假
+     */
+    String commonCancelLeave = APP_DOMAIN + "/common/cancelLeave";
+
+
+    /**
+     * 请假列表
+     */
+    String commonleaveList = APP_DOMAIN + "/common/leaveList";
+
+
+    /**
+     * 查询通讯录
+     */
+    String appQueryByAddressBook = APP_DOMAIN + "/user/appQueryByAddressBook";
 
 
 }

@@ -8,7 +8,6 @@ import android.support.multidex.MultiDex;
 import android.widget.ImageView;
 
 import com.blankj.utilcode.util.CrashUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.caitiaobang.core.app.app.BaseApplication;
@@ -20,8 +19,6 @@ import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.cookie.CookieJarImpl;
 import com.lzy.okgo.cookie.store.SPCookieStore;
 import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
-import com.orhanobut.hawk.Hawk;
-import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.DiskLogAdapter;
 import com.orhanobut.logger.Logger;
 
@@ -44,7 +41,6 @@ public class BaseApp extends BaseApplication {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
-
     }
 
 
@@ -69,13 +65,23 @@ public class BaseApp extends BaseApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+//        Logger.addLogAdapter(new AndroidLogAdapter() {
+//            @Override public boolean isLoggable(int priority, String tag) {
+//                return BuildConfig.DEBUG;
+//            }
+//        });
+        Logger.addLogAdapter(new DiskLogAdapter());
+//        FormatStrategy formatStrategy = CsvFormatStrategy.newBuilder()
+//                .tag("custom")
+//                .build();
+//
+//        Logger.addLogAdapter(new AndroidLogAdapter(formatStrategy));
 
         initOkGo();
         initFileCrash();
         NineGridView.setImageLoader(new PicassoImageLoader());
 
-//        Logger.addLogAdapter(new AndroidLogAdapter());
-        Logger.addLogAdapter(new DiskLogAdapter());
+
     }
 
     /**

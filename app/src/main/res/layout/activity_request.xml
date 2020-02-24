@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+
+    tools:context=".moudle.activity.RequestActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <include layout="@layout/include_actionbar_back" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:background="#fafafa" />
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="申请原因：" />
+
+            <com.caitiaobang.core.app.tools.nice_spinner.NiceSpinner
+                android:id="@+id/activity_request_spiner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+        <View
+            style="@style/line_style"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp" />
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:orientation="vertical">
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="申请时间：" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/activity_request_start_time"
+                    android:layout_width="0dp"
+                    android:layout_height="25dp"
+                    android:layout_weight="1"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:gravity="center"
+
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="点击选择开始时间"
+                    android:textColor="@color/c_999"
+                    android:textSize="10sp"
+                    app:bl_corners_radius="12dp"
+                    app:bl_solid_color="#f2f2f2" />
+
+                <TextView
+                    android:id="@+id/activity_request_end_time"
+                    android:layout_width="0dp"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="点击选择结束时间"
+                    android:textColor="@color/c_999"
+                    android:textSize="10sp"
+
+                    app:bl_corners_radius="12dp"
+                    app:bl_solid_color="#f2f2f2" />
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            style="@style/line_style"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical">
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:gravity="center"
+                android:text="原因：" />
+
+            <EditText
+                android:id="@+id/activity_request_reson"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@color/white"
+                android:gravity="start"
+                android:hint="请输入请假原因（必填）"
+                android:padding="10dp"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <View
+            style="@style/line_style"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp" />
+
+        <TextView
+            android:id="@+id/activity_request_save"
+            android:layout_width="150dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="提交"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:bl_corners_radius="10dp"
+            app:bl_solid_color="@color/p_color_blue"
+            app:bl_stroke_color="@color/p_color_blue"
+            app:bl_stroke_width="1dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/activity_request_display_group"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#90000000"
+        android:clickable="true"
+        android:focusable="false"
+        android:orientation="vertical">
+
+
+        <ImageButton
+            android:id="@+id/activity_request_back"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@null"
+            android:src="@mipmap/ic_action_bar_back_write" />
+
+        <TextView
+            android:id="@+id/activity_request_display_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="200dp"
+            android:text="请假中..."
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+
+        <TextView
+            android:id="@+id/activity_request_display_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
+            android:text="2019 9月"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+
+        <TextView
+
+            android:id="@+id/activity_request_chanel_leave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="100dp"
+            android:padding="5dp"
+            android:text="取消请假"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:bl_corners_radius="5dp"
+            app:bl_stroke_color="#fff"
+            app:bl_stroke_width="1dp" />
+
+    </LinearLayout>
+</RelativeLayout>

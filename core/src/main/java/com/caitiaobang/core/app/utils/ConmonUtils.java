@@ -1,6 +1,9 @@
 package com.caitiaobang.core.app.utils;
 
 import android.text.TextUtils;
+import android.util.Log;
+
+import com.orhanobut.logger.Logger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -79,14 +82,14 @@ public class ConmonUtils {
     }
 
     /**
-     * 1 man 2 girl
+     * 1 man 2 girl 果是奇数性别为男，偶数则为女。
      */
     public static int isSex(String idCard) {
         if (!TextUtils.isEmpty(idCard) && idCard.length() == 18) {
-            if (Integer.parseInt(idCard.substring(16, 17)) / 2 == 0) {
-                return 1;
-            } else {
+            if (Integer.parseInt(idCard.substring(16, 17)) %2==0 ) {
                 return 2;
+            } else {
+                return 1;
             }
         }
         return 0;

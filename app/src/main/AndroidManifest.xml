@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yinfeng.yf_trajectory">
+
     <!-- 用于进行网络定位 -->
-    <!--开机广播-->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-
-
+    <!-- 开机广播 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 用于访问GPS定位 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 获取运营商信息，用于支持提供运营商信息相关的接口 -->
@@ -17,9 +18,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 用于申请调用A-GPS模块 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- 用于申请调用A-GPS模块 -->
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" /> <!-- 用于申请获取蓝牙信息进行室内定位 -->
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.SEND_SMS" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- <uses-permission android:name="android.permission.SEND_SMS" /> -->
+    <!-- <uses-permission android:name="android.permission.RECEIVE_SMS" /> -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- 华为HDM权限 -->
@@ -33,8 +33,10 @@
     <uses-permission android:name="com.huawei.permission.sec.MDM_CONNECTIVITY" />
     <uses-permission android:name="com.huawei.permission.sec.MDM_DEVICE_MANAGER" />
     <uses-permission android:name="com.huawei.permission.sec.MDM_SETTINGS_RESTRICTION" />
-    <uses-permission android:name="com.huawei.permission.sec.MDM_MMS" />
-
+    <uses-permission android:name="com.huawei.permission.sec.MDM_MMS" /> <!-- 闹钟 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <application
         android:name=".BaseApp"
         android:allowBackup="true"
@@ -43,7 +45,11 @@
         android:roundIcon="@mipmap/ic_app_start_icon"
         android:supportsRtl="true"
         android:theme="@style/AppThemeBase">
-        <activity android:name=".moudle.login.SMSActivity"></activity>
+        <service
+            android:name=".alarm.ContactWorkService"
+            android:exported="false"></service>
+
+        <activity android:name=".moudle.activity.RequestActivity" />
         <activity
             android:name=".moudle.activity.QueryDateBaseActivity"
             android:screenOrientation="portrait" />
@@ -84,9 +90,11 @@
         <activity
             android:name=".moudle.activity.MainActivity"
             android:screenOrientation="portrait" />
-        <!--<activity-->
-            <!--android:name=".moudle.login.LoginVerActivity"-->
-            <!--android:screenOrientation="portrait" />-->
+        <activity
+            android:name=".moudle.activity.LeaveHistoryActivity"
+            android:screenOrientation="portrait" /> <!-- <activity -->
+        <!-- android:name=".moudle.login.LoginVerActivity" -->
+        <!-- android:screenOrientation="portrait" /> -->
         <activity
             android:name=".moudle.login.SplashActivity"
             android:screenOrientation="portrait"
@@ -124,13 +132,6 @@
             android:process=":music_service" />
         <service android:name=".moudle.service.LocationServiceTest" />
         <service
-            android:name=".LocationService"
-            android:process=":remote1">
-            <intent-filter>
-                <action android:name="com.yinfeng.yf_trajectory.LocationService" />
-            </intent-filter>
-        </service>
-        <service
             android:name=".LocationHelperService"
             android:process=":remote2">
             <intent-filter>
@@ -141,23 +142,46 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".moudle.login.ICCIDActivity"
+            android:screenOrientation="portrait" />
 
+        <service
+            android:name=".LocationService"
+            android:process=":remote1">
+            <intent-filter>
+                <action android:name="com.yinfeng.yf_trajectory.LocationService" />
+            </intent-filter>
+        </service>
 
         <receiver android:name=".SimStateReceiver">
             <intent-filter android:priority="900">
-                <action android:name="android.intent.action.SIM_STATE_CHANGED"/>
+                <action android:name="android.intent.action.SIM_STATE_CHANGED" />
+            </intent-filter>
+        </receiver> <!-- 接收开机启动广播 -->
+        <receiver
+            android:name=".BootBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter android:priority="1000">
+
+                <!-- .接收启动完成的广播 -->
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.ACTION_REQUEST_SHUTDOWN" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".alarm.AlarmReceiver"
+            android:exported="false"
+            android:process=":contarck">
+            <intent-filter>
+                <action android:name="com.yinfeng.yf_trajectory.BROADCAST_ALARM" />
             </intent-filter>
         </receiver>
 
-
-        <receiver android:name=".BootBroadcastReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_SHUTDOWN"></action>
-            </intent-filter>
-        </receiver>
 
     </application>
 

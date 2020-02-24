@@ -172,7 +172,7 @@ public class LocationServiceTest extends Service {
                     String lng = amapLocation.getLongitude() + "";
                     String time = System.currentTimeMillis() + "";
                     String address = amapLocation.getAddress() + "";
-                    Logger.v( "定位SDK更新数据 " + "lat: " + lat + "lng: " + lng + "time: " + time + "address: " + address);
+                   Log.i("testre","定位SDK更新数据 " + "lat: " + lat + "lng: " + lng + "time: " + time + "address: " + address);
                     mTempNums++;
                     showToastC("" + mTempNums);
 //                    LatLng curLatlng = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
@@ -182,7 +182,7 @@ public class LocationServiceTest extends Service {
                 } else {
                     LocationErrUtils.getInstance().showErr(amapLocation.getErrorCode());
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
-                    Logger.v( "location Error, ErrCode:"
+                   Log.i("testre","location Error, ErrCode:"
                             + amapLocation.getErrorCode() + ", errInfo:"
                             + amapLocation.getErrorInfo());
                 }
@@ -260,7 +260,7 @@ public class LocationServiceTest extends Service {
             }
 
             int mmUplaodMinute = mUplaod / 60;
-            Logger.v( " 抓取频率: " + mGrap + " 上传间隔: " + mUplaod + " 计时器任务 整除 ？：" + min % mmUplaodMinute + " 当前时间：" + min);
+           Log.i("testre"," 抓取频率: " + mGrap + " 上传间隔: " + mUplaod + " 计时器任务 整除 ？：" + min % mmUplaodMinute + " 当前时间：" + min);
 
             if (!NetworkUtils.isConnected()) {
                 showToastC("网络无连接，仅设备模式定位");
@@ -269,10 +269,11 @@ public class LocationServiceTest extends Service {
 
             if (min % mmUplaodMinute == 0) {
                 if (parseDate() != null) {
-                    Logger.v( "查询数据 jsonArray ：" + parseDate());
+                   Log.i("testre","查询数据 jsonArray ：" + parseDate());
                     commitLocationInfo(parseDate());
                 } else {
-                    showToastC("上传失败，数据转化异常");
+                    showToastC("上传失败，数据转化" +
+                            "异常");
                 }
             }
         }
@@ -290,7 +291,7 @@ public class LocationServiceTest extends Service {
                 String queryLng = mList.get(i).getLng();
                 String queryTime = mList.get(i).getTime();
                 String queryAddress = mList.get(i).getAddress();
-                Logger.v( "查询数据 ：" + "lat: " + queryLat + "lng: " + queryLng + "time: " + queryTime + " mList:" + "  address :" + queryAddress + mList.size());
+               Log.i("testre","查询数据 ：" + "lat: " + queryLat + "lng: " + queryLng + "time: " + queryTime + " mList:" + "  address :" + queryAddress + mList.size());
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("lat", queryLat);
@@ -299,7 +300,7 @@ public class LocationServiceTest extends Service {
                     jsonObject.put("name", queryAddress);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Logger.v( "JSONException ：");
+                   Log.i("testre","JSONException ：");
                 }
                 jsonArray.put(jsonObject);
 
@@ -317,7 +318,7 @@ public class LocationServiceTest extends Service {
 //        OkGo.<String>post(Api.API_point_insert)
         // http://192.168.1.137:8111/admin/point/insert
         String token = Hawk.get(ConstantApi.HK_TOKEN);
-        Log.i("testtoken","token: upload "+token);
+      Log.i("testre","  token: upload "+token);
         OkGo.<String>post(Api.API_point_insert)
                 .tag(this)
                 .headers("track-token", token)
@@ -327,32 +328,32 @@ public class LocationServiceTest extends Service {
                     public void onSuccess(Response<String> response) {
                         String data = response.body();//这个就是返回来的结果
                         Timber.i("success:%s", data);
-                        Logger.v( "onSuccess：" + data);
+                       Log.i("testre","onSuccess：" + data);
                         try {
                             ConmonBean_string bean = new Gson().fromJson(response.body(), ConmonBean_string.class);
                             if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS) {
-                                Logger.v( "上传成功");
+                               Log.i("testre","上传成功");
                                 DaoSession daoSession = BaseApplication.getDaoInstant();
                                 daoSession.deleteAll(GreendaoLocationBean.class);
                             } else if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_ERR_901) {
                                 Toast.makeText(getBaseContext(), "账号在其他地方登陆，密码已泄露，建议重置并重新登录！", Toast.LENGTH_SHORT).show();
-                                Logger.v( "账号在其他地方登陆");
+                               Log.i("testre","账号在其他地方登陆");
                                 AppManager.getInstance().finishAllActivity();
                                 stopSelf(-1);
 //                                ActivityUtils.startActivity(LoginVerActivity.class);
                             } else {
-                                Logger.v( bean.getMessage());
+                               Log.i("testre",bean.getMessage());
                                 showToastC(bean.getMessage());
                             }
                         } catch (Exception e) {
-                            Logger.v( "转化失败");
+                           Log.i("testre","转化失败");
                         }
                     }
 
                     @Override
                     public void onError(Response<String> response) {
                         super.onError(response);
-                        Logger.v( "onError：" + response.body());
+                       Log.i("testre","onError：" + response.body());
                         try {
                             ConmonBean_string bean = new Gson().fromJson(response.body(), ConmonBean_string.class);
                             if (bean.isSuccess() && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS) {
@@ -360,7 +361,7 @@ public class LocationServiceTest extends Service {
                             }
                         } catch (Exception e) {
                             showToastC("转化失败");
-                            Logger.v( "Gson转化失败");
+                           Log.i("testre","Gson转化失败");
 
                         }
                     }
@@ -409,7 +410,7 @@ public class LocationServiceTest extends Service {
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Logger.v( "请求结果：上传信息" + GsonUtils.getInstance().toJson(response));
+                       Log.i("testre","请求结果：上传信息" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }
@@ -476,7 +477,7 @@ public class LocationServiceTest extends Service {
                     if (NetworkInfo.State.CONNECTED == info.getState() && info.isAvailable()) {
                         if (info.getType() == ConnectivityManager.TYPE_WIFI
                                 || info.getType() == ConnectivityManager.TYPE_MOBILE) {
-                            Logger.v( "网络可用，精度定位");
+                           Log.i("testre","网络可用，精度定位");
                             if (mLocationClient == null) {
                                 initLocation(mGrap, false);
                             } else {
@@ -490,7 +491,7 @@ public class LocationServiceTest extends Service {
 
                         }
                     } else {
-                        Logger.v( "网络不可用，GPS定位");
+                       Log.i("testre","网络不可用，GPS定位");
                         if (mLocationClient == null) {
                             initLocation(mGrap, true);
                         } else {

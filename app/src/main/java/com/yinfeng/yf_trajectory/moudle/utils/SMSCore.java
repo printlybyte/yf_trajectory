@@ -83,12 +83,12 @@ public class SMSCore {
 //                      switch(getResultCode())
 //                      {
 //                          case Activity.RESULT_OK:
-//                              Log.i("====>", "RESULT_OK");
+//                            Log.i("testre","====>", "RESULT_OK");
 //                              System.out.println("RESULT_OK");
 //
 //                              break;
 //                          case Activity.RESULT_CANCELED:
-//                              Log.i("=====>", "RESULT_CANCELED");
+//                            Log.i("testre","=====>", "RESULT_CANCELED");
 //                              break;
 //                      }
 //                  }

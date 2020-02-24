@@ -137,7 +137,7 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
     public void onDateSet(TimePickerDialog timePickerView, long millseconds) {
         String text = ConmonUtils.getDateToString(millseconds);
 //        mTime = millseconds / 1000 + "";
-        Log.i("", "");
+       Log.i("testre","");
         if (mTimeType == 1) {
             mTimeStart = text;
             mActivityMatterApplicationStartTime.setText(text);
@@ -200,9 +200,9 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
         public void onMyLocationChange(Location location) {
             if (location != null) {
                 aMap.moveCamera(CameraUpdateFactory.zoomTo(16));
-                Logger.v( "地图定位刷新：");
+               Log.i("testre","地图定位刷新：");
             } else {
-                Logger.v( "地图定位刷新 错误");
+               Log.i("testre","地图定位刷新 错误");
             }
 
         }
@@ -298,7 +298,7 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Logger.v( "请求结果：" + GsonUtils.getInstance().toJson(response));
+                       Log.i("testre","请求结果：" + GsonUtils.getInstance().toJson(response));
                         if (type == 1) {
                             dismisProgress();
                         }
@@ -317,7 +317,7 @@ public class ViewTrackMapActivity extends BaseActivity implements View.OnClickLi
         int mSize = response.getData().getTrack().size();
         for (int i = 0; i < mSize; i++) {
             ViewTrackMapActivityBean.DataBean.TrackBean bean = response.getData().getTrack().get(i);
-            Logger.v( "lat: " + bean.getX() + " lng: " + bean.getY());
+           Log.i("testre","lat: " + bean.getX() + " lng: " + bean.getY());
             double latx = bean.getX();
             double laty = bean.getY();
             latLngs.add(new LatLng(laty, latx));
