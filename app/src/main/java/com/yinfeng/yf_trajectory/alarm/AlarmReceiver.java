@@ -30,7 +30,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             //通知比赛开始
             long matchID = intent.getLongExtra(Net.Param.ID, 0);
 //            showNotificationRemindMe(context, matchID);
-            Log.i("testrx", "接收到定时广播 更新联系人数据");
+            Logger.i("接收到定时广播 更新联系人数据");
             Logger.i("接收到定时广播 更新联系人数据");
             Intent intentActon = new Intent(context, ContactWorkService.class);
             intentActon.setAction(IntentConst.Action.downloadcontact);

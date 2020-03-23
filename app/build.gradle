@@ -10,14 +10,16 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
         sourceCompatibility JavaVersion.VERSION_1_8
     }
-    compileSdkVersion 28
+    compileSdkVersion 29
+    buildToolsVersion "29.0.1"
+
     defaultConfig {
         applicationId "com.yinfeng.yf_trajectory"
-        minSdkVersion 16
+        minSdkVersion 18
         targetSdkVersion 22
         multiDexEnabled true
-        versionCode 210
-        versionName "2.1.0"
+        versionCode 212
+        versionName "2.1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -53,10 +55,10 @@ dependencies {
     //    implementation 'com.noober.background:core:1.4.4'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30'
     implementation project(path: ':core')
-    implementation files('libs/hwsdk-mdm-openapi-9.0.0.1.jar')
+//    implementation files('libs/hwsdk-mdm-openapi-9.0.0.1.jar')
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
     implementation(name: 'dialog-release', ext: 'aar')
-
+    implementation 'com.huawei.mdm:mdmkit:10.0.1.300'
     
 //    implementation 'com.sunchen:netstatusbus:0.1.5'
 }

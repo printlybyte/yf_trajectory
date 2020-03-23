@@ -1,9 +1,13 @@
 package com.yinfeng.yf_trajectory;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -11,6 +15,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -29,6 +35,8 @@ import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.orhanobut.hawk.Hawk;
 import com.orhanobut.logger.Logger;
+import com.yinfeng.yf_trajectory.alarm.ContactWorkService;
+import com.yinfeng.yf_trajectory.alarm.IntentConst;
 import com.yinfeng.yf_trajectory.moudle.bean.GetWorkStatusBean;
 import com.yinfeng.yf_trajectory.moudle.bean.IsLeaveStatusBean;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -77,6 +85,20 @@ public class LocationService extends NotiService {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
+        builder.setContentTitle("");
+        builder.setContentText("");
+        builder.setWhen(System.currentTimeMillis());
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pt = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        builder.setContentIntent(pt);
+        Notification notification = builder.build();
+        startForeground(0, notification);
+
+
         initBroadCastReceiver();
 
     }
@@ -98,6 +120,8 @@ public class LocationService extends NotiService {
 
     @Override
     public void onDestroy() {
+
+        stopForeground(false);
         unregisterReceiver(mEventReceiver);
         unregisterReceiver(mTimeReceiver);
         unApplyNotiKeepMech();
@@ -135,7 +159,7 @@ public class LocationService extends NotiService {
         mLocationClient.setLocationOption(mLocationOption);
         mLocationClient.setLocationListener(locationListener);
         mLocationClient.startLocation();
-        Log.i("testre", "初始化定位组件....");
+        Logger.i("初始化定位组件....");
     }
 
     /**
@@ -144,13 +168,13 @@ public class LocationService extends NotiService {
     void stopLocation() {
         if (null != mLocationClient) {
             mLocationClient.stopLocation();
-            Log.i("testre", "停止定位....");
+            Logger.i("停止定位....");
             sendServiceMsg("stop");
         }
     }
 
     void startLocation() {
-        Log.i("testre", "启动定位....");
+        Logger.i("启动定位....");
         if (null != mLocationClient) {
             mLocationClient.startLocation();
         } else {
@@ -177,7 +201,7 @@ public class LocationService extends NotiService {
 
     private void sendLocationBroadcast(AMapLocation aMapLocation) {
         if (null == aMapLocation || aMapLocation.getErrorCode() != 0) {
-            Log.i("testre", "定位失败...." + aMapLocation.getLocationDetail());
+            Logger.i("定位失败...." + aMapLocation.getLocationDetail());
             return;
         }
         dealWithDate(aMapLocation);
@@ -190,28 +214,37 @@ public class LocationService extends NotiService {
         IntentFilter timeFilter = new IntentFilter();
         timeFilter.addAction(Intent.ACTION_TIME_TICK);
         registerReceiver(mTimeReceiver, timeFilter);
-        Log.i("testre", "轮训器广播注册...");
+        Logger.i("轮训器广播注册...");
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         networkConnectChangedReceiver = new NetworkConnectChangedReceiver();
         registerReceiver(networkConnectChangedReceiver, filter);
-        Log.i("testre", "网络状态广播注册...");
+        Logger.i("网络状态广播注册...");
         IntentFilter eventFilter = new IntentFilter();
         eventFilter.addAction(ConstantApi.service_action);
         registerReceiver(mEventReceiver, eventFilter);
-        Log.i("testre", "service事件广播注册...");
+        Logger.i("service事件广播注册...");
 
     }
 
     private void cleanLog(int day, int hour, int min) {
+
+        //定时更新手机通讯录
+        if ((hour == 10 && min == 1) || (hour == 14 && min == 1)) {
+            Intent intentActon = new Intent(getBaseContext(), ContactWorkService.class);
+            intentActon.setAction(IntentConst.Action.downloadcontact);
+            startService(intentActon);
+        }
+
+
         if ((day == 10 && hour == 10 && min == 10) || (day == 20 && hour == 20 && min == 20)) {
             try {
                 FileUtils.deleteDir(Environment.getExternalStorageDirectory() + "/logger");
-                Log.i("testre", "清理日志文件中...");
+                Logger.i("清理日志文件中...");
             } catch (Exception e) {
-                Log.i("testre", "清理日志文件出错");
+                Logger.i("清理日志文件出错");
             }
         }
     }
@@ -237,8 +270,8 @@ public class LocationService extends NotiService {
 //            mHandler.sendMessage(message);
 
 
-            checkWorkTime(hour, min);
-            Log.i("testre", "当前时间：分钟" + min + " 当前时间：小时" + hour);
+            Logger.i("当前时间：分钟" + min + " 当前时间：小时" + hour);
+            checkWorkTime(hour, min, day);
 
 
         }
@@ -255,9 +288,9 @@ public class LocationService extends NotiService {
 //        Log.i("testre",Utils.getLocationStr(aMapLocation));
         if (!TextUtils.isEmpty(provider) && provider.equals("gps")) {
             insertLoactionDate(lat, lng, time + "", address, accuracy, provider, speed);
-            Log.i("testre", "lat：" + lat + " lng: " + lng + " address:" + address);
+//            Logger.i("lat：" + lat + " lng: " + lng + " address:" + address);
         } else {
-            Log.i("testre", "非GPS数据  或者GPS为null  不写入数据库 ");
+            Logger.i("非GPS数据  或者GPS为null  不写入数据库 ");
         }
     }
 
@@ -306,11 +339,13 @@ public class LocationService extends NotiService {
             super.handleMessage(msg);
             if (msg.what == 102) {
                 mHandler.sendEmptyMessageDelayed(102, mCheckLoopTime * 60 * 1000);
-                Log.i("testre", "轮训器 102...：更新时间..." + mCheckLoopTime * 60 * 1000);
+                Logger.i("轮训器 102...：更新时间..." + mCheckLoopTime * 60 * 1000);
 
 
 //                getUploadInfo();
 //                getUpdateAndAliveTime();
+
+                requestWakeLock();
                 getCommonJudgeIsWork();
                 getJudgeLeave();
                 Utils.checkPer();
@@ -318,12 +353,12 @@ public class LocationService extends NotiService {
             }
             if (msg.what == 103) {
                 mHandler.sendEmptyMessageDelayed(103, mUplaodTime * 1000);
-                Log.i("testre", "轮训器 103...：上传时间..." + mUplaodTime * 1000);
+                Logger.i("轮训器 103...：上传时间..." + mUplaodTime * 1000);
                 if (parseDate() != null) {
-                    Log.i("testre", "数据上传中..." + parseDate());
+                    Logger.i("数据上传中..." + parseDate());
                     commitLocationInfoToken(parseDate());
                 } else {
-                    Log.i("testre", "数据库无数据");
+                    Logger.i("数据库无数据");
                 }
             }
 
@@ -333,20 +368,28 @@ public class LocationService extends NotiService {
                 if (!TextUtils.isEmpty(mType)) {
                     if (mType.equals("start")) {
                         startLocation();
-                        Log.i("testre", "接收到广播启动定位....");
+                        Logger.i("接收到广播启动定位....");
                     } else if (mType.equals("stop")) {
                         stopLocation();
-                        Log.i("testre", "接收到广播停止定位.....");
+                        Logger.i("接收到广播停止定位.....");
+                    } else if (mType.equals("upload")) {
+                        if (parseDate() != null) {
+                            Logger.i("数据上传中..." + parseDate());
+                            commitLocationInfoToken(parseDate());
+                        } else {
+                            Logger.i("数据库无数据");
+                        }
                     } else {
-                        Log.i("testre", "接收到广播类型不明.....");
+                        Logger.i("接收到广播类型不明.....");
                     }
+
                 }
             }
 
             if (msg.what == 105) {
                 Bundle bundle = msg.getData();
                 int day = bundle.getInt("day");
-                Log.i("TESTRE", "service event: " + day);
+                Logger.i("service event: " + day);
                 int hour = bundle.getInt("hour");
                 int min = bundle.getInt("min");
                 int week = bundle.getInt("week");
@@ -365,9 +408,9 @@ public class LocationService extends NotiService {
 //            return;
 //        }
 
-//        Log.i("testre", "week: " + week);
+//        Logger.i("week: " + week);
 //        if (week == 7 || week == 1) {
-//            Log.i("testre", "周六日不定位.....");
+//            Logger.i("周六日不定位.....");
 //            stopLocation();
 //            return;
 //        }
@@ -379,7 +422,7 @@ public class LocationService extends NotiService {
 //        if (!TextUtils.isEmpty(isWorkingDay) && !isWorkingDay.equals("1")) {
 //            //强制停止
 //            stopLocation();
-//            Log.i("testre", "非工作日 不定位....");
+//            Logger.i("非工作日 不定位....");
 //            LattePreference.saveKey(ConstantApi.work_time_status, "0");
 //            return;
 //        }
@@ -404,11 +447,11 @@ public class LocationService extends NotiService {
                     //如果当前的网络连接成功并且网络连接可用
                     if (NetworkInfo.State.CONNECTED == info.getState() && info.isAvailable()) {
                         if (info.getType() == ConnectivityManager.TYPE_WIFI || info.getType() == ConnectivityManager.TYPE_MOBILE) {
-                            Log.i("testre", "网络可用....");
+                            Logger.i("网络可用....");
 //                            NotificationManagerUtils.startNotificationManager("网络可用", R.mipmap.ic_app_start_icon);
                         }
                     } else {
-                        Log.i("testre", "网络不可用....");
+                        Logger.i("网络不可用....");
 //                        stopLooperLocation();
 //                        NotificationManagerUtils.startNotificationManager("网络断开", R.mipmap.ic_app_start_icon);
                     }
@@ -426,7 +469,7 @@ public class LocationService extends NotiService {
         String leave_time_status = LattePreference.getValue(ConstantApi.leave_time_status);
         if (!TextUtils.isEmpty(leave_time_status) && leave_time_status.equals("1")) {
             stopLocation();
-            Log.i("testre", "停止定位");
+            Logger.i("停止定位");
             return;
         }
 //                String leave_time_start = LattePreference.getValue(ConstantApi.leave_time_start);
@@ -452,25 +495,37 @@ public class LocationService extends NotiService {
 
     }
 
-    private void checkWorkTime(int hour, int min) {
+    private void checkWorkTime(int hour, int min, int day) {
+
+
+
+        if (min % 10 == 0) {
+            requestWakeLock();
+        }
 
         String leave_time_status = LattePreference.getValue(ConstantApi.leave_time_status);
-
-
         if (!TextUtils.isEmpty(leave_time_status) && leave_time_status.equals("1")) {
             stopLocation();
-            Log.i("testre", "请假中...停止定位");
+            Logger.i("请假中...停止定位");
             return;
         }
+
 
         String work_day_isLocation = LattePreference.getValue(ConstantApi.work_day_isLocation_status);
-        if (!TextUtils.isEmpty(work_day_isLocation) && leave_time_status.equals("2")) {
+        if (!TextUtils.isEmpty(work_day_isLocation) && work_day_isLocation.equals("2")) {
             stopLocation();
-            Log.i("testre", "非工作日..点击定位...停止定位");
+            Logger.i("非工作日..点击定位...停止定位");
+            if (hour == 6 && (min > 1 && min < 10)) {
+                LattePreference.saveKey(ConstantApi.work_day_isLocation_status, "1");
+                Logger.i("非工作日..自动启动");
+            }
+
+            if (hour == 7 && (min > 1 && min < 10)) {
+                LattePreference.saveKey(ConstantApi.work_day_isLocation_status, "1");
+                Logger.i("非工作日..自动启动");
+            }
             return;
         }
-
-
 
 
         String mTime_start = LattePreference.getValue(ConstantApi.work_time_start);
@@ -497,30 +552,34 @@ public class LocationService extends NotiService {
             countMinute = min + "";
         }
         int countLongI = Integer.parseInt(countHour + countMinute);
-        Log.i("testre", "countLongI: " + countLongI + " startLongI: " + startLongI + " endLongI" + endLongI);
+        Logger.i("countLongI: " + countLongI + " startLongI: " + startLongI + " endLongI" + endLongI);
         if (countLongI > startLongI && endLongI > countLongI) {
             //当前时间在区间范围就开始定位
             LattePreference.saveKey(ConstantApi.work_time_status, "1");
-            Log.i("testre", "在当前时间区间，自动清除状态启动定位");
+            Logger.i("在当前时间区间，自动清除状态启动定位");
         }
         String work_time_status = LattePreference.getValue(ConstantApi.work_time_status);
         if (!TextUtils.isEmpty(work_time_status) && work_time_status.equals("0")) {
             stopLocation();
-            Log.i("testre", "stopLocation.....");
+            Logger.i("stopLocation.....");
         } else {
-            Log.i("testre", "startLocation......");
+            Logger.i("startLocation......");
             startLocation();
         }
+
+        cleanLog(day, hour, min);
+
+
     }
 
     /**
      * isWorkStatus==0 异常  ==1 工作日   ==2 非工作日
      */
     private void getCommonJudgeIsWork() {
-        Log.i("testre", "接口地址: " + Api.commonJudgeIsWork);
+        Logger.i("接口地址: " + Api.commonJudgeIsWork);
         String token = Hawk.get(ConstantApi.HK_TOKEN);
         if (TextUtils.isEmpty(token)) {
-            Log.i("testre", "commonJudgeIsWork token =null ");
+            Logger.i("commonJudgeIsWork token =null ");
             return;
         }
         OkHttpUtils
@@ -531,7 +590,7 @@ public class LocationService extends NotiService {
                 .execute(new GenericsCallback<GetWorkStatusBean>(new JsonGenericsSerializator()) {
                     @Override
                     public void onError(Call call, Exception e, int id) {
-                        Log.i("testre", "getCommonJudgeIsWork：" + e.getMessage() + "");
+                        Logger.i("getCommonJudgeIsWork：" + e.getMessage() + "");
 //                        LattePreference.saveKey(ConstantApi.isWorkingDay, "0");
                     }
 
@@ -539,16 +598,18 @@ public class LocationService extends NotiService {
                     public void onResponse(GetWorkStatusBean response, int id) {
 
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
-                            Log.i("testre", "请求结果：" + GsonUtils.getInstance().toJson(response));
-                            if (response.isData()) {
+                            Logger.i("请求结果：" + GsonUtils.getInstance().toJson(response));
+
+                            if (response.getData().isIsWork()) {//工作日
                                 LattePreference.saveKey(ConstantApi.work_day_isLocation_status, "1");
-//                                LattePreference.saveKey(ConstantApi.isWorkingDay, "1");
                             } else {
-//                                LattePreference.saveKey(ConstantApi.isWorkingDay, "0");
+                                if (response.getData().isIsStartUp()) {  //非工作日启动
+                                    //清除状态
+                                    LattePreference.saveKey(ConstantApi.work_day_isLocation_status, "1");
+                                }
                             }
                         } else {
-                            Log.i("testre", response.getMessage());
-//                            LattePreference.saveKey(ConstantApi.isWorkingDay, "0");
+                            Logger.i(response.getMessage());
                         }
                     }
                 });
@@ -558,7 +619,7 @@ public class LocationService extends NotiService {
     private void getJudgeLeave() {
         String token = Hawk.get(ConstantApi.HK_TOKEN);
         if (TextUtils.isEmpty(token)) {
-            Log.i("testre", "getJudgeLeave token =null ");
+            Logger.i("getJudgeLeave token =null ");
             return;
         }
         OkGo.<String>get(Api.commonjudgeLeave)
@@ -567,8 +628,8 @@ public class LocationService extends NotiService {
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(Response<String> response) {
-                        Log.i("testre", "接口地址：" + Api.commonjudgeLeave);
-                        Log.i("testre", "请求结果: 成功" + "响应码" + response.code() + "请求结果 " + response.body());
+                        Logger.i("接口地址：" + Api.commonjudgeLeave);
+                        Logger.i("请求结果: 成功" + "响应码" + response.code() + "请求结果 " + response.body());
                         try {
                             IsLeaveStatusBean bean = new Gson().fromJson(response.body(), IsLeaveStatusBean.class);
                             if (bean != null && bean.getCode() == ConstantApi.API_REQUEST_SUCCESS && bean.isSuccess()) {
@@ -593,8 +654,22 @@ public class LocationService extends NotiService {
                     @Override
                     public void onError(Response<String> response) {
                         super.onError(response);
-                        Log.i("testre", "请求结果: 失败" + '\n' + "响应码" + response.code() + '\n' + "请求结果 " + response.body());
+                        Logger.i("请求结果: 失败" + '\n' + "响应码" + response.code() + '\n' + "请求结果 " + response.body());
                     }
                 });
     }
+
+
+
+    public void requestWakeLock() {
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                    "MyApp::MyWakelockTag");
+            wakeLock.acquire();
+
+            wakeLock.release();
+        Logger.i("唤醒设备，点亮屏幕");
+            //释放
+    }
+
 }

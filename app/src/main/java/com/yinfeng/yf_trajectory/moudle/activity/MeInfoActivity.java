@@ -1,6 +1,7 @@
 package com.yinfeng.yf_trajectory.moudle.activity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -19,11 +20,13 @@ import com.caitiaobang.core.app.net.GenericsCallback;
 import com.caitiaobang.core.app.net.JsonGenericsSerializator;
 import com.caitiaobang.core.app.storge.LattePreference;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
 import com.yinfeng.yf_trajectory.R;
-import com.yinfeng.yf_trajectory.moudle.bean.LeaveHistoryActivityBean;
+import com.yinfeng.yf_trajectory.alarm.ContactWorkService;
+import com.yinfeng.yf_trajectory.alarm.IntentConst;
 import com.yinfeng.yf_trajectory.moudle.bean.UserInfoBean;
 import com.zhy.http.okhttp.OkHttpUtils;
 
@@ -59,6 +62,7 @@ public class MeInfoActivity extends BaseActivity implements View.OnClickListener
      */
     private TextView mActivityMeInfoVersion;
     private LinearLayout mActivityMeInfoLeave;
+    private LinearLayout mActivityMeInfoSync;
 
     @Override
     protected int getContentLayoutId() {
@@ -96,6 +100,8 @@ public class MeInfoActivity extends BaseActivity implements View.OnClickListener
         mActivityMeInfoVersion = (TextView) findViewById(R.id.activity_me_info_version);
         mActivityMeInfoLeave = (LinearLayout) findViewById(R.id.activity_me_info_leave);
         mActivityMeInfoLeave.setOnClickListener(this);
+        mActivityMeInfoSync = (LinearLayout) findViewById(R.id.activity_me_info_sync);
+        mActivityMeInfoSync.setOnClickListener(this);
     }
 
 
@@ -112,7 +118,7 @@ public class MeInfoActivity extends BaseActivity implements View.OnClickListener
             showToastC("个人信息查询失败");
             return;
         }
-        Log.i("testre", "API: " + Api.API_user_info + " par: token");
+        Logger.i("API: " + Api.API_user_info + " par: token");
 
         OkHttpUtils
                 .post()
@@ -151,7 +157,7 @@ public class MeInfoActivity extends BaseActivity implements View.OnClickListener
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i("testre", "请求结果：" + GsonUtils.getInstance().toJson(response));
+                        Logger.i("请求结果：" + GsonUtils.getInstance().toJson(response));
                         dismisProgress();
                     }
                 });
@@ -181,7 +187,7 @@ public class MeInfoActivity extends BaseActivity implements View.OnClickListener
 
     private void loginErr() {
         Toast.makeText(MeInfoActivity.this, "您的账号在其他地方登陆！", Toast.LENGTH_SHORT).show();
-        Log.i("testre", "账号在其他地方登陆");
+        Logger.i("账号在其他地方登陆");
         LattePreference.clear();
         AppManager.getInstance().finishAllActivity();
         finish();
@@ -203,6 +209,12 @@ public class MeInfoActivity extends BaseActivity implements View.OnClickListener
 
                 ActivityUtils.startActivity(LeaveHistoryActivity.class);
 
+                break;
+            case R.id.activity_me_info_sync:
+                Toast.makeText(mContext, "同步中...", Toast.LENGTH_SHORT).show();
+                Intent intentActon = new Intent(this, ContactWorkService.class);
+                intentActon.setAction(IntentConst.Action.downloadcontact);
+                startService(intentActon);
                 break;
         }
     }

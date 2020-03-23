@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.caitiaobang.core.BuildConfig;
 import com.caitiaobang.core.R;
@@ -329,10 +330,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BGASwipe
     }
 
     public void showToastC(String msg) {
-        if (mContext == null) {
-            mContext = BaseActivity.this;
-        }
-        MToast.makeTextLong(mContext, msg);
+//        if (mContext == null) {
+////            mContext = BaseActivity.this;
+////        }
+//        MToast.makeTextLong(mContext, msg);
+        Toast.makeText(mContext, ""+msg, Toast.LENGTH_SHORT).show();
     }
 
     public void showToastC(int msgid) {

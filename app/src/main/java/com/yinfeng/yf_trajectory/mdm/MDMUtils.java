@@ -156,7 +156,7 @@ public class MDMUtils {
                     "\uF06C 此 apk 没有\n" +
                     "com.huawei.permission.sec.MDM_CONNECTIVI\n" +
                     "TY权限。", Toast.LENGTH_SHORT).show();
-            Log.i("testre", "SecurityException forceMobiledataOn======" + i.toString());
+            Logger.i("SecurityException forceMobiledataOn======" + i.toString());
         }
 
     }
@@ -218,7 +218,7 @@ public class MDMUtils {
             mPackageList.add(pageName);
             boolean isSuccess = deviceHwSystemManager.setSuperWhiteListForHwSystemManger(componentName, mPackageList);
             if (isSuccess) {
-                Toast.makeText(mContent, "信任应用名单添加成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContent, "信任应用名单添加成功", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(mContent, "信任应用名单添加失败", Toast.LENGTH_SHORT).show();
             }
@@ -248,7 +248,7 @@ public class MDMUtils {
             ComponentName componentName = new ComponentName(pageName, mComponentName);
             boolean isSuccess = deviceSettingsManager.setLocationServiceDisabled(componentName, isDisabled);
             if (isSuccess) {
-                Toast.makeText(mContent, "定位服务配置成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContent, "定位服务配置成功", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(mContent, "定位服务配置失败", Toast.LENGTH_SHORT).show();
             }
@@ -275,7 +275,7 @@ public class MDMUtils {
             ComponentName componentName = new ComponentName(pageName, mComponentName);
             boolean isSuccess = deviceSettingsManager.setLocationModeDisabled(componentName, isDisabled);
             if (isSuccess) {
-                Toast.makeText(mContent, "定位模式设置成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContent, "定位模式设置成功", Toast.LENGTH_SHORT).show();
                 return true;
             } else {
                 Toast.makeText(mContent, "定位模式设置失败", Toast.LENGTH_SHORT).show();
@@ -387,7 +387,7 @@ public class MDMUtils {
 //                Toast.makeText(mContent, "应用通知消息功能被禁用", Toast.LENGTH_SHORT).show();
                 return true;
             } else {
-                Toast.makeText(mContent, "应用通知消息功能未禁用", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContent, "应用通知消息功能未禁用", Toast.LENGTH_SHORT).show();
                 return false;
             }
         } catch (SecurityException e) {
@@ -446,7 +446,7 @@ public class MDMUtils {
             ComponentName componentName = new ComponentName(pageName, mComponentName);
             boolean isSuccess = deviceSettingsManager.setRestoreFactoryDisabled(componentName, isDisabled);
             if (isSuccess) {
-                Toast.makeText(mContent, "出厂设置配置成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContent, "出厂设置配置成功", Toast.LENGTH_SHORT).show();
                 return true;
             } else {
                 Toast.makeText(mContent, "出厂设置配置失败", Toast.LENGTH_SHORT).show();
@@ -479,7 +479,7 @@ public class MDMUtils {
             ComponentName componentName = new ComponentName(pageName, mComponentName);
             boolean isSuccess = deviceRestrictionManager.setSystemUpdateDisabled(componentName, isDisabled);
             if (isSuccess) {
-                Toast.makeText(mContent, "禁用系统升级成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContent, "禁用系统升级成功", Toast.LENGTH_SHORT).show();
                 return true;
             } else {
                 Toast.makeText(mContent, "禁用系统升级失败", Toast.LENGTH_SHORT).show();
@@ -515,7 +515,7 @@ public class MDMUtils {
             ComponentName componentName = new ComponentName(pageName, mComponentName);
             boolean isSuccess = deviceSettingsManager.setSearchIndexDisabled(componentName, isDisabled);
             if (isSuccess) {
-                Toast.makeText(mContent, "设置搜索已禁用", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContent, "设置搜索已禁用", Toast.LENGTH_SHORT).show();
                 return true;
             } else {
                 Toast.makeText(mContent, "设置搜索未禁用", Toast.LENGTH_SHORT).show();
@@ -670,7 +670,7 @@ public class MDMUtils {
             ComponentName componentName = new ComponentName(pageName, mComponentName);
             boolean isSuccess = deviceSettingsManager.setTimeAndDateSetDisabled(componentName, isDisabled);
             if (isSuccess) {
-                Toast.makeText(mContent, "时间设置成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContent, "时间设置成功", Toast.LENGTH_SHORT).show();
                 return true;
             } else {
                 Toast.makeText(mContent, "时间设置失败", Toast.LENGTH_SHORT).show();
@@ -714,6 +714,28 @@ public class MDMUtils {
         } catch (IllegalArgumentException e) {
             Toast.makeText(mContent, "参数 admin 为 null。", Toast.LENGTH_SHORT).show();
             return false;
+        }
+    }
+
+
+    public void setPowerSaveModeDisabled(boolean isDisabled) {
+        try {
+            String pageName = mContent.getPackageName();
+            DeviceHwSystemManager deviceHwSystemManager = new DeviceHwSystemManager();
+            ComponentName componentName = new ComponentName(pageName, mComponentName);
+
+            boolean isSuccess = deviceHwSystemManager.setPowerSaveModeDisabled(componentName, isDisabled);
+            if (isSuccess) {
+            } else {
+                Toast.makeText(mContent, "省电模式禁止失败", Toast.LENGTH_SHORT).show();
+            }
+        } catch (SecurityException e) {
+            Toast.makeText(mContent, "\uF06C 此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.systemmanager.permission.ACCESS_INTERFACE\n" +
+                    "权限。", Toast.LENGTH_SHORT).show();
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(mContent, "输入的包名为 null。", Toast.LENGTH_SHORT).show();
         }
     }
 

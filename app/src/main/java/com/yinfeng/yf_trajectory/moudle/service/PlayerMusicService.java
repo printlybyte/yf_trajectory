@@ -17,6 +17,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
@@ -84,29 +85,21 @@ public class PlayerMusicService extends Service {
     private boolean isPermission = true;
 
 
-
-    /**
-     * 权限检测 不要太频繁
-     */
-
-
-
-
-
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-
+    MediaPlayer mMediaPlayer;
     @Override
     public void onCreate() {
         super.onCreate();
+
+
         if (DEBUG)
             Log.d(TAG, TAG + "---->onCreate,启动服务");
-//        mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.silent);
-//        mMediaPlayer.setLooping(true);
+        mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.silent);
+        mMediaPlayer.setLooping(true);
 
 
         initEvent();
@@ -127,15 +120,33 @@ public class PlayerMusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                startPlayMusic();
+            }
+        }).start();
         return START_STICKY;
     }
 
+    private void startPlayMusic(){
+        if(mMediaPlayer != null){
+            mMediaPlayer.start();
+        }
+    }
+
+    private void stopPlayMusic(){
+        if(mMediaPlayer != null){
+            mMediaPlayer.stop();
+        }
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         if (DEBUG)
             Log.d(TAG, TAG + "---->onCreate,停止服务");
+        stopPlayMusic();
         Intent intent = new Intent(getApplicationContext(), PlayerMusicService.class);
         startService(intent);
 
@@ -212,7 +223,7 @@ public class PlayerMusicService extends Service {
             showToastC("网络无链接,请稍后在试");
             return;
         }
-        Log.i("testre", "API: " + Api.appVersionGetNewVersion);
+        Logger.i("API: " + Api.appVersionGetNewVersion);
         OkHttpUtils
                 .get()
                 .url(Api.appVersionGetNewVersion)
@@ -240,12 +251,12 @@ public class PlayerMusicService extends Service {
                                 downloadFile(DownLoadUrl);
 
                             } else {
-                                Log.i("testre", "无新版本");
+                                Logger.i("无新版本");
                             }
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i("testre", "请求结果：检测新版本 " + GsonUtils.getInstance().toJson(response));
+                        Logger.i("请求结果：检测新版本 " + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }
@@ -286,12 +297,12 @@ public class PlayerMusicService extends Service {
                                 NotificationManagerUtils.startNotificationManager("检测到银丰助手新版本，下载中...", R.mipmap.ic_app_start_icon);
                                 downloadFileHelpApk(DownLoadUrl);
                             } else {
-                                Log.i("testre", "无新版本");
+                                Logger.i("无新版本");
                             }
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i("testre", "请求结果：检测新版本助手：" + GsonUtils.getInstance().toJson(response));
+                        Logger.i("请求结果：检测新版本助手：" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }
@@ -311,7 +322,7 @@ public class PlayerMusicService extends Service {
                 .execute(new FileCallback(mPath, downLoadApkName) {
                     @Override
                     public void onSuccess(Response<File> response) {
-                        Log.i("testre", "下载成功....");
+                        Logger.i("下载成功....");
                         Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
                         mIntent.putExtra("result", ConstantApi.RECEVIER_DOWNLOAD_APK);
                         sendBroadcast(mIntent);
@@ -319,7 +330,7 @@ public class PlayerMusicService extends Service {
 
                     @Override
                     public void onError(Response<File> response) {
-                        Log.i("testre", "下载失败,重试中....");
+                        Logger.i("下载失败,重试中....");
                         showToastC("下载失败,重试中....");
                         NotificationManagerUtils.startNotificationManager("银丰轨迹下载失败，重新下载中...", R.mipmap.ic_app_start_icon);
                         requestDate();
@@ -330,7 +341,7 @@ public class PlayerMusicService extends Service {
                     @Override
                     public void downloadProgress(Progress progress) {
                         float prgressx = progress.fraction * 100;
-                        Log.i("testre", "下载进度 ：" + prgressx);
+                        Logger.i("下载进度 ：" + prgressx);
                         if (prgressx == 100) {
 
                         }
@@ -352,7 +363,7 @@ public class PlayerMusicService extends Service {
                 .execute(new FileCallback(mPath, downLoadApkName) {
                     @Override
                     public void onSuccess(Response<File> response) {
-                        Log.i("testre", "下载成功....");
+                        Logger.i("下载成功....");
                         Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
                         mIntent.putExtra("result", ConstantApi.RECEVIER_DOWNLOAD_HELP_APK);
                         sendBroadcast(mIntent);
@@ -360,7 +371,7 @@ public class PlayerMusicService extends Service {
 
                     @Override
                     public void onError(Response<File> response) {
-                        Log.i("testre", "下载失败,重试中....");
+                        Logger.i("下载失败,重试中....");
                         showToastC("下载失败,重试中....");
                         NotificationManagerUtils.startNotificationManager("轨迹助手下载失败，重新下载中...", R.mipmap.ic_app_start_icon);
                         requestDateHelpApk();
@@ -369,7 +380,7 @@ public class PlayerMusicService extends Service {
                     @Override
                     public void downloadProgress(Progress progress) {
                         float prgressx = progress.fraction * 100;
-                        Log.i("testre", "下载进度 ：" + prgressx);
+                        Logger.i("下载进度 ：" + prgressx);
                         if (prgressx == 100) {
                         }
                     }

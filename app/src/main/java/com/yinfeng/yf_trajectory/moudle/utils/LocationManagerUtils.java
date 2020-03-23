@@ -13,6 +13,7 @@ import com.amap.api.services.geocoder.RegeocodeAddress;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
 import com.caitiaobang.core.app.app.Latte;
+import com.orhanobut.logger.Logger;
 
 /**
  * ============================================
@@ -53,7 +54,7 @@ public class LocationManagerUtils {
         mLocationClient.setLocationOption(mLocationOption);
         mLocationClient.setLocationListener(aMapLocationListener);
         mLocationClient.startLocation();
-        Log.i("testre", "初始化单次定位组件....");
+        Logger.i("初始化单次定位组件....");
 
         geocoderSearch = new GeocodeSearch(Latte.getApplicationContext());
         geocoderSearch.setOnGeocodeSearchListener(geocodeSearchListener);
@@ -64,19 +65,29 @@ public class LocationManagerUtils {
     GeocodeSearch.OnGeocodeSearchListener geocodeSearchListener = new GeocodeSearch.OnGeocodeSearchListener() {
         @Override
         public void onRegeocodeSearched(RegeocodeResult regeocodeResult, int i) {
-            String getLatitude = regeocodeResult.getRegeocodeQuery().getPoint().getLatitude() + "";
-            String getLongitude = regeocodeResult.getRegeocodeQuery().getPoint().getLongitude() + "";
-            RegeocodeAddress address = regeocodeResult.getRegeocodeAddress();
-            String addressx = address.getFormatAddress();
-            if (locationListenerm != null) {
-                locationListenerm.OnLocationListenerm(1, null,getLatitude,getLongitude,addressx);
+            if (regeocodeResult != null) {
+                String getLatitude = regeocodeResult.getRegeocodeQuery().getPoint().getLatitude() + "";
+                String getLongitude = regeocodeResult.getRegeocodeQuery().getPoint().getLongitude() + "";
+                RegeocodeAddress address = regeocodeResult.getRegeocodeAddress();
+                String addressx = address.getFormatAddress();
+                if (locationListenerm != null) {
+                    locationListenerm.OnLocationListenerm(1, null, getLatitude, getLongitude, addressx);
+                }
+            }else {
+                if (locationListenerm != null) {
+                    locationListenerm.OnLocationListenerm(0, null, "", "", "");
+                }
             }
+
 
         }
 
         @Override
         public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
 
+            if (locationListenerm != null) {
+                locationListenerm.OnLocationListenerm(0, null, "", "", "");
+            }
         }
     };
 
@@ -85,7 +96,7 @@ public class LocationManagerUtils {
         public void onLocationChanged(AMapLocation amapLocation) {
             if (amapLocation != null) {
                 if (amapLocation.getErrorCode() == 0) {
-                    Log.i("testre", "初始化单次定位成功...." + amapLocation.getAddress() + "==" + amapLocation.getLatitude() + "==" + amapLocation.getLongitude());
+                    Logger.i("初始化单次定位成功...." + amapLocation.getAddress() + "==" + amapLocation.getLatitude() + "==" + amapLocation.getLongitude());
                     //可在其中解析amapLocation获取相应内容。
                     // 第一个参数表示一个Latlng，第二参数表示范围多少米，第三个参数表示是火系坐标系还是GPS原生坐标系
                     LatLonPoint latLng = new LatLonPoint(amapLocation.getLatitude(), amapLocation.getLongitude());
@@ -95,9 +106,9 @@ public class LocationManagerUtils {
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     if (locationListenerm != null) {
-                        locationListenerm.OnLocationListenerm(0, amapLocation,"","","");
+                        locationListenerm.OnLocationListenerm(0, amapLocation, "", "", "");
                     }
-                    Log.i("testre", "location Error, ErrCode:"
+                    Logger.i("location Error, ErrCode:"
                             + amapLocation.getErrorCode() + ", errInfo:"
                             + amapLocation.getErrorInfo());
                 }
@@ -111,14 +122,14 @@ public class LocationManagerUtils {
             mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
             mLocationOption = null;
             mLocationClient = null;
-            Log.i("testre", "释放单次定位组件....");
+            Logger.i("释放单次定位组件....");
         }
 
     }
 
 
     public interface OnLocationListenerm {
-        void OnLocationListenerm(int status, AMapLocation aMapLocation,String lat,String lng,String addr);
+        void OnLocationListenerm(int status, AMapLocation aMapLocation, String lat, String lng, String addr);
     }
 
     public void setLocationListenerm(OnLocationListenerm onLocationListenerm) {

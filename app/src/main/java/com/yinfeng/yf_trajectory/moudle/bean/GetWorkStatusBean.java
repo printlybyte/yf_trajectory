@@ -11,17 +11,18 @@ package com.yinfeng.yf_trajectory.moudle.bean;
  **/
 public class GetWorkStatusBean {
 
+
     /**
      * code : 200
      * message : 操作成功！
-     * data : false
-     * now : 2019-11-11 09:46:31
+     * data : {"isWork":false,"isStartUp":true}
+     * now : 2020-03-18 11:43:04
      * success : true
      */
 
     private int code;
     private String message;
-    private boolean data;
+    private DataBean data;
     private String now;
     private boolean success;
 
@@ -41,11 +42,11 @@ public class GetWorkStatusBean {
         this.message = message;
     }
 
-    public boolean isData() {
+    public DataBean getData() {
         return data;
     }
 
-    public void setData(boolean data) {
+    public void setData(DataBean data) {
         this.data = data;
     }
 
@@ -63,5 +64,31 @@ public class GetWorkStatusBean {
 
     public void setSuccess(boolean success) {
         this.success = success;
+    }
+
+    public static class DataBean {
+        /**
+         * isWork : false
+         * isStartUp : true
+         */
+
+        private boolean isWork;
+        private boolean isStartUp;
+
+        public boolean isIsWork() {
+            return isWork;
+        }
+
+        public void setIsWork(boolean isWork) {
+            this.isWork = isWork;
+        }
+
+        public boolean isIsStartUp() {
+            return isStartUp;
+        }
+
+        public void setIsStartUp(boolean isStartUp) {
+            this.isStartUp = isStartUp;
+        }
     }
 }

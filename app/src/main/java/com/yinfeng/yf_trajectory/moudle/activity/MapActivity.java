@@ -52,12 +52,14 @@ import com.yinfeng.yf_trajectory.LocationService;
 import com.yinfeng.yf_trajectory.LocationStatusManager;
 import com.yinfeng.yf_trajectory.R;
 import com.yinfeng.yf_trajectory.alarm.AlarmUtil;
+import com.yinfeng.yf_trajectory.alarm.ContactWorkService;
 import com.yinfeng.yf_trajectory.alarm.IntentConst;
 import com.yinfeng.yf_trajectory.alarm.Net;
 import com.yinfeng.yf_trajectory.mdm.MDMUtils;
 import com.yinfeng.yf_trajectory.moudle.bean.UserInfoBean;
 import com.yinfeng.yf_trajectory.moudle.service.PlayerMusicService;
 import com.yinfeng.yf_trajectory.moudle.utils.InstallAppUtils;
+import com.yinfeng.yf_trajectory.moudle.utils.LocationErrUtils;
 import com.yinfeng.yf_trajectory.moudle.utils.LocationManagerUtils;
 import com.yinfeng.yf_trajectory.moudle.utils.NotificationManagerUtils;
 import com.yinfeng.yf_trajectory.moudle.utils.WorkUtils;
@@ -65,6 +67,8 @@ import com.zhy.http.okhttp.OkHttpUtils;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
+
+import static com.yinfeng.yf_trajectory.moudle.utils.PermissionUtilsx.getSystemVersion;
 
 //import com.yinfeng.yf_trajectory.moudle.login.LoginVerActivity;
 
@@ -104,7 +108,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         super.initView();
 //        PlayVoice.playVoice(getApplicationContext(), R.raw.per_tts);
         initEventRecaver();
-//        createAlarm();
+        createAlarm();
         mActivityMapHeadimg = (CircleImageView) findViewById(R.id.activity_map_headimg);
         mActivityMapHeadimg.setOnClickListener(this);
         mActivityMapName = (TextView) findViewById(R.id.activity_map_name);
@@ -132,7 +136,13 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     private void createAlarm() {
         Intent intent = new Intent(IntentConst.Action.matchRemind);
         intent.putExtra(Net.Param.ID, 123);
-        AlarmUtil.controlAlarm(MapActivity.this, 7, 13, 123, intent);
+        AlarmUtil.controlAlarm(MapActivity.this, 6, 13, 123, intent);
+
+
+        Intent intentActon = new Intent(this, ContactWorkService.class);
+        intentActon.setAction(IntentConst.Action.downloadcontact);
+        startService(intentActon);
+
     }
 
 
@@ -173,30 +183,43 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     private void initHuaWeiHDM() {
         mdmUtils = new MDMUtils();
 
-        if (!mdmUtils.isNotificationDisabled()) {
+        try {
+
+
+//        if (!mdmUtils.isNotificationDisabled()) {
             mdmUtils.setNotificationDisabled(false);
-            Logger.i("通知禁用未关闭");
-        } else {
-            Logger.i("通知禁用已关闭");
-        }
-        //禁用隐私空间
-        if (!mdmUtils.isAddUserDisabled()) {
-            mdmUtils.setAddUserDisabled(true);
-            Logger.i("通知添加多用户未开启");
-        } else {
-            Logger.i("通知添加多用户已开启");
-        }
-        //禁止反激活
-        mdmUtils.addDisabledDeactivateMdmPackages();
-        //禁止时间设置
-        if (!mdmUtils.isTimeAndDateSetDisabled()) {
-            Logger.i("时间设置已未禁用");
-            mdmUtils.setTimeAndDateSetDisabled(true);
-        } else {
-            Logger.i("时间设置已禁用");
-        }
+            mdmUtils.setRestoreFactoryDisabled(false);
 
 
+            mdmUtils.setSystemUpdateDisabled(false);
+
+            if (getSystemVersion() > 1000) {
+                mdmUtils.setPowerSaveModeDisabled(true);
+            }
+//            Logger.i("通知禁用未关闭");
+//        } else {
+//            Logger.i("通知禁用已关闭");
+//        }
+            //禁用隐私空间
+            if (!mdmUtils.isAddUserDisabled()) {
+                mdmUtils.setAddUserDisabled(true);
+                Logger.i("通知添加多用户未开启");
+            } else {
+                Logger.i("通知添加多用户已开启");
+            }
+            //禁止反激活
+            mdmUtils.addDisabledDeactivateMdmPackages();
+            //禁止时间设置
+            if (!mdmUtils.isTimeAndDateSetDisabled()) {
+                Logger.i("时间设置已未禁用");
+                mdmUtils.setTimeAndDateSetDisabled(true);
+            } else {
+                Logger.i("时间设置已禁用");
+            }
+
+        } catch (Exception e) {
+            Logger.i("mapActivity  权限设置失败" + e.getMessage());
+        }
     }
 
 
@@ -206,6 +229,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         if (bean != null) {
             setUserDate(bean);
         }
+
         initHuaWeiHDM();
     }
 
@@ -319,14 +343,18 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                         @Override
                         public void failure(String msg) {
                             showToastC(msg);
-                            WaitDialog.dismiss( );
+                            WaitDialog.dismiss();
                         }
                     });
+
+
                     String work_time_status = LattePreference.getValue(ConstantApi.work_time_status);
                     if (!TextUtils.isEmpty(work_time_status) && work_time_status.equals("1")) {
                         mActivityMapStatus.setImageResource(R.mipmap.ic_start);
                     } else {
                         mActivityMapStatus.setImageResource(R.mipmap.ic_stop);
+
+                        Log.i("TESTREZ", "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ" + work_time_status);
                     }
 
                 }
@@ -336,7 +364,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void failure(String msg) {
                 showToastC(msg);
-                WaitDialog.dismiss( );
+                WaitDialog.dismiss();
             }
         });
 
@@ -380,12 +408,12 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                         //参数依次是：视角调整区域的中心点坐标、希望调整到的缩放级别、俯仰角0°~45°（垂直与地图时为0）、偏航角 0~360° (正北方为0)
                         CameraUpdate mCameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)), 16, 30, 0));
                         aMap.moveCamera(mCameraUpdate);
+
                     }
                 });
 
                 break;
             case R.id.activity_map_work_down:
-                WaitDialog.show(MapActivity.this, "请稍后...");
                 WorkUtils.getInstance().getJudgeLeave();
                 WorkUtils.getInstance().setOnWorkListener(new WorkUtils.OnWorkListenerI() {
                     @Override
@@ -394,7 +422,6 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                         if (bundleBean.getIsLeaveing() == 1) {
                             //请假中...
                             showToastC("请假中...");
-                            WaitDialog.dismiss( );
                         } else {
                             voidStopWorkDay();
                         }
@@ -403,7 +430,6 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                     @Override
                     public void failure(String msg) {
                         showToastC(msg);
-                        WaitDialog.dismiss( );
                     }
                 });
 
@@ -453,7 +479,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                     @Override
                     public void failure(String msg) {
                         showToastC(msg);
-                        WaitDialog.dismiss( );
+                        WaitDialog.dismiss();
                     }
                 });
                 break;
@@ -468,7 +494,6 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                 if (bundleBean.getIsWorkDay() == 2) {
                     //非工作日  不用做是否上班中判断
                     stopLoc(2);
-                    WaitDialog.dismiss( );
                 } else {
 
                     //工作日    上班中不允许下班
@@ -478,7 +503,6 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                         public void successful(int status, WorkUtils.IBundleBean bundleBean) {
                             if (bundleBean.getIsWorking() == 1) {
                                 //工作中
-                                WaitDialog.dismiss( );
                                 showToastC("工作中...");
                             } else {
                                 stopLoc(1);
@@ -488,7 +512,6 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                         @Override
                         public void failure(String msg) {
                             showToastC(msg);
-                            WaitDialog.dismiss( );
                         }
                     });
 
@@ -499,7 +522,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void failure(String msg) {
                 showToastC(msg);
-                WaitDialog.dismiss( );
+                WaitDialog.dismiss();
             }
         });
 
@@ -541,8 +564,9 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
             }
 
             @Override
-            public void failure(String msg) {  showToastC(msg);
-                WaitDialog.dismiss( );
+            public void failure(String msg) {
+                showToastC(msg);
+                WaitDialog.dismiss();
             }
         });
 
@@ -561,7 +585,14 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                 mActivityMapStatus.setImageResource(R.mipmap.ic_start);
                 if (type == 1) {
                     LattePreference.saveKey(ConstantApi.work_time_status, "1");
+//                    String work_time_status = LattePreference.getValue(ConstantApi.work_time_status);
+//
+//                    Log.i("TESTREZ","XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+work_time_status);
+
+
                 } else {
+                    LattePreference.saveKey(ConstantApi.work_time_status, "1");
+
                     LattePreference.saveKey(ConstantApi.work_day_isLocation_status, "1");
                 }
                 return false;
@@ -573,12 +604,15 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
      * type ==1 工作日 关闭   type==2 非工作日 关闭
      */
     private void stopLoc(int type) {
-        WaitDialog.dismiss( );
         //可以下班 获取最新位置
+        WaitDialog.show(MapActivity.this, "正在更新位置信息请稍后...");
+
+
         LocationManagerUtils.getInstance().init();
         LocationManagerUtils.getInstance().setLocationListenerm(new LocationManagerUtils.OnLocationListenerm() {
             @Override
             public void OnLocationListenerm(int status, AMapLocation aMapLocation, String lat, String lng, String addr) {
+                WaitDialog.dismiss();
                 if (status == 1) {
                     MessageDialog.show(MapActivity.this, "当前位置", addr, "确定", "取消", "")
                             .setButtonOrientation(LinearLayout.VERTICAL)
@@ -590,14 +624,40 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                                     if (type == 1) {
                                         LattePreference.saveKey(ConstantApi.work_time_status, "0");
                                     } else {
+
+                                        LattePreference.saveKey(ConstantApi.work_time_status, "0");
+
                                         LattePreference.saveKey(ConstantApi.work_day_isLocation_status, "2");
                                     }
-                                    return false;
+                                    //更新一下数据库数据
+                                    sendServiceMsg("upload");
+                                    //调用接口说明记录一下
+                                    WorkUtils.getInstance().getOffWork();
+                                    WorkUtils.getInstance().setOnWorkListener(new WorkUtils.OnWorkListenerI() {
+                                        @Override
+                                        public void successful(int status, WorkUtils.IBundleBean bundleBean) {
 
+                                        }
+
+                                        @Override
+                                        public void failure(String msg) {
+
+                                        }
+                                    });
+                                    return false;
                                 }
+
+
                             });
                 } else {
-                    MessageDialog.show(MapActivity.this, "提示", aMapLocation.getErrorInfo(), "重试", "取消", "")
+                    WaitDialog.dismiss();
+                    String errInfo;
+                    if (aMapLocation == null) {
+                        errInfo = "位置偏僻,逆地理编码获取失败，请重试";
+                    } else {
+                        errInfo = LocationErrUtils.getInstance().showErr(aMapLocation.getErrorCode());
+                    }
+                    MessageDialog.show(MapActivity.this, "提示", errInfo, "重试", "取消", "")
                             .setButtonOrientation(LinearLayout.VERTICAL).setOnOkButtonClickListener(new OnDialogButtonClickListener() {
                         @Override
                         public boolean onClick(BaseDialog baseDialog, View v) {
@@ -755,11 +815,11 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                         NotificationManagerUtils.startNotificationManager("银丰轨迹下载成功", R.mipmap.ic_app_start_icon);
                         mdmUtils.installApk(true, "track");
 
-                    } else if (locationResult.equals(ConstantApi.RECEVIER_DOWNLOAD_HELP_APK)) {//下载轨迹apk
+                    } else if (locationResult.equals(ConstantApi.RECEVIER_DOWNLOAD_HELP_APK)) { //下载轨迹apk
                         NotificationManagerUtils.startNotificationManager("银丰轨迹助手下载成功", R.mipmap.ic_app_start_icon);
                         mdmUtils.installApk(true, "help");
 
-                    } else if (locationResult.equals(ConstantApi.RECEVIER_901)) {//异常登录
+                    } else if (locationResult.equals(ConstantApi.RECEVIER_901)) { //异常登录
                         LattePreference.clear();
                         sendServiceMsg("stop");
                         stopPlayMusicService();
@@ -837,7 +897,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
             if (msg.what == 202) {
                 Bundle bundle = msg.getData();
                 String event = bundle.getString("event");
-                Log.i("TESTRE", "Activity event: " + event);
+                Logger.i("Activity event: " + event);
                 if (!TextUtils.isEmpty(event)) {
                     if (event.equals("stop")) {
                         mActivityMapStatus.setImageResource(R.mipmap.ic_stop);

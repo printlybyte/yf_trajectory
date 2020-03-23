@@ -103,7 +103,7 @@ public interface Api {
     String commongetWorkTime = APP_DOMAIN + "/common/getWorkTime";
     String commonjudgeLeave = APP_DOMAIN + "/common/judgeLeave";
 
-    String commonJudgeIsWork = APP_DOMAIN + "/common/judgeIsWork";
+    String commonJudgeIsWork = APP_DOMAIN + "/common/judgeIsWorkV2";
 
 
     /**
@@ -121,7 +121,16 @@ public interface Api {
     /**
      * 查询通讯录
      */
-    String appQueryByAddressBook = APP_DOMAIN + "/user/appQueryByAddressBook";
+//    String appQueryByAddressBook = APP_DOMAIN + "/user/appQueryByAddressBook";
+    String appQueryByAddressBook = APP_DOMAIN + "/user/appQueryByAddressBookV2";
+
+
+
+    String offWork = APP_DOMAIN + "/user/offwork/offWork";
+
+
+    String offWork_callback = APP_DOMAIN + "/user/callBackByAddrBook";
+
 
 
 }

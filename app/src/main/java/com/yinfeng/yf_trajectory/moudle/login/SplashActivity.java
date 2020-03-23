@@ -20,8 +20,11 @@ import com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver;
 import com.yinfeng.yf_trajectory.mdm.SampleEula;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusBean;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusUtils;
+import com.yinfeng.yf_trajectory.moudle.utils.WorkUtils;
 
 import org.greenrobot.eventbus.Subscribe;
+
+import static com.yinfeng.yf_trajectory.moudle.utils.PermissionUtilsx.getSystemVersion;
 
 public class SplashActivity extends AppCompatActivity {
     private MDMUtils mdmUtils = null;
@@ -37,8 +40,12 @@ public class SplashActivity extends AppCompatActivity {
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         mAdminName = new ComponentName(this, SampleDeviceReceiver.class);
         sampleEula = new SampleEula(this, mDevicePolicyManager, mAdminName);
-        sampleEula.activeProcessApp();
 
+       try {
+        sampleEula.activeProcessApp();
+       }catch (Exception e){
+           finish();
+       }
 //        initNetworkConnect();
 
     }
@@ -48,11 +55,12 @@ public class SplashActivity extends AppCompatActivity {
      */
     @Subscribe
     public void onEventMainThread(EventBusBean event) {
-        Toast.makeText(this, "" + event.getType(), Toast.LENGTH_SHORT).show();
-        if (event.getType() == 1) { //激活
+        try {
+
+//        Toast.makeText(this, "" + event.getType(), Toast.LENGTH_SHORT).show();
+        if (event.getType() == 1) {   //激活
             //禁止关闭GPS
             boolean isActive = mdmUtils.setLocationModeDisabled(true);
-
             if (!isActive) {
                 Toast.makeText(this, "此手机无权限", Toast.LENGTH_SHORT).show();
                 finish();
@@ -60,7 +68,6 @@ public class SplashActivity extends AppCompatActivity {
             }
             //禁用隐私空间
             mdmUtils.setAddUserDisabled(true);
-
             //禁止反激活
             mdmUtils.addDisabledDeactivateMdmPackages();
             //强制开启数据服务
@@ -76,22 +83,30 @@ public class SplashActivity extends AppCompatActivity {
             //设置一级菜单 //禁用应用查看一级菜单
             mdmUtils.setCustomSettingsMenu();
             //禁止系统升级
-            mdmUtils.setSystemUpdateDisabled(true);
+            mdmUtils.setSystemUpdateDisabled(false);
             //禁止应用通知消息
 //            mdmUtils.setNotificationDisabled(true);
             //禁止出厂设置
-            mdmUtils.setRestoreFactoryDisabled(true);
+            mdmUtils.setRestoreFactoryDisabled(false);
+
+            if (getSystemVersion() > 1000) {
+                mdmUtils.setPowerSaveModeDisabled(true);
+            }
             //禁用搜索
             mdmUtils.setSearchIndexDisabled(true);
             ActivityUtils.startActivity(ICCIDActivity.class);
             Hawk.put(ConstantApi.isActivation, "1");
             finish();
-        } else if (event.getType() == 2) { //取消
+        } else if (event.getType() == 2) {   //取消
+            //禁止出厂设置
             if (mAdminName != null && mAdminName != null) {
                 sampleEula.activeProcessApp();
             } else {
                 Toast.makeText(this, "mAdminName= null", Toast.LENGTH_SHORT).show();
             }
+        }
+        }catch (Exception e){
+            Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -107,15 +122,15 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new EventBusUtils().register(this);
-        LattePreference.saveKey(ConstantApi.work_time_status,"3");
+        LattePreference.saveKey(ConstantApi.work_time_status, "3");
 
 //        LattePreference.saveKey(ConstantApi.overtime_status,"3");
 
         String isLoginStatus = Hawk.get(ConstantApi.isActivation, "");
         if (TextUtils.isEmpty(isLoginStatus)) {
-//            initHuaWeiHDM();
-            ActivityUtils.startActivity(ICCIDActivity.class);
-            finish();
+            initHuaWeiHDM();
+//            ActivityUtils.startActivity(ICCIDActivity.class);
+//            finish();
         } else {
             ActivityUtils.startActivity(ICCIDActivity.class);
             finish();

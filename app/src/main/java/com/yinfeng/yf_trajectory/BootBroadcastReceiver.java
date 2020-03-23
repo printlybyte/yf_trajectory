@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.moudle.login.SplashActivity;
@@ -22,7 +23,12 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        startOneActivity(context);
+        try {
+            startOneActivity(context);
+        } catch (Exception e) {
+            Logger.i("开机广播： " + e.getMessage() + "   " + e);
+            Toast.makeText(context, "" + e.getMessage() + "   " + e, Toast.LENGTH_SHORT).show();
+        }
 //        if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
 //        }
 

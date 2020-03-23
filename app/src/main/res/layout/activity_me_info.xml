@@ -11,12 +11,12 @@
     <include layout="@layout/include_actionbar_back" />
 
     <LinearLayout
-        android:paddingBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:background="@color/white"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="20dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -46,10 +46,10 @@
                 app:bl_solid_color="@color/p_color_blue" />
 
             <TextView
-                android:layout_centerHorizontal="true"
                 android:id="@+id/activity_me_info_hint_double"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
+                android:layout_centerHorizontal="true"
                 android:layout_marginRight="@dimen/dp_10"
                 android:background="#00000000" />
         </RelativeLayout>
@@ -113,7 +113,6 @@
         </RelativeLayout>
 
 
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -136,7 +135,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:paddingLeft="10dp"
-                android:text="" 
+                android:text=""
                 android:textColor="@color/c_999"
                 android:textSize="14sp" />
 
@@ -169,6 +168,7 @@
                 android:textSize="14sp" />
 
         </RelativeLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -254,11 +254,12 @@
                 android:textSize="14sp" />
 
         </RelativeLayout>
+
         <RelativeLayout
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="25dp"
-            android:layout_marginTop="22dp">
+            android:layout_marginTop="22dp"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="match_parent"
@@ -283,21 +284,20 @@
                 app:bl_solid_color="@color/p_color_blue" />
 
 
-
         </RelativeLayout>
 
 
         <LinearLayout
-            android:visibility="gone"
             android:id="@+id/activity_me_info_request"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="30dp"
             android:layout_width="50dp"
-            android:foreground="?android:attr/selectableItemBackground"
-
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
-            android:orientation="vertical">
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+
+            android:foreground="?android:attr/selectableItemBackground"
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <ImageView
 
@@ -316,30 +316,63 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/activity_me_info_leave"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="30dp"
-            android:layout_width="50dp"
-            android:foreground="?android:attr/selectableItemBackground"
-
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <ImageView
 
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@mipmap/ic_leaveing_list_icon" />
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/activity_me_info_leave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:gravity="center"
-                android:text="请假记录"
-                android:textColor="@color/c_333"
-                android:textSize="12sp" />
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="30dp"
+
+                android:layout_marginBottom="30dp"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@mipmap/ic_leaveing_list_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="请假记录"
+                    android:textColor="@color/c_333"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/activity_me_info_sync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@mipmap/ic_sync_icoon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="同步"
+                    android:textColor="@color/c_333"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 

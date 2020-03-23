@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.caitiaobang.core.app.net.GenericsCallback;
 import com.caitiaobang.core.app.net.JsonGenericsSerializator;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
@@ -138,7 +139,7 @@ public class BottomCouponDialog extends BaseDialogFragment implements View.OnCli
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i("testre", "请求结果：上传信息" + GsonUtils.getInstance().toJson(response));
+                        Logger.i("请求结果：上传信息" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }

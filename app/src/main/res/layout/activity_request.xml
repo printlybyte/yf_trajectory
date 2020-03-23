@@ -134,7 +134,7 @@
                 android:layout_height="100dp"
                 android:background="@color/white"
                 android:gravity="start"
-                android:hint="请输入请假原因（必填）"
+                android:hint="请输入原因（必填）"
                 android:padding="10dp"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -211,7 +211,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="100dp"
             android:padding="5dp"
-            android:text="取消请假"
+            android:text="取消"
             android:textColor="@color/white"
             android:textSize="16sp"
             app:bl_corners_radius="5dp"

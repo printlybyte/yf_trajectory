@@ -61,7 +61,7 @@ public class GreendaoUtils {
                     jsonObject.put("speed", querySpeed);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.i("testre", "JSONException ：");
+                    Logger.i("JSONException ：");
                 }
                 jsonArray.put(jsonObject);
             }

@@ -28,6 +28,7 @@ import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.lcodecore.tkrefreshlayout.footer.LoadingView;
 import com.lcodecore.tkrefreshlayout.header.GoogleDotView;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
@@ -109,7 +110,7 @@ public class LeaveHistoryActivity extends BaseActivity {
 //                            showToastC(response.getMessage());
                             mTestMultipleStatusView.showEmpty();
                         }
-                        Log.i("testre", "请求结果：" + GsonUtils.getInstance().toJson(response));
+                        Logger.i("请求结果：" + GsonUtils.getInstance().toJson(response));
                         dismisProgress();
                     }
                 });
@@ -257,7 +258,7 @@ public class LeaveHistoryActivity extends BaseActivity {
     }
 
     private void getCancelLeave() {
-        Log.i("testre", "API: " + Api.commonCancelLeave + " par:");
+        Logger.i("API: " + Api.commonCancelLeave + " par:");
         String token = Hawk.get(ConstantApi.HK_TOKEN);
         if (TextUtils.isEmpty(token)) {
             showToastC("getCancelLeave token =null ");
@@ -283,7 +284,7 @@ public class LeaveHistoryActivity extends BaseActivity {
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i("testre", "请求结果：是否是工作日" + GsonUtils.getInstance().toJson(response));
+                        Logger.i("请求结果：是否是工作日" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }

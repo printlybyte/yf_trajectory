@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.caitiaobang.core.app.app.Latte;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public final class ConmonUtils {
             item.put("versionCode", pInfo.versionCode);
             item.put("versionName", pInfo.versionName);
             if (pInfo.packageName.equals("com.yinfeng.yf_trajectory_help")) {
-                Log.i("TESTRE", "packageName: " + pInfo.packageName + pInfo.versionCode);
+                Logger.i("packageName: " + pInfo.packageName + pInfo.versionCode);
                 return pInfo.versionCode;
             }
             item.put("appName", pInfo.applicationInfo.loadLabel(pckMan).toString());

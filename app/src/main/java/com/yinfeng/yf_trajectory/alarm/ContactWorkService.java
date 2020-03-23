@@ -18,6 +18,7 @@ import com.yinfeng.yf_trajectory.LocationService;
 import com.yinfeng.yf_trajectory.LocationStatusManager;
 import com.yinfeng.yf_trajectory.moudle.bean.ContactWorkServiceBean;
 import com.yinfeng.yf_trajectory.moudle.bean.LeaveHistoryActivityBean;
+import com.yinfeng.yf_trajectory.moudle.utils.WorkUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 
 import okhttp3.Call;
@@ -42,7 +43,7 @@ public class ContactWorkService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         final String action = intent.getAction();
-        Log.i("testrx", "通讯录服务 onHandleIntent" + "  action:" + action);
+        Logger.i("通讯录服务 onHandleIntent" + "  action:" + action);
         if (!TextUtils.isEmpty(action)) {
             if (action.equals(IntentConst.Action.downloadcontact)) {
                 requestDate();
@@ -56,7 +57,7 @@ public class ContactWorkService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("testrx", "通讯录服务 onCreate");
+        Logger.i("通讯录服务 onCreate");
     }
 
     @Override
@@ -66,7 +67,7 @@ public class ContactWorkService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i("testrx", "通讯录服务 onStartCommand");
+        Logger.i("通讯录服务 onStartCommand");
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -74,8 +75,8 @@ public class ContactWorkService extends IntentService {
     public void onDestroy() {
 
 //        sendServiceMsg("start");
-        Log.i("testrx", "onDestroy");
-        Log.i("testrx", "通讯录服务 完成 重启定位服务");
+        Logger.i("onDestroy");
+        Logger.i("通讯录服务 完成 重启定位服务");
         startLocationService();
         super.onDestroy();
 
@@ -98,17 +99,19 @@ public class ContactWorkService extends IntentService {
     }
 
     private void requestDate() {
-        Log.i("testrx", "通讯录服务 requestDate");
+        Logger.i("通讯录服务 requestDate");
         if (!NetworkUtils.isConnected()) {
             Toast.makeText(this, "网络无连接", Toast.LENGTH_SHORT).show();
-            Log.i("testrx", "通讯录数据下载失败，无网络连接");
+            Logger.i("通讯录数据下载失败，无网络连接");
             return;
         }
 
         String token = Hawk.get(ConstantApi.HK_TOKEN);
         if (TextUtils.isEmpty(token)) {
             Toast.makeText(this, "token = null ", Toast.LENGTH_SHORT).show();
-            Log.i("testrx", "通讯录数据下载失败，无token");
+            Logger.i("通讯录数据下载失败，无token");
+
+            WorkUtils.getInstance().getOffWork_callback();
             return;
         }
         OkHttpUtils
@@ -119,6 +122,7 @@ public class ContactWorkService extends IntentService {
                 .execute(new GenericsCallback<ContactWorkServiceBean>(new JsonGenericsSerializator()) {
                     @Override
                     public void onError(Call call, Exception e, int id) {
+                        WorkUtils.getInstance().getOffWork_callback();
                         showToast("通讯录数据下载失败" + e.getMessage());
                     }
 
@@ -126,18 +130,33 @@ public class ContactWorkService extends IntentService {
                     public void onResponse(ContactWorkServiceBean response, int id) {
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.getData().getList().size() > 0) {
                             Logger.i("联系人开始写入......");
-                            for (int i = 0; i < response.getData().getList().size(); i++) {
-                                String phone = response.getData().getList().get(i).getPhone();
-                                String name = response.getData().getList().get(i).getName();
-                                if (!TextUtils.isEmpty(phone) && !TextUtils.isEmpty(name)) {
-                                    ContactUtils.savePhone(name, phone);
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //设置其耗时操作
+                                    try {
+                                        Thread.sleep(1000);
+                                        for (int i = 0; i < response.getData().getList().size(); i++) {
+                                            String phone = response.getData().getList().get(i).getPhone();
+                                            String name = response.getData().getList().get(i).getName();
+                                            if (!TextUtils.isEmpty(phone) && !TextUtils.isEmpty(name)) {
+                                                ContactUtils.savePhone(name, phone);
+                                            }
+                                        }
+                                    } catch (InterruptedException e) {
+                                        Log.i("耗时操作", e.getMessage());
+                                    }
                                 }
-                            }
+                            }).start();
+                            showToast("通讯录同步成功");
                         } else {
-                            Log.i("testrx", "通讯录数据下载失败 date =null ");
+                            showToast("通讯录同步失败");
+                            WorkUtils.getInstance().getOffWork_callback();
+                            Logger.i("通讯录数据下载失败 date =null ");
                         }
-                        Log.i("testrx", "请求结果：通讯录数据 size" + response.getData().getList().size());
 
+
+                        Logger.i("请求结果：通讯录数据 size" + response.getData().getList().size());
                         Logger.i("联系人写入成功 : 共" + response.getData().getList().size());
                     }
                 });

@@ -23,6 +23,7 @@ import com.jzxiang.pickerview.data.Type;
 import com.jzxiang.pickerview.listener.OnDateSetListener;
 import com.kongzue.dialog.v3.WaitDialog;
 import com.orhanobut.hawk.Hawk;
+import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
@@ -86,7 +87,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
 
     @Override
     protected void initData() {
-        setTitle("请假申请");
+        setTitle("申请");
         getMatterInfo();
     }
 
@@ -114,7 +115,6 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
     }
 
     private void getMatterInfo() {
-
         OkHttpUtils
                 .get()
 //                .addHeader("track-token", token)
@@ -137,7 +137,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i("testre", "请求结果：上传信息" + GsonUtils.getInstance().toJson(response));
+                        Logger.i("请求结果：上传信息" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }
@@ -181,7 +181,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
                     return;
                 }
                 long comparisonMinute = (mTimeEndL - mTimeStartL) / 1000 / 60;
-                Log.i("TESTRE", "mTimeEndL: " + mTimeEndL + " mTimeStartL: " + mTimeStartL + " comparisonMinute: " + comparisonMinute);
+                Logger.i("mTimeEndL: " + mTimeEndL + " mTimeStartL: " + mTimeStartL + " comparisonMinute: " + comparisonMinute);
                 if (comparisonMinute < 30) {
                     showToastC("申请时间不得少于30分钟,请重新选择开始时间");
                     return;
@@ -216,7 +216,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
         map.put("matter", matter);
         map.put("remark", resonStr);
         String mNetUrl = Api.commonrecordOperate;
-        Log.i("testre", "API: " + mNetUrl + "发送json：" + new Gson().toJson(map));
+        Logger.i("API: " + mNetUrl + "发送json：" + new Gson().toJson(map));
         OkHttpUtils
                 .postString()
                 .addHeader("track-token", token)
@@ -243,7 +243,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
 //                                    LattePreference.saveKey(ConstantApi.leave_time_start, startTime + "");
 //                                    LattePreference.saveKey(ConstantApi.leave_time_end, endTime + "");
                                     String leave_time_status = LattePreference.getValue(ConstantApi.leave_time_status);
-                                    Log.i("testre", "leave_time_status: " + leave_time_status + "  " + startTime + "   " + endTime);
+                                    Logger.i("leave_time_status: " + leave_time_status + "  " + startTime + "   " + endTime);
                                     finish();
                                 }
                             });
@@ -251,7 +251,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
                             showToastC(response.getMessage());
                         }
                         dismisProgress();
-                        Log.i("testre", "请求结果 暂停事项" + GsonUtils.getInstance().toJson(response));
+                        Logger.i("请求结果 暂停事项" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }
@@ -278,7 +278,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
     public void onDateSet(TimePickerDialog timePickerView, long millseconds) {
         String text = ConmonUtils.getDateToString(millseconds);
 //        mTime = millseconds / 1000 + "";
-        Log.i("testre", "");
+        Logger.i("");
         if (mTimeType == 1) {
             mTimeStart = text;
             mTimeStartL = millseconds;
@@ -319,7 +319,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
     private void getCommonjudgeLeave() {
         WaitDialog.show(RequestActivity.this, "请稍后...");
 
-        Log.i("testre", "API: " + Api.commonjudgeLeave + " par:");
+        Logger.i("API: " + Api.commonjudgeLeave + " par:");
         String token = Hawk.get(ConstantApi.HK_TOKEN);
         if (TextUtils.isEmpty(token)) {
             showToastC("commonjudgeLeave token =null ");
@@ -343,11 +343,11 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
                     public void onResponse(IsLeaveStatusBean response, int id) {
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
                             IsLeaveStatusBean.DataBean bean = response.getData();
-                            Log.i("testre", "请求结果：上下班时间" + GsonUtils.getInstance().toJson(response));
+                            Logger.i("请求结果：上下班时间" + GsonUtils.getInstance().toJson(response));
 
                             if (!TextUtils.isEmpty(bean.getState())) {
                                 if (bean.getState().equals("1")) {
-                                    mActivityRequestDisplayTitle.setText("请假中...");
+                                    mActivityRequestDisplayTitle.setText(bean.getMatter()+"");
                                     mActivityRequestDisplayGroup.setVisibility(View.VISIBLE);
                                     mActivityRequestDisplayTime.setText(bean.getStartTime() + " -- " + bean.getEndTime());
                                 } else if (bean.getState().equals("0")) {
@@ -371,7 +371,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
                             mActivityRequestDisplayTitle.setText("异常");
                             showToastC(response.getMessage());
                         }
-                        Log.i("testre", "请求结果：请假状态" + GsonUtils.getInstance().toJson(response));
+                        Logger.i("请求结果：请假状态" + GsonUtils.getInstance().toJson(response));
 
                     }
                 });
@@ -380,7 +380,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
 
 
     private void getCancelLeave() {
-        Log.i("testre", "API: " + Api.commonCancelLeave + " par:");
+        Logger.i("API: " + Api.commonCancelLeave + " par:");
         String token = Hawk.get(ConstantApi.HK_TOKEN);
         if (TextUtils.isEmpty(token)) {
             showToastC("getCancelLeave token =null ");
@@ -400,7 +400,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
                     @Override
                     public void onResponse(ChanelLeaveBean response, int id) {
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
-                            showToastC("取消请假成功");
+                            showToastC("取消成功");
                             LattePreference.saveKey(ConstantApi.work_time_status, "1");
                             LattePreference.saveKey(ConstantApi.leave_time_status, "0");
                             sendServiceMsg("start");
@@ -408,7 +408,7 @@ public class RequestActivity extends BaseActivity implements View.OnClickListene
                         } else {
                             showToastC(response.getMessage());
                         }
-                        Log.i("testre", "请求结果：是否是工作日" + GsonUtils.getInstance().toJson(response));
+                        Logger.i("请求结果：是否是工作日" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }
