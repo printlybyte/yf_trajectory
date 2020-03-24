@@ -345,7 +345,7 @@ public class LocationService extends NotiService {
 //                getUploadInfo();
 //                getUpdateAndAliveTime();
 
-                requestWakeLock();
+//                requestWakeLock();
                 getCommonJudgeIsWork();
                 getJudgeLeave();
                 Utils.checkPer();
@@ -499,9 +499,9 @@ public class LocationService extends NotiService {
 
 
 
-        if (min % 10 == 0) {
-            requestWakeLock();
-        }
+//        if (min % 10 == 0) {
+//            requestWakeLock();
+//        }
 
         String leave_time_status = LattePreference.getValue(ConstantApi.leave_time_status);
         if (!TextUtils.isEmpty(leave_time_status) && leave_time_status.equals("1")) {

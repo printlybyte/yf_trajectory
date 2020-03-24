@@ -191,7 +191,7 @@ public class PlayerMusicService extends Service {
                 String locationResult = intent.getStringExtra("result");
                 if (null != locationResult && !locationResult.trim().equals("")) {
                     if ("downlaod".equals(locationResult)) {
-                        wakeUpAndUnlock();
+//                        wakeUpAndUnlock();
                         requestDate();
                     }
 
