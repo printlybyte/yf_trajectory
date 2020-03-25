@@ -618,12 +618,13 @@ public class MDMUtils {
             return false;
         }
     }
-    public boolean isAddUserDisabled( ) {
+
+    public boolean isAddUserDisabled() {
         try {
             String pageName = mContent.getPackageName();
             DeviceSettingsManager deviceSettingsManager = new DeviceSettingsManager();
             ComponentName componentName = new ComponentName(pageName, mComponentName);
-            boolean isSuccess = deviceSettingsManager.isAddUserDisabled(componentName );
+            boolean isSuccess = deviceSettingsManager.isAddUserDisabled(componentName);
             if (isSuccess) {
                 return true;
             } else {
@@ -741,7 +742,7 @@ public class MDMUtils {
 
 
     /**
-    * ComponentName admin 调用该接口的apk的组件名称，
+     * ComponentName admin 调用该接口的apk的组件名称，
      * 不能为null
      * String packageName 要设置的第三方桌面包名，不
      * 能为null
@@ -750,13 +751,14 @@ public class MDMUtils {
      * 返回参数说明
      * 返回值类型 返回值 说明
      * Void NA NA
-    */
+     */
     public void setDefaultLauncher() {
         String pageName = mContent.getPackageName();//获取应用
         DeviceControlManager deviceControlManager = new DeviceControlManager();
         ComponentName componentName = new ComponentName(pageName, mComponentName);
         try {
-            deviceControlManager.setDefaultLauncher(componentName,"","");
+            deviceControlManager.setDefaultLauncher(componentName, pageName, "com.yinfeng.yf_trajectory.launcher.LuancherHomeActivity");
+            Toast.makeText(mContent, "setDefaultLauncher设置成功"+" pageName:"+pageName+'\n'+"classname: "+"com.yinfeng.yf_trajectory.launcher.LuancherHomeActivity", Toast.LENGTH_SHORT).show();
         } catch (SecurityException i) {
             Toast.makeText(mContent, "此 apk 未经设备管理激活。\n" +
                     "\uF06C 此 apk 没有\n" +
@@ -766,4 +768,21 @@ public class MDMUtils {
         }
 
     }
+
+    public void clearDefaultLauncher() {
+        String pageName = mContent.getPackageName();//获取应用
+        DeviceControlManager deviceControlManager = new DeviceControlManager();
+        ComponentName componentName = new ComponentName(pageName, mComponentName);
+        try {
+            deviceControlManager.clearDefaultLauncher(componentName);
+        } catch (SecurityException i) {
+            Toast.makeText(mContent, "此 apk 未经设备管理激活。\n" +
+                    "\uF06C 此 apk 没有\n" +
+                    "com.huawei.permission.sec.SDK_LAUNCHER\n" +
+                    "TY权限。", Toast.LENGTH_SHORT).show();
+            Logger.i("SecurityException forceMobiledataOn======" + i.toString());
+        }
+    }
+
+
 }

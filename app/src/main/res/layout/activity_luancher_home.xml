@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".launcher.LuancherHomeActivity">
+
+
+
+    <!--列表布局-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/include_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/headview"
+        android:background="#fff"
+        android:focusableInTouchMode="false"
+        android:overScrollMode="never"
+        android:scrollbars="none" />
+
+
+</LinearLayout>

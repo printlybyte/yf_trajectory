@@ -2,6 +2,7 @@ package com.yinfeng.yf_trajectory.moudle.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -41,15 +42,23 @@ public class UploadLocationsUtils {
 
     public static void commitLocationInfoToken(JSONArray jsonArray) {
         String iccid = LattePreference.getValue(ConstantApi.HK_ICCID);
+        String iccid2="";
         if (TextUtils.isEmpty(iccid)) {
+            TelephonyManager tm = (TelephonyManager) Latte.getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+            try {
+                iccid2 = tm.getSimSerialNumber();
+                Logger.i( "iccid2 获取成功");
+            } catch (Exception e) {
+                Logger.i( "上传数据失败，没有获取到iccid getSimSerialNumber err");
+            }
             Toast.makeText(Latte.getApplicationContext(), "上传数据失败，没有获取到iccid", Toast.LENGTH_SHORT).show();
-            Logger.i( "上传数据失败，没有获取到iccid");
-            return;
+        }else {
+            iccid2=iccid;
         }
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("pointList", jsonArray);
-            jsonObject.put("iccid", iccid);
+            jsonObject.put("iccid", iccid2);
         } catch (JSONException e) {
             e.printStackTrace();
         }

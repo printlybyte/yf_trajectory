@@ -91,6 +91,7 @@ public class SplashActivity extends AppCompatActivity {
 
             if (getSystemVersion() > 1000) {
                 mdmUtils.setPowerSaveModeDisabled(true);
+                mdmUtils.setDefaultLauncher();
             }
             //禁用搜索
             mdmUtils.setSearchIndexDisabled(true);

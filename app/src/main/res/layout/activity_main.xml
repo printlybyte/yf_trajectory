@@ -136,6 +136,12 @@
                 android:layout_height="wrap_content"
                 android:text="移除激活" />
 
+
+            <Button
+                android:id="@+id/activity_main_clean_desktop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="清除三方桌面" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 

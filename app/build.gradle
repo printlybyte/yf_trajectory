@@ -59,6 +59,6 @@ dependencies {
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
     implementation(name: 'dialog-release', ext: 'aar')
     implementation 'com.huawei.mdm:mdmkit:10.0.1.300'
-    
+
 //    implementation 'com.sunchen:netstatusbus:0.1.5'
 }

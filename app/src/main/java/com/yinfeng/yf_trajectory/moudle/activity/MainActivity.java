@@ -24,6 +24,8 @@ import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusUtils;
 
 import org.greenrobot.eventbus.Subscribe;
 
+import static com.yinfeng.yf_trajectory.moudle.utils.PermissionUtilsx.getSystemVersion;
+
 //import com.yinfeng.yf_trajectory.moudle.login.LoginVerActivity;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -105,6 +107,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * 开启时间设置
      */
     private Button mActivityMainStartTimeSetting;
+    /**
+     * 清除三方桌面
+     */
+    private Button mActivityMainCleanDesktop;
 
 
     @Override
@@ -179,6 +185,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mActivityMainRemovePositionApp.setOnClickListener(this);
         mActivityMainStartTimeSetting = (Button) findViewById(R.id.activity_main_start_time_setting);
         mActivityMainStartTimeSetting.setOnClickListener(this);
+        mActivityMainCleanDesktop = (Button) findViewById(R.id.activity_main_clean_desktop);
+        mActivityMainCleanDesktop.setOnClickListener(this);
     }
 
     @Override
@@ -253,6 +261,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.activity_main_start_time_setting:
                 mdmUtils.setTimeAndDateSetDisabled(false);
                 break;
+            case R.id.activity_main_clean_desktop:
+                if (getSystemVersion() > 1000) {
+                    mdmUtils.clearDefaultLauncher();
+                    Toast.makeText(mContext, "clearDefaultLauncher", Toast.LENGTH_SHORT).show();
+                }
+
+                break;
         }
     }
 
@@ -287,11 +302,5 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO:OnCreate Method has been created, run FindViewById again to generate code
-        setContentView(R.layout.activity_main);
-        initView();
-    }
+
 }
