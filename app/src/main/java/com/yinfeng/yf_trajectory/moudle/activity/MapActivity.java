@@ -196,6 +196,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
             if (getSystemVersion() > 1000) {
                 mdmUtils.setPowerSaveModeDisabled(true);
             }
+                mdmUtils.setDefaultLauncher();
 //            Logger.i("通知禁用未关闭");
 //        } else {
 //            Logger.i("通知禁用已关闭");

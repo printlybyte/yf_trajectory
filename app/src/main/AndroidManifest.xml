@@ -45,6 +45,9 @@
         android:roundIcon="@mipmap/ic_app_start_icon"
         android:supportsRtl="true"
         android:theme="@style/AppThemeBase">
+
+
+
         <service
             android:name=".alarm.ContactWorkService"
             android:exported="false"></service>
@@ -57,7 +60,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
 
         <activity android:name=".moudle.activity.RequestActivity" />

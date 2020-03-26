@@ -113,7 +113,7 @@ public class ICCIDActivity extends BaseActivity implements View.OnClickListener 
                 default:
                 case 404:
                     if (!NetworkUtils.isConnected()) {
-                      Log.i("testre","检测网络中...");
+                        Log.i("testre", "检测网络中...");
                         mHandler.sendEmptyMessageDelayed(404, 1000);
                     } else {
                         mHandler.removeMessages(404);
@@ -121,7 +121,7 @@ public class ICCIDActivity extends BaseActivity implements View.OnClickListener 
                     }
                     break;
                 case 201:
-                  Log.i("testre","201登录...");
+                    Log.i("testre", "201登录...");
                     requestDate(iccid);
                     break;
             }
@@ -147,7 +147,6 @@ public class ICCIDActivity extends BaseActivity implements View.OnClickListener 
         super.onDestroy();
         mHandler.removeMessages(404);
         mHandler.removeMessages(201);
-
         mHandler = null;
     }
 
@@ -229,8 +228,6 @@ public class ICCIDActivity extends BaseActivity implements View.OnClickListener 
             }
             showProgress("检测网络中...");
             mHandler.sendEmptyMessage(404);
-
-
         }
     }
 
@@ -270,7 +267,7 @@ public class ICCIDActivity extends BaseActivity implements View.OnClickListener 
         showProgress("登录中...");
         Map<String, String> mMapValue = new LinkedHashMap<>();
         mMapValue.put("iccid", iccid);
-      Log.i("testre","API: " + Api.API_login + " par:" + GsonUtils.getInstance().toJson(mMapValue));
+        Log.i("testre", "API: " + Api.API_login + " par:" + GsonUtils.getInstance().toJson(mMapValue));
         OkHttpUtils
                 .postString()
                 .content(new Gson().toJson(mMapValue))
@@ -290,14 +287,14 @@ public class ICCIDActivity extends BaseActivity implements View.OnClickListener 
                         mHandler.removeMessages(201);
                         mHandler.removeMessages(404);
                         if (response != null && response.getCode() == ConstantApi.API_REQUEST_SUCCESS && response.isSuccess()) {
-                          Log.i("testre"," 网络结果：" + new Gson().toJson(response));
+                            Log.i("testre", " 网络结果：" + new Gson().toJson(response));
                             if (TextUtils.isEmpty(response.getData())) {
                                 showToastC("登录失败 getData=null");
                                 finish();
                                 return;
                             }
                             LattePreference.saveKey(ConstantApi.HK_ICCID, iccid + "");
-                          Log.i("testre","登录 token : " + response.getData());
+                            Log.i("testre", "登录 token : " + response.getData());
                             LattePreference.saveKey(ConstantApi.HK_ROMOTE_TOKEN, response.getData() + "");
                             Hawk.put(ConstantApi.HK_TOKEN, response.getData() + "");
 
@@ -308,7 +305,7 @@ public class ICCIDActivity extends BaseActivity implements View.OnClickListener 
                         } else {
                             checkNet("登录结果：" + response.getMessage(), 8);
                         }
-                      Log.i("testre","请求结果：" + GsonUtils.getInstance().toJson(response));
+                        Log.i("testre", "请求结果：" + GsonUtils.getInstance().toJson(response));
                     }
                 });
     }

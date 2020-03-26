@@ -92,6 +92,7 @@ public class SplashActivity extends AppCompatActivity {
             if (getSystemVersion() > 1000) {
                 mdmUtils.setPowerSaveModeDisabled(true);
             }
+                mdmUtils.setDefaultLauncher();
             //禁用搜索
             mdmUtils.setSearchIndexDisabled(true);
             ActivityUtils.startActivity(ICCIDActivity.class);
@@ -128,9 +129,9 @@ public class SplashActivity extends AppCompatActivity {
 
         String isLoginStatus = Hawk.get(ConstantApi.isActivation, "");
         if (TextUtils.isEmpty(isLoginStatus)) {
-            initHuaWeiHDM();
-//            ActivityUtils.startActivity(ICCIDActivity.class);
-//            finish();
+//            initHuaWeiHDM();
+            ActivityUtils.startActivity(ICCIDActivity.class);
+            finish();
         } else {
             ActivityUtils.startActivity(ICCIDActivity.class);
             finish();
