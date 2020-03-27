@@ -18,6 +18,7 @@ import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.mdm.MDMUtils;
 import com.yinfeng.yf_trajectory.mdm.SampleDeviceReceiver;
 import com.yinfeng.yf_trajectory.mdm.SampleEula;
+import com.yinfeng.yf_trajectory.moudle.activity.NewTestActivity;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusBean;
 import com.yinfeng.yf_trajectory.moudle.eventbus.EventBusUtils;
 import com.yinfeng.yf_trajectory.moudle.utils.WorkUtils;
@@ -36,11 +37,11 @@ public class SplashActivity extends AppCompatActivity {
      * 初始化相关组件
      */
     private void initHuaWeiHDM() {
+
         mdmUtils = new MDMUtils();
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         mAdminName = new ComponentName(this, SampleDeviceReceiver.class);
         sampleEula = new SampleEula(this, mDevicePolicyManager, mAdminName);
-
        try {
         sampleEula.activeProcessApp();
        }catch (Exception e){
@@ -89,13 +90,13 @@ public class SplashActivity extends AppCompatActivity {
             //禁止出厂设置
             mdmUtils.setRestoreFactoryDisabled(false);
 
-            if (getSystemVersion() > 1000) {
+//            if (getSystemVersion() > 1000) {
                 mdmUtils.setPowerSaveModeDisabled(true);
                 mdmUtils.setDefaultLauncher();
-            }
+//            }
             //禁用搜索
             mdmUtils.setSearchIndexDisabled(true);
-            ActivityUtils.startActivity(ICCIDActivity.class);
+            ActivityUtils.startActivity(NewTestActivity.class);
             Hawk.put(ConstantApi.isActivation, "1");
             finish();
         } else if (event.getType() == 2) {   //取消
@@ -133,7 +134,7 @@ public class SplashActivity extends AppCompatActivity {
 //            ActivityUtils.startActivity(ICCIDActivity.class);
 //            finish();
         } else {
-            ActivityUtils.startActivity(ICCIDActivity.class);
+            ActivityUtils.startActivity(NewTestActivity.class);
             finish();
         }
     }

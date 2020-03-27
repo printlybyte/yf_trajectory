@@ -45,23 +45,25 @@
         android:roundIcon="@mipmap/ic_app_start_icon"
         android:supportsRtl="true"
         android:theme="@style/AppThemeBase">
-
-        <activity android:name=".launcher.LuancherHomeActivity"
-            android:launchMode="singleTask"
+        <activity android:name=".moudle.activity.NewTestActivity"></activity>
+        <activity
+            android:name=".launcher.LuancherHomeActivity"
             android:clearTaskOnLaunch="true"
-            android:stateNotNeeded="true"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="nosensor"
             android:configChanges="keyboard|keyboardHidden|navigation"
+            android:enabled="true"
+            android:launchMode="singleTask"
             android:resizeableActivity="true"
             android:resumeWhilePausing="true"
+            android:screenOrientation="nosensor"
+            android:stateNotNeeded="true"
             android:taskAffinity=""
-            android:enabled="true">
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.MONKEY"/>
+                <category android:name="android.intent.category.MONKEY" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.LAUNCHER_APP" />
             </intent-filter>
@@ -131,12 +133,15 @@
             android:name=".moudle.login.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
-            <!--<intent-filter>-->
 
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            <!-- <intent-filter> -->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".moudle.activity.MapActivity"
