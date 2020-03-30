@@ -129,9 +129,9 @@ public class SplashActivity extends AppCompatActivity {
 
         String isLoginStatus = Hawk.get(ConstantApi.isActivation, "");
         if (TextUtils.isEmpty(isLoginStatus)) {
-//            initHuaWeiHDM();
-            ActivityUtils.startActivity(ICCIDActivity.class);
-            finish();
+            initHuaWeiHDM();
+//            ActivityUtils.startActivity(ICCIDActivity.class);
+//            finish();
         } else {
             ActivityUtils.startActivity(ICCIDActivity.class);
             finish();
