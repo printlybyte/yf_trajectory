@@ -42,6 +42,7 @@ public class SplashActivity extends AppCompatActivity {
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         mAdminName = new ComponentName(this, SampleDeviceReceiver.class);
         sampleEula = new SampleEula(this, mDevicePolicyManager, mAdminName);
+
        try {
         sampleEula.activeProcessApp();
        }catch (Exception e){
