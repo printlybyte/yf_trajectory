@@ -64,6 +64,7 @@ dependencies {
     api 'io.reactivex.rxjava2:rxjava:2.2.8'
     api 'me.leolin:ShortcutBadger:1.1.22@aar'
     api 'com.noober.background:core:1.4.4'
+
     api 'com.jakewharton.timber:timber:4.7.1'
     api 'com.contrarywind:Android-PickerView:4.1.8'
     api 'com.zhy:okhttputils:2.6.2'

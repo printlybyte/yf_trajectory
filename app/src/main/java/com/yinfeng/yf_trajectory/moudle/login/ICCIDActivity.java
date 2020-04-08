@@ -243,10 +243,10 @@ public class ICCIDActivity extends BaseActivity implements View.OnClickListener 
             checkNet("银丰轨迹权限-存储权限已关闭，请及时打开", 9);
             return false;
         }
-//        if (!PermissionUtilsx.is_LOCATION()) {
-//            checkNet("银丰轨迹权限-位置信息权限已关闭，请及时打开", 9);
-//            return false;
-//        }
+        if (!PermissionUtilsx.is_LOCATION()) {
+            checkNet("银丰轨迹权限-位置信息权限已关闭，请及时打开", 9);
+            return false;
+        }
 
         if (!NetworkUtils.isConnected()) {
             checkNet("网络无连接，请检测网络是否可以正常上网", 1);

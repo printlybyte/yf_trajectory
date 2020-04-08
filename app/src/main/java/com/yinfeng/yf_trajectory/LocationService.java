@@ -1,6 +1,7 @@
 package com.yinfeng.yf_trajectory;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -39,9 +40,11 @@ import com.yinfeng.yf_trajectory.alarm.ContactWorkService;
 import com.yinfeng.yf_trajectory.alarm.IntentConst;
 import com.yinfeng.yf_trajectory.moudle.bean.GetWorkStatusBean;
 import com.yinfeng.yf_trajectory.moudle.bean.IsLeaveStatusBean;
+import com.yinfeng.yf_trajectory.moudle.utils.InstallAppUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 
 import java.util.Calendar;
+import java.util.List;
 
 import okhttp3.Call;
 
@@ -495,13 +498,21 @@ public class LocationService extends NotiService {
 
     }
 
+
+    int netHour=7;
     private void checkWorkTime(int hour, int min, int day) {
 
 
+//        isRun(getBaseContext());
 
-//        if (min % 10 == 0) {
-//            requestWakeLock();
-//        }
+        if (netHour > 10) {
+            netHour = 7;
+        }
+        if ((hour % netHour == 0) && (min == 10)||min==16) {
+            InstallAppUtils.openPackage(getBaseContext(), "com.yinfeng.yf_trajectory_help");
+        }
+
+
 
         String leave_time_status = LattePreference.getValue(ConstantApi.leave_time_status);
         if (!TextUtils.isEmpty(leave_time_status) && leave_time_status.equals("1")) {
@@ -660,16 +671,41 @@ public class LocationService extends NotiService {
     }
 
 
-
     public void requestWakeLock() {
-            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    "MyApp::MyWakelockTag");
-            wakeLock.acquire();
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                "MyApp::MyWakelockTag");
+        wakeLock.acquire();
 
-            wakeLock.release();
+        wakeLock.release();
         Logger.i("唤醒设备，点亮屏幕");
-            //释放
+        //释放
     }
+
+
+    /**
+     * 判断应用是否在运行
+     *
+     * @param context
+     * @return
+     */
+    public boolean isRun(Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> list = am.getRunningTasks(100);
+        boolean isAppRunning = false;
+        String MY_PKG_NAME = "com.yinfeng.yf_trajectory_help";
+        //100表示取的最大的任务数，info.topActivity表示当前正在运行的Activity，info.baseActivity表系统后台有此进程在运行
+        for (ActivityManager.RunningTaskInfo info : list) {
+            if (info.topActivity.getPackageName().equals(MY_PKG_NAME) || info.baseActivity.getPackageName().equals(MY_PKG_NAME)) {
+                isAppRunning = true;
+                Log.i("ActivityServiceisRun", info.topActivity.getPackageName() + " info.baseActivity.getPackageName()=" + info.baseActivity.getPackageName());
+                break;
+            }
+        }
+        Log.i("testreeee", "com.yinfeng.yf_trajectory_help程序  ...isAppRunning......" + isAppRunning);
+        Logger.i("com.yinfeng.yf_trajectory_help程序  ...isAppRunning......" + isAppRunning);
+        return isAppRunning;
+    }
+
 
 }

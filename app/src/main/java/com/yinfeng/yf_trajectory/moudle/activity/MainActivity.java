@@ -287,11 +287,5 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO:OnCreate Method has been created, run FindViewById again to generate code
-        setContentView(R.layout.activity_main);
-        initView();
-    }
+
 }

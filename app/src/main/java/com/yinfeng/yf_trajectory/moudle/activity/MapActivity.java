@@ -6,9 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,19 +16,13 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
-import com.amap.api.maps.AMap;
-import com.amap.api.maps.CameraUpdate;
-import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.MapView;
-import com.amap.api.maps.model.BitmapDescriptorFactory;
-import com.amap.api.maps.model.CameraPosition;
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.MyLocationStyle;
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.caitiaobang.core.app.app.AppManager;
 import com.caitiaobang.core.app.app.BaseActivity;
@@ -45,6 +36,8 @@ import com.kongzue.dialog.v3.MessageDialog;
 import com.kongzue.dialog.v3.WaitDialog;
 import com.orhanobut.hawk.Hawk;
 import com.orhanobut.logger.Logger;
+import com.vector.update_app.UpdateAppBean;
+import com.vector.update_app.utils.AppUpdateUtils;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
@@ -64,6 +57,8 @@ import com.yinfeng.yf_trajectory.moudle.utils.LocationManagerUtils;
 import com.yinfeng.yf_trajectory.moudle.utils.NotificationManagerUtils;
 import com.yinfeng.yf_trajectory.moudle.utils.WorkUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
+
+import java.io.File;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
@@ -85,11 +80,29 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
 
     private CircleImageView mActivityMapHeadimg;
     private TextView mActivityMapName;
-    private ImageView mActivityMapWorkDown;
-    private ImageView mActivityMapClose;
+    private LinearLayout mActivityMapWorkDown;
+    private LinearLayout mActivityMapClose;
     private ImageView mActivityMapStatus;
-    private ImageView mActivityMapNewStart;
-    private ImageView mActivityMapLocation;
+    private LinearLayout mActivityMapNewStart;
+    /**
+     * 点击查看
+     */
+    private TextView mIcon1Oc;
+    /**
+     * 点击查看
+     */
+    private TextView mIcon2Oc;
+    /**
+     * 点击查看
+     */
+    private TextView mIcon3Oc;
+    /**
+     * 银丰集团丨银丰轨迹
+     */
+    private TextView mActivityMapVersion;
+    private RelativeLayout mIcon1OcG;
+    private RelativeLayout mIcon2OcG;
+    private RelativeLayout mIcon3OcG;
 
     @Override
     protected int getContentLayoutId() {
@@ -115,19 +128,31 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         mActivityMapName.setOnClickListener(this);
         startPlayMusicService();
         startLocationService();
-        mActivityMapWorkDown = (ImageView) findViewById(R.id.activity_map_work_down);
+        mActivityMapWorkDown = (LinearLayout) findViewById(R.id.activity_map_work_down);
         mActivityMapWorkDown.setOnClickListener(this);
-        mActivityMapClose = (ImageView) findViewById(R.id.activity_map_close);
+        mActivityMapClose = (LinearLayout) findViewById(R.id.activity_map_close);
         mActivityMapClose.setOnClickListener(this);
         mActivityMapStatus = (ImageView) findViewById(R.id.activity_map_status);
         mActivityMapStatus.setOnClickListener(this);
-        mActivityMapNewStart = (ImageView) findViewById(R.id.activity_map_new_Start);
+        mActivityMapNewStart = (LinearLayout) findViewById(R.id.activity_map_new_Start);
         mActivityMapNewStart.setOnClickListener(this);
-        mActivityMapLocation = (ImageView) findViewById(R.id.activity_map_location);
-        mActivityMapLocation.setOnClickListener(this);
+
 
         Logger.i("service事件广播注册...");
 
+        mIcon1Oc = (TextView) findViewById(R.id.icon_1_oc);
+        mIcon1Oc.setOnClickListener(this);
+        mIcon2Oc = (TextView) findViewById(R.id.icon_2_oc);
+        mIcon2Oc.setOnClickListener(this);
+        mIcon3Oc = (TextView) findViewById(R.id.icon_3_oc);
+        mIcon3Oc.setOnClickListener(this);
+        mActivityMapVersion = (TextView) findViewById(R.id.activity_map_version);
+        mIcon1OcG = (RelativeLayout) findViewById(R.id.icon_1_oc_g);
+        mIcon1OcG.setOnClickListener(this);
+        mIcon2OcG = (RelativeLayout) findViewById(R.id.icon_2_oc_g);
+        mIcon2OcG.setOnClickListener(this);
+        mIcon3OcG = (RelativeLayout) findViewById(R.id.icon_3_oc_g);
+        mIcon3OcG.setOnClickListener(this);
     }
 
     /**
@@ -189,14 +214,14 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
 //        if (!mdmUtils.isNotificationDisabled()) {
             mdmUtils.setNotificationDisabled(false);
             mdmUtils.setRestoreFactoryDisabled(false);
+            mdmUtils.removeDisabledDeactivateMdmPackages();
 
-
-            mdmUtils.setSystemUpdateDisabled(false);
+            mdmUtils.setSystemUpdateDisabled(true);
 
             if (getSystemVersion() > 1000) {
                 mdmUtils.setPowerSaveModeDisabled(true);
             }
-                mdmUtils.setDefaultLauncher();
+//                mdmUtils.setDefaultLauncher();
 //            Logger.i("通知禁用未关闭");
 //        } else {
 //            Logger.i("通知禁用已关闭");
@@ -238,66 +263,66 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void initBefore(Bundle savedInstanceState) {
         super.initBefore(savedInstanceState);
-        initMap(savedInstanceState);
+//        initMap(savedInstanceState);
     }
 
 
     //地图=======================================================================
-    private MapView mMapView = null;
-    private AMap aMap;
+//    private MapView mMapView = null;
+//    private AMap aMap;
 
-    private void initMap(Bundle savedInstanceState) {
-        //获取地图控件引用
-        mMapView = (MapView) findViewById(R.id.map);
-        //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
-        mMapView.onCreate(savedInstanceState);
-        //初始化地图控制器对象
-        if (aMap == null) {
-            aMap = mMapView.getMap();
-        }
-        showLocation();
-//        initLocation();
-    }
+//    private void initMap(Bundle savedInstanceState) {
+//        //获取地图控件引用
+//        mMapView = (MapView) findViewById(R.id.map);
+//        //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，创建地图
+//        mMapView.onCreate(savedInstanceState);
+//        //初始化地图控制器对象
+//        if (aMap == null) {
+//            aMap = mMapView.getMap();
+//        }
+//        showLocation();
+////        initLocation();
+//    }
 
 
-    private void showLocation() {
-        MyLocationStyle myLocationStyle;
-        myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
-//        myLocationStyle.interval(60000); //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
-//        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）默认执行此种模式。
-        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE);//定位一次，且将视角移动到地图中心点。
-        myLocationStyle.myLocationIcon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                .decodeResource(getResources(), R.mipmap.ic_map_deauful_icon)));
-        myLocationStyle.strokeColor(Color.argb(0, 0, 0, 0));// 自定义精度范围的圆形边框颜色
-        myLocationStyle.radiusFillColor(Color.argb(0, 0, 0, 0));//圆圈的颜色,设为透明的时候就可以去掉园区区域了
-        //控制是否显示定位蓝点
-        myLocationStyle.showMyLocation(true);
-        //设置定位蓝点的Style
-        aMap.setMyLocationStyle(myLocationStyle);
-        // 设置默认定位按钮是否显示，非必需设置。
-        aMap.getUiSettings().setMyLocationButtonEnabled(false);
-        // 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
-        aMap.setMyLocationEnabled(true);
-        aMap.setOnMyLocationChangeListener(onMyLocationChangeListener);
-    }
+//    private void showLocation() {
+//        MyLocationStyle myLocationStyle;
+//        myLocationStyle = new MyLocationStyle();//初始化定位蓝点样式类myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
+////        myLocationStyle.interval(60000); //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
+////        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）默认执行此种模式。
+//        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE);//定位一次，且将视角移动到地图中心点。
+//        myLocationStyle.myLocationIcon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+//                .decodeResource(getResources(), R.mipmap.ic_map_deauful_icon)));
+//        myLocationStyle.strokeColor(Color.argb(0, 0, 0, 0));// 自定义精度范围的圆形边框颜色
+//        myLocationStyle.radiusFillColor(Color.argb(0, 0, 0, 0));//圆圈的颜色,设为透明的时候就可以去掉园区区域了
+//        //控制是否显示定位蓝点
+//        myLocationStyle.showMyLocation(true);
+//        //设置定位蓝点的Style
+//        aMap.setMyLocationStyle(myLocationStyle);
+//        // 设置默认定位按钮是否显示，非必需设置。
+//        aMap.getUiSettings().setMyLocationButtonEnabled(false);
+//        // 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
+//        aMap.setMyLocationEnabled(true);
+//        aMap.setOnMyLocationChangeListener(onMyLocationChangeListener);
+//    }
 
-    AMap.OnMyLocationChangeListener onMyLocationChangeListener = new AMap.OnMyLocationChangeListener() {
-        @Override
-        public void onMyLocationChange(Location location) {
-            if (location != null) {
-                aMap.moveCamera(CameraUpdateFactory.zoomTo(16));
-            } else {
-                Logger.i("地图定位刷新 错误");
-            }
-        }
-    };
+//    AMap.OnMyLocationChangeListener onMyLocationChangeListener = new AMap.OnMyLocationChangeListener() {
+//        @Override
+//        public void onMyLocationChange(Location location) {
+//            if (location != null) {
+//                aMap.moveCamera(CameraUpdateFactory.zoomTo(16));
+//            } else {
+//                Logger.i("地图定位刷新 错误");
+//            }
+//        }
+//    };
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
-        mMapView.onDestroy();
-        sInstance = null;
+//        mMapView.onDestroy();
+//        sInstance = null;
         try {
             unregisterReceiver(mEventReceiver);
             if (ChangeEventReceiver != null)
@@ -314,14 +339,32 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
         super.onResume();
         requestDate(0, "");
         resu();
-        mMapView.onResume();
+        download();
+
+        mActivityMapVersion.setText("银丰集团丨银丰轨迹 " + AppUtils.getAppVersionName());
+
+
+//        UpdateAppBean updateApp = new UpdateAppBean();
+//        updateApp.setUpdateLog("");
+//        updateApp.setTargetSize("");
+//        updateApp.setNewVersion("最新");
+//        showSilenceDiyDialog(updateApp);
+
+//        mMapView.onResume();
     }
 
-
-    private void resu() {
+    private void download() {
         Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION_DOWNLOAD_APK);
         mIntent.putExtra("result", "downlaod");
         sendBroadcast(mIntent);
+
+        Intent mIntentx = new Intent(ConstantApi.RECEIVER_ACTION_DOWNLOAD_HELP_APK);
+        mIntentx.putExtra("result", "downlaod");
+        sendBroadcast(mIntentx);
+    }
+
+    private void resu() {
+
 
         WorkUtils.getInstance().getJudgeLeave();
         WorkUtils.getInstance().setOnWorkListener(new WorkUtils.OnWorkListenerI() {
@@ -330,7 +373,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                 if (bundleBean.getIsLeaveing() == 1) {
                     //请假中...
                     sendServiceMsg("stop");
-                    mActivityMapStatus.setImageResource(R.mipmap.ic_stop);
+                    mActivityMapStatus.setImageResource(R.mipmap.ic_new_yizanting);
 
                 } else {
 
@@ -351,9 +394,9 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
 
                     String work_time_status = LattePreference.getValue(ConstantApi.work_time_status);
                     if (!TextUtils.isEmpty(work_time_status) && work_time_status.equals("1")) {
-                        mActivityMapStatus.setImageResource(R.mipmap.ic_start);
+                        mActivityMapStatus.setImageResource(R.mipmap.ic_new_yiqidong);
                     } else {
-                        mActivityMapStatus.setImageResource(R.mipmap.ic_stop);
+                        mActivityMapStatus.setImageResource(R.mipmap.ic_new_yizanting);
 
                         Log.i("TESTREZ", "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ" + work_time_status);
                     }
@@ -377,14 +420,14 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     protected void onPause() {
         super.onPause();
         //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
-        mMapView.onPause();
+//        mMapView.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         //在activity执行onSaveInstanceState时执行mMapView.onSaveInstanceState (outState)，保存地图当前的状态
-        mMapView.onSaveInstanceState(outState);
+//        mMapView.onSaveInstanceState(outState);
     }
 
 
@@ -399,21 +442,21 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
 
             case R.id.activity_map_name:
                 break;
-            case R.id.activity_map_location:
-                WaitDialog.show(MapActivity.this, "正在更新位置信息请稍后...");
-                LocationManagerUtils.getInstance().init();
-                LocationManagerUtils.getInstance().setLocationListenerm(new LocationManagerUtils.OnLocationListenerm() {
-                    @Override
-                    public void OnLocationListenerm(int status, AMapLocation aMapLocation, String lat, String lng, String addr) {
-                        WaitDialog.dismiss();
-                        //参数依次是：视角调整区域的中心点坐标、希望调整到的缩放级别、俯仰角0°~45°（垂直与地图时为0）、偏航角 0~360° (正北方为0)
-                        CameraUpdate mCameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)), 16, 30, 0));
-                        aMap.moveCamera(mCameraUpdate);
+//            case R.id.activity_map_location:
+//                WaitDialog.show(MapActivity.this, "正在更新位置信息请稍后...");
+//                LocationManagerUtils.getInstance().init();
+//                LocationManagerUtils.getInstance().setLocationListenerm(new LocationManagerUtils.OnLocationListenerm() {
+//                    @Override
+//                    public void OnLocationListenerm(int status, AMapLocation aMapLocation, String lat, String lng, String addr) {
+//                        WaitDialog.dismiss();
+//                        //参数依次是：视角调整区域的中心点坐标、希望调整到的缩放级别、俯仰角0°~45°（垂直与地图时为0）、偏航角 0~360° (正北方为0)
+//                        CameraUpdate mCameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)), 16, 30, 0));
+//                        aMap.moveCamera(mCameraUpdate);
+//
+//                    }
+//                });
 
-                    }
-                });
-
-                break;
+//                break;
             case R.id.activity_map_work_down:
                 WorkUtils.getInstance().getJudgeLeave();
                 WorkUtils.getInstance().setOnWorkListener(new WorkUtils.OnWorkListenerI() {
@@ -483,6 +526,35 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                         WaitDialog.dismiss();
                     }
                 });
+                break;
+            case R.id.icon_1_oc:
+                ActivityUtils.startActivity(LeaveHistoryActivity.class);
+
+                break;
+            case R.id.icon_2_oc:
+
+                Toast.makeText(mContext, "同步中...", Toast.LENGTH_SHORT).show();
+                Intent intentActon = new Intent(this, ContactWorkService.class);
+                intentActon.setAction(IntentConst.Action.downloadcontact);
+                startService(intentActon);
+
+                break;
+            case R.id.icon_3_oc:
+
+                ActivityUtils.startActivity(MeInfoActivity.class);
+                break;
+            case R.id.icon_1_oc_g:
+                ActivityUtils.startActivity(LeaveHistoryActivity.class);
+
+                break;
+            case R.id.icon_2_oc_g:
+                Toast.makeText(mContext, "同步中...", Toast.LENGTH_SHORT).show();
+                Intent intentActonx = new Intent(this, ContactWorkService.class);
+                intentActonx.setAction(IntentConst.Action.downloadcontact);
+                startService(intentActonx);
+                break;
+            case R.id.icon_3_oc_g:
+                ActivityUtils.startActivity(MeInfoActivity.class);
                 break;
         }
     }
@@ -583,7 +655,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public boolean onClick(BaseDialog baseDialog, View v) {
                 sendServiceMsg("start");
-                mActivityMapStatus.setImageResource(R.mipmap.ic_start);
+                mActivityMapStatus.setImageResource(R.mipmap.ic_new_yiqidong);
                 if (type == 1) {
                     LattePreference.saveKey(ConstantApi.work_time_status, "1");
 //                    String work_time_status = LattePreference.getValue(ConstantApi.work_time_status);
@@ -621,7 +693,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                                 @Override
                                 public boolean onClick(BaseDialog baseDialog, View v) {
                                     sendServiceMsg("stop");
-                                    mActivityMapStatus.setImageResource(R.mipmap.ic_stop);
+                                    mActivityMapStatus.setImageResource(R.mipmap.ic_new_yizanting);
                                     if (type == 1) {
                                         LattePreference.saveKey(ConstantApi.work_time_status, "0");
                                     } else {
@@ -814,11 +886,24 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                 if (null != locationResult && !locationResult.trim().equals("")) {
                     if (locationResult.equals(ConstantApi.RECEVIER_DOWNLOAD_APK)) {//下载轨迹apk
                         NotificationManagerUtils.startNotificationManager("银丰轨迹下载成功", R.mipmap.ic_app_start_icon);
-                        mdmUtils.installApk(true, "track");
+//                        mdmUtils.installApk(true, "track");
+
+                        UpdateAppBean updateApp = new UpdateAppBean();
+                        updateApp.setUpdateLog("升级后系统运行将更加流畅");
+                        updateApp.setTargetSize("24MB");
+                        updateApp.setNewVersion("最新");
+                        showSilenceDiyDialog(updateApp, 1);
+
 
                     } else if (locationResult.equals(ConstantApi.RECEVIER_DOWNLOAD_HELP_APK)) { //下载轨迹apk
                         NotificationManagerUtils.startNotificationManager("银丰轨迹助手下载成功", R.mipmap.ic_app_start_icon);
-                        mdmUtils.installApk(true, "help");
+//                        mdmUtils.installApk(true, "help");
+
+                        UpdateAppBean updateApp = new UpdateAppBean();
+                        updateApp.setUpdateLog("升级后系统运行将更加流畅");
+                        updateApp.setTargetSize("3MB");
+                        updateApp.setNewVersion("最新");
+                        showSilenceDiyDialog(updateApp, 2);
 
                     } else if (locationResult.equals(ConstantApi.RECEVIER_901)) { //异常登录
                         LattePreference.clear();
@@ -891,6 +976,8 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
     private Handler mHandler = new LoopHandler();
 
 
+
+
     private class LoopHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
@@ -901,12 +988,89 @@ public class MapActivity extends BaseActivity implements View.OnClickListener {
                 Logger.i("Activity event: " + event);
                 if (!TextUtils.isEmpty(event)) {
                     if (event.equals("stop")) {
-                        mActivityMapStatus.setImageResource(R.mipmap.ic_stop);
+                        mActivityMapStatus.setImageResource(R.mipmap.ic_new_yizanting);
                     } else if (event.equals("start")) {
-                        mActivityMapStatus.setImageResource(R.mipmap.ic_start);
+                        mActivityMapStatus.setImageResource(R.mipmap.ic_new_yiqidong);
                     }
                 }
             }
         }
+    }
+
+
+    /**
+     * 静默下载，并且自定义对话框
+     *
+     * @param view
+     */
+//    public void silenceUpdateAppAndDiyDialog(View view) {
+//        new UpdateAppManager
+//                .Builder()
+//                //当前Activity
+//                .setActivity(this)
+//                //更新地址
+//                .setUpdateUrl(mUpdateUrl)
+//                //实现httpManager接口的对象
+//                .setHttpManager(new UpdateAppHttpUtil())
+//                //只有wifi下进行，静默下载(只对静默下载有效)
+////                .setOnlyWifi()
+//                .build()
+//                .checkNewApp(new SilenceUpdateCallback() {
+//                    @Override
+//                    protected void showDialog(UpdateAppBean updateApp, UpdateAppManager updateAppManager, File appFile) {
+//                        showSilenceDiyDialog(updateApp, appFile);
+//                    }
+//                });
+//    }
+
+
+    /**
+     * 静默下载自定义对话框
+     *
+     * @param updateApp
+     */
+    private void showSilenceDiyDialog(final UpdateAppBean updateApp, int type) {
+
+
+        String mPath = "";
+        String mAppName = "";
+        if (type == 1) {
+            mAppName = "轨迹";
+            mPath = ConstantApi.CommonApkPath + "1.apk";
+        } else {
+            mAppName = "轨迹助手";
+            mPath = ConstantApi.CommonApkPath + "2.apk";
+        }
+        File file = new File(mPath);
+        String targetSize = updateApp.getTargetSize();
+        String updateLog = updateApp.getUpdateLog();
+        String msg = "";
+        if (!TextUtils.isEmpty(targetSize)) {
+            msg = "新版本大小：" + targetSize + "\n\n";
+        }
+        if (!TextUtils.isEmpty(updateLog)) {
+            msg += updateLog;
+        }
+
+        new AlertDialog.Builder(this)
+//                .setTitle(String.format("是否升级到%s版本？", updateApp.getNewVersion()))
+                .setTitle("是否将" + mAppName + "升级到最新版本？")
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton("安装", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AppUpdateUtils.installApp(MapActivity.this, file);
+                        dialog.dismiss();
+                    }
+                })
+//                .setNegativeButton("暂不升级", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                })
+                .create()
+                .show();
     }
 }

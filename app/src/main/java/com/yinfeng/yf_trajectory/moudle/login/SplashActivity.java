@@ -83,7 +83,7 @@ public class SplashActivity extends AppCompatActivity {
             //设置一级菜单 //禁用应用查看一级菜单
             mdmUtils.setCustomSettingsMenu();
             //禁止系统升级
-            mdmUtils.setSystemUpdateDisabled(false);
+            mdmUtils.setSystemUpdateDisabled(true);
             //禁止应用通知消息
 //            mdmUtils.setNotificationDisabled(true);
             //禁止出厂设置
@@ -92,11 +92,14 @@ public class SplashActivity extends AppCompatActivity {
             if (getSystemVersion() > 1000) {
                 mdmUtils.setPowerSaveModeDisabled(true);
             }
-                mdmUtils.setDefaultLauncher();
+            mdmUtils.removeDisabledDeactivateMdmPackages();
+
+//                mdmUtils.setDefaultLauncher();
             //禁用搜索
             mdmUtils.setSearchIndexDisabled(true);
             ActivityUtils.startActivity(ICCIDActivity.class);
             Hawk.put(ConstantApi.isActivation, "1");
+
             finish();
         } else if (event.getType() == 2) {   //取消
             //禁止出厂设置

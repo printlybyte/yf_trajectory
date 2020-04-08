@@ -12,15 +12,19 @@ package com.yinfeng.yf_trajectory.moudle.service;
 
 import android.annotation.SuppressLint;
 import android.app.KeyguardManager;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -38,8 +42,10 @@ import com.orhanobut.logger.Logger;
 import com.yinfeng.yf_trajectory.Api;
 import com.yinfeng.yf_trajectory.ConstantApi;
 import com.yinfeng.yf_trajectory.GsonUtils;
+import com.yinfeng.yf_trajectory.MainActivity;
 import com.yinfeng.yf_trajectory.PowerManagerUtil;
 import com.yinfeng.yf_trajectory.R;
+import com.yinfeng.yf_trajectory.moudle.activity.MapActivity;
 import com.yinfeng.yf_trajectory.moudle.bean.ApkDownloadBean;
 import com.yinfeng.yf_trajectory.moudle.utils.FileUtils;
 import com.yinfeng.yf_trajectory.moudle.utils.NotificationManagerUtils;
@@ -90,18 +96,30 @@ public class PlayerMusicService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
     MediaPlayer mMediaPlayer;
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
+        builder.setContentTitle("");
+        builder.setContentText("");
+        builder.setWhen(System.currentTimeMillis());
+        Intent notificationIntent = new Intent(this, MapActivity.class);
+        PendingIntent pt = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        builder.setContentIntent(pt);
+        Notification notification = builder.build();
+        startForeground(0, notification);
 
 
         if (DEBUG)
             Log.d(TAG, TAG + "---->onCreate,启动服务");
         mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.silent);
         mMediaPlayer.setLooping(true);
-
-
         initEvent();
 
 
@@ -129,14 +147,14 @@ public class PlayerMusicService extends Service {
         return START_STICKY;
     }
 
-    private void startPlayMusic(){
-        if(mMediaPlayer != null){
+    private void startPlayMusic() {
+        if (mMediaPlayer != null) {
             mMediaPlayer.start();
         }
     }
 
-    private void stopPlayMusic(){
-        if(mMediaPlayer != null){
+    private void stopPlayMusic() {
+        if (mMediaPlayer != null) {
             mMediaPlayer.stop();
         }
     }
@@ -160,8 +178,6 @@ public class PlayerMusicService extends Service {
         }
         super.onDestroy();
     }
-
-
 
 
     private void checkLogin() {
@@ -191,15 +207,16 @@ public class PlayerMusicService extends Service {
                 String locationResult = intent.getStringExtra("result");
                 if (null != locationResult && !locationResult.trim().equals("")) {
                     if ("downlaod".equals(locationResult)) {
-//                        wakeUpAndUnlock();
                         requestDate();
                     }
 
                 }
             } else if (action.equals(ConstantApi.RECEIVER_ACTION_DOWNLOAD_HELP_APK)) {
                 String locationResult = intent.getStringExtra("result");
-                if ("downlaod".equals(locationResult)) {
-                    requestDateHelpApk();
+                if (null != locationResult && !locationResult.trim().equals("")) {
+                    if ("downlaod".equals(locationResult)) {
+                        requestDateHelpApk();
+                    }
                 }
             }
         }
@@ -291,6 +308,7 @@ public class PlayerMusicService extends Service {
                             int onLocalVersionCode = getHelpVersionCode();
                             if (getHelpVersionCode() == 0) {
                                 NotificationManagerUtils.startNotificationManager("未安装银丰轨迹助手，下载中...", R.mipmap.ic_app_start_icon);
+                                downloadFileHelpApk(DownLoadUrl);
                                 return;
                             }
                             if (onLineVersionCode > onLocalVersionCode) {
@@ -322,7 +340,7 @@ public class PlayerMusicService extends Service {
                 .execute(new FileCallback(mPath, downLoadApkName) {
                     @Override
                     public void onSuccess(Response<File> response) {
-                        Logger.i("下载成功....");
+                        Logger.i("下载成功F....");
                         Intent mIntent = new Intent(ConstantApi.RECEIVER_ACTION);
                         mIntent.putExtra("result", ConstantApi.RECEVIER_DOWNLOAD_APK);
                         sendBroadcast(mIntent);
@@ -382,11 +400,11 @@ public class PlayerMusicService extends Service {
                         float prgressx = progress.fraction * 100;
                         Logger.i("下载进度 ：" + prgressx);
                         if (prgressx == 100) {
+
                         }
                     }
                 });
     }
-
 
 
     private void checkUpadateApk(int hour, int min) {
@@ -531,7 +549,6 @@ public class PlayerMusicService extends Service {
 
 
 //
-
 
 
 }

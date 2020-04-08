@@ -131,28 +131,28 @@ public class PermissionUtilsx {
     /**
      * 检测电话权限6.0之前
      */
-//    public static boolean is_LOCATION() {
-//
-//
-//        if (getSystemVersion() >= 1000) {
-//            return true;
-//        }
-//
-//
-//        try {
-//            TelephonyManager mTelephonyManager = (TelephonyManager) Latte.getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-//            List<NeighboringCellInfo> infos = mTelephonyManager.getNeighboringCellInfo();
-//            Logger.i("检测定位权限 : 正常 ");
-//            if (infos == null) {
-//                return false;
-//            } else {
-//                return true;
-//            }
-//        } catch (Exception e) {
-//            Logger.i("检测定位权限 : 异常" + e.getMessage());
-//            return false;
-//        }
-//    }
+    public static boolean is_LOCATION() {
+
+
+        if (getSystemVersion() >= 1000) {
+            return true;
+        }
+
+
+        try {
+            TelephonyManager mTelephonyManager = (TelephonyManager) Latte.getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+            List<NeighboringCellInfo> infos = mTelephonyManager.getNeighboringCellInfo();
+            Logger.i("检测定位权限 : 正常 ");
+            if (infos == null) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (Exception e) {
+            Logger.i("检测定位权限 : 异常" + e.getMessage());
+            return false;
+        }
+    }
 
 
     public static boolean checkP() {
@@ -168,12 +168,12 @@ public class PermissionUtilsx {
             requestDate("存储权限已关闭");
             return false;
         }
-//        if (!PermissionUtilsx.is_LOCATION()) {
-//            checkNet("银丰轨迹权限-位置权限已关闭，请及时打开", 9);
-//            Logger.i("权限已关闭，请及时打开");
-//            requestDate("位置权限已关闭");
-//            return false;
-//        }
+        if (!PermissionUtilsx.is_LOCATION()) {
+            checkNet("银丰轨迹权限-位置权限已关闭，请及时打开", 9);
+            Logger.i("权限已关闭，请及时打开");
+            requestDate("位置权限已关闭");
+            return false;
+        }
 
 //        if (!NetworkUtils.isConnected()) {
 //          Log.i("testre","网络无连接，请检测网络是否可以正常上网");
